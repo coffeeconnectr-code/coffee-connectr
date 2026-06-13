@@ -8,9 +8,9 @@ export const MAP_COLORS = {
   roadMuted: '#8B6A3E',
   label: '#F5F2EC',
   labelHalo: '#0A0A0A',
-  pin: '#B08D57',
+  pin: '#F5F2EC',
   pinBorder: '#0A0A0A',
-  pinIcon: '#F5F2EC',
+  pinIcon: '#0A0A0A',
 }
 
 export const MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/dark'
