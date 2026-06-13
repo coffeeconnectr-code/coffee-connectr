@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   CATEGORIES,
   OPEN_TO_OPTIONS,
@@ -199,6 +200,9 @@ export default function ProfileForm({ userId, userEmail }) {
           <h2>Your profile</h2>
           <p className="profile-subtitle">Signed in as {userEmail}</p>
         </div>
+        <Link to={`/profile/${userId}`} className="secondary-button profile-action-link">
+          View profile
+        </Link>
       </div>
 
       <form className="profile-form" onSubmit={handleSubmit}>
