@@ -6,6 +6,7 @@ import {
   splitList,
 } from '../lib/profileConstants'
 import { fetchProfile, saveProfile, uploadProfileImage } from '../lib/profileApi'
+import LocationPicker from './LocationPicker'
 
 const emptyForm = {
   profile_type: 'individual',
@@ -13,6 +14,8 @@ const emptyForm = {
   profile_photo_url: '',
   cover_image_url: '',
   location: '',
+  latitude: null,
+  longitude: null,
   primary_category: '',
   secondary_categories: [],
   about_bio: '',
@@ -41,6 +44,8 @@ function profileToForm(profile) {
     profile_photo_url: profile.profile_photo_url ?? '',
     cover_image_url: profile.cover_image_url ?? '',
     location: profile.location ?? '',
+    latitude: profile.latitude ?? null,
+    longitude: profile.longitude ?? null,
     primary_category: profile.primary_category ?? '',
     secondary_categories: profile.secondary_categories ?? [],
     about_bio: profile.about_bio ?? '',
@@ -143,6 +148,8 @@ export default function ProfileForm({ userId, userEmail }) {
       profile_photo_url: form.profile_photo_url || null,
       cover_image_url: form.cover_image_url || null,
       location: form.location.trim() || null,
+      latitude: form.latitude,
+      longitude: form.longitude,
       primary_category: form.primary_category || null,
       secondary_categories: form.secondary_categories,
       about_bio: form.about_bio.trim() || null,
@@ -253,15 +260,19 @@ export default function ProfileForm({ userId, userEmail }) {
             ) : null}
           </label>
 
-          <label>
-            Location
-            <input
-              type="text"
-              value={form.location}
-              onChange={(event) => updateField('location', event.target.value)}
-              placeholder="City, country (map pin coming later)"
-            />
-          </label>
+          <LocationPicker
+            location={form.location}
+            latitude={form.latitude}
+            longitude={form.longitude}
+            onChange={({ location, latitude, longitude }) => {
+              setForm((current) => ({
+                ...current,
+                location,
+                latitude,
+                longitude,
+              }))
+            }}
+          />
 
           <label>
             Primary category
