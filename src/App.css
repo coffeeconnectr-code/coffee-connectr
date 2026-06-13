@@ -263,6 +263,182 @@ button:disabled {
   background-position: center;
   border: 1px solid var(--border);
   border-bottom: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover-placeholder {
+  color: color-mix(in srgb, var(--accent) 70%, var(--text-muted));
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-owner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.completion-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, var(--card));
+}
+
+.completion-banner.compact {
+  margin-bottom: 1rem;
+}
+
+.completion-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.completion-copy p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.completion-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--input-bg);
+  overflow: hidden;
+}
+
+.completion-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: inherit;
+}
+
+.profile-section {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.profile-section h3 {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.profile-social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.88rem;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.social-link:hover {
+  border-color: var(--accent);
+}
+
+.profile-empty-hint {
+  margin: 1rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.empty-icon {
+  font-size: 2rem;
+}
+
+.empty-checklist {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-muted);
+}
+
+.empty-checklist li + li {
+  margin-top: 0.35rem;
+}
+
+.skeleton-block,
+.skeleton-map,
+.skeleton-line,
+.skeleton-circle {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--border) 70%, transparent) 25%,
+    color-mix(in srgb, var(--accent) 12%, var(--border)) 50%,
+    color-mix(in srgb, var(--border) 70%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 10px;
+}
+
+.skeleton-circle {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  margin-top: -3rem;
+}
+
+.skeleton-line {
+  height: 14px;
+  margin-top: 0.65rem;
+}
+
+.skeleton-line.short {
+  width: 35%;
+}
+
+.skeleton-line.medium {
+  width: 70%;
+}
+
+.skeleton-map {
+  height: 200px;
+  margin-top: 1rem;
+}
+
+.profile-skeleton-copy {
+  flex: 1;
+  padding-top: 0.35rem;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.status-message a {
+  color: var(--accent);
 }
 
 .profile-view-body {

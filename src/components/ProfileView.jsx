@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchProfile } from '../lib/profileApi'
+import { getProfileCompletion, getSocialLinks } from '../lib/profileCompletion'
 import { OPEN_TO_OPTIONS } from '../lib/profileConstants'
 import ProfileMapPreview from './ProfileMapPreview'
+import ProfileSkeleton from './ProfileSkeleton'
 
 function formatOpenTo(values) {
   return values
@@ -42,10 +44,24 @@ function TagList({ label, values }) {
   )
 }
 
+function ProfileSection({ title, children }) {
+  if (!children) {
+    return null
+  }
+
+  return (
+    <section className="profile-section">
+      <h3>{title}</h3>
+      {children}
+    </section>
+  )
+}
+
 export default function ProfileView({ userId, currentUserId }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const isOwnProfile = userId === currentUserId
 
@@ -79,27 +95,50 @@ export default function ProfileView({ userId, currentUserId }) {
     }
   }, [userId])
 
+  async function handleCopyLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    } catch {
+      setCopied(false)
+    }
+  }
+
   if (loading) {
-    return <p className="status-message">Loading profile...</p>
+    return <ProfileSkeleton />
   }
 
   if (error) {
-    return <p className="status-message profile-error">{error}</p>
+    return (
+      <section className="card profile-view-empty">
+        <h2>Something went wrong</h2>
+        <p className="status-message profile-error">{error}</p>
+      </section>
+    )
   }
 
   if (!profile) {
     return (
       <section className="card profile-view-empty">
-        <h2>Profile not found</h2>
+        <div className="empty-icon">☕</div>
+        <h2>{isOwnProfile ? 'Your profile is waiting' : 'Profile not found'}</h2>
         <p className="status-message">
           {isOwnProfile
-            ? 'You have not created a profile yet.'
+            ? 'Introduce yourself to the coffee community with a photo, bio, and location.'
             : 'This user has not published a profile yet.'}
         </p>
         {isOwnProfile ? (
-          <Link to="/profile/edit" className="primary-button profile-action-link">
-            Create your profile
-          </Link>
+          <>
+            <ul className="empty-checklist">
+              <li>Add your name and photo</li>
+              <li>Choose your coffee categories</li>
+              <li>Drop a pin on the map</li>
+            </ul>
+            <Link to="/profile/edit" className="primary-button profile-action-link">
+              Create your profile
+            </Link>
+          </>
         ) : null}
       </section>
     )
@@ -107,15 +146,84 @@ export default function ProfileView({ userId, currentUserId }) {
 
   const isIndividual = profile.profile_type === 'individual'
   const hasMap = profile.latitude != null && profile.longitude != null
+  const completion = isOwnProfile ? getProfileCompletion(profile) : null
+  const socialLinks = getSocialLinks(profile)
+
+  const aboutSection = (
+    <>
+      {profile.about_bio ? <p className="profile-bio">{profile.about_bio}</p> : null}
+      {socialLinks.length ? (
+        <div className="profile-social-links">
+          {socialLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.url}
+              target="_blank"
+              rel="noreferrer"
+              className="social-link"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      ) : null}
+      <TagList label="Secondary categories" values={profile.secondary_categories} />
+    </>
+  )
+
+  const detailsSection = isIndividual ? (
+    <dl className="profile-details">
+      <Detail label="Years of experience" value={profile.years_of_experience} />
+      <TagList label="Skills / specialties" values={profile.skills_specialties} />
+      <Detail label="Certifications" value={profile.certifications} />
+      <Detail label="Open to" value={formatOpenTo(profile.open_to_status)} />
+      <TagList label="Languages" values={profile.languages} />
+    </dl>
+  ) : (
+    <dl className="profile-details">
+      <Detail label="Year established" value={profile.year_established} />
+      <Detail label="Team size" value={profile.team_size} />
+      <Detail label="Services offered" value={profile.services_offered} />
+      <Detail label="Opening hours" value={profile.opening_hours} />
+    </dl>
+  )
+
+  const showAboutSection =
+    profile.about_bio || socialLinks.length || (profile.secondary_categories?.length ?? 0) > 0
+  const showDetailsSection =
+    isIndividual
+      ? profile.years_of_experience ||
+        profile.skills_specialties?.length ||
+        profile.certifications ||
+        profile.open_to_status?.length ||
+        profile.languages?.length
+      : profile.year_established ||
+        profile.team_size ||
+        profile.services_offered ||
+        profile.opening_hours
 
   return (
     <article className="profile-view">
       <div
         className="profile-cover"
         style={profile.cover_image_url ? { backgroundImage: `url(${profile.cover_image_url})` } : undefined}
-      />
+      >
+        {!profile.cover_image_url ? <span className="cover-placeholder">Coffee Connectr</span> : null}
+      </div>
 
       <div className="profile-view-body card">
+        {completion && completion.percent < 100 ? (
+          <div className="completion-banner">
+            <div className="completion-copy">
+              <strong>Profile {completion.percent}% complete</strong>
+              <p>Add: {completion.missing.slice(0, 3).join(', ')}</p>
+            </div>
+            <Link to="/profile/edit" className="secondary-button profile-action-link">
+              Finish profile
+            </Link>
+          </div>
+        ) : null}
+
         <div className="profile-view-top">
           <div className="profile-avatar-wrap">
             {profile.profile_photo_url ? (
@@ -143,9 +251,14 @@ export default function ProfileView({ userId, currentUserId }) {
               </div>
 
               {isOwnProfile ? (
-                <Link to="/profile/edit" className="secondary-button profile-action-link">
-                  Edit profile
-                </Link>
+                <div className="profile-owner-actions">
+                  <Link to="/profile/edit" className="secondary-button profile-action-link">
+                    Edit profile
+                  </Link>
+                  <button type="button" className="secondary-button" onClick={handleCopyLink}>
+                    {copied ? 'Link copied' : 'Copy link'}
+                  </button>
+                </div>
               ) : null}
             </div>
 
@@ -155,46 +268,33 @@ export default function ProfileView({ userId, currentUserId }) {
           </div>
         </div>
 
-        {profile.about_bio ? <p className="profile-bio">{profile.about_bio}</p> : null}
-
-        {profile.website ? (
-          <p className="profile-website">
-            <a href={profile.website} target="_blank" rel="noreferrer">
-              {profile.website}
-            </a>
-          </p>
+        {showAboutSection ? (
+          <ProfileSection title="About">{aboutSection}</ProfileSection>
+        ) : isOwnProfile ? (
+          <p className="profile-empty-hint">Add a bio and links in Edit profile to tell your story.</p>
         ) : null}
-
-        <TagList label="Secondary categories" values={profile.secondary_categories} />
 
         {hasMap ? (
-          <ProfileMapPreview
-            latitude={profile.latitude}
-            longitude={profile.longitude}
-            location={profile.location}
-          />
+          <ProfileSection title="Location">
+            <ProfileMapPreview
+              latitude={profile.latitude}
+              longitude={profile.longitude}
+              location={profile.location}
+            />
+          </ProfileSection>
         ) : profile.location ? (
-          <Detail label="Location" value={profile.location} />
+          <ProfileSection title="Location">
+            <Detail label="Location" value={profile.location} />
+          </ProfileSection>
+        ) : isOwnProfile ? (
+          <p className="profile-empty-hint">Add a map pin in Edit profile so people know where you are.</p>
         ) : null}
 
-        <dl className="profile-details">
-          {isIndividual ? (
-            <>
-              <Detail label="Years of experience" value={profile.years_of_experience} />
-              <TagList label="Skills / specialties" values={profile.skills_specialties} />
-              <Detail label="Certifications" value={profile.certifications} />
-              <Detail label="Open to" value={formatOpenTo(profile.open_to_status)} />
-              <TagList label="Languages" values={profile.languages} />
-            </>
-          ) : (
-            <>
-              <Detail label="Year established" value={profile.year_established} />
-              <Detail label="Team size" value={profile.team_size} />
-              <Detail label="Services offered" value={profile.services_offered} />
-              <Detail label="Opening hours" value={profile.opening_hours} />
-            </>
-          )}
-        </dl>
+        {showDetailsSection ? (
+          <ProfileSection title={isIndividual ? 'Experience' : 'Business details'}>
+            {detailsSection}
+          </ProfileSection>
+        ) : null}
       </div>
     </article>
   )

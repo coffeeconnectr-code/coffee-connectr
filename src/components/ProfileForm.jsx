@@ -7,6 +7,7 @@ import {
   splitList,
 } from '../lib/profileConstants'
 import { fetchProfile, saveProfile, uploadProfileImage } from '../lib/profileApi'
+import { getProfileCompletion } from '../lib/profileCompletion'
 import LocationPicker from './LocationPicker'
 
 const emptyForm = {
@@ -21,6 +22,8 @@ const emptyForm = {
   secondary_categories: [],
   about_bio: '',
   website: '',
+  linkedin_url: '',
+  instagram_url: '',
   job_title_role: '',
   years_of_experience: '',
   skills_specialties: '',
@@ -51,6 +54,8 @@ function profileToForm(profile) {
     secondary_categories: profile.secondary_categories ?? [],
     about_bio: profile.about_bio ?? '',
     website: profile.website ?? '',
+    linkedin_url: profile.linkedin_url ?? '',
+    instagram_url: profile.instagram_url ?? '',
     job_title_role: profile.job_title_role ?? '',
     years_of_experience: profile.years_of_experience?.toString() ?? '',
     skills_specialties: joinList(profile.skills_specialties),
@@ -155,6 +160,8 @@ export default function ProfileForm({ userId, userEmail }) {
       secondary_categories: form.secondary_categories,
       about_bio: form.about_bio.trim() || null,
       website: form.website.trim() || null,
+      linkedin_url: form.linkedin_url.trim() || null,
+      instagram_url: form.instagram_url.trim() || null,
       job_title_role: form.profile_type === 'individual' ? form.job_title_role.trim() || null : null,
       years_of_experience:
         form.profile_type === 'individual' && form.years_of_experience
@@ -192,6 +199,13 @@ export default function ProfileForm({ userId, userEmail }) {
   }
 
   const isIndividual = form.profile_type === 'individual'
+  const completion = getProfileCompletion({
+    ...form,
+    skills_specialties: splitList(form.skills_specialties),
+    languages: splitList(form.languages),
+    years_of_experience: form.years_of_experience ? Number(form.years_of_experience) : null,
+    year_established: form.year_established ? Number(form.year_established) : null,
+  })
 
   return (
     <section className="card profile-card">
@@ -204,6 +218,17 @@ export default function ProfileForm({ userId, userEmail }) {
           View profile
         </Link>
       </div>
+
+      {completion.percent < 100 ? (
+        <div className="completion-banner compact">
+          <div className="completion-copy">
+            <strong>{completion.percent}% complete</strong>
+            <div className="completion-bar">
+              <span style={{ width: `${completion.percent}%` }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <form className="profile-form" onSubmit={handleSubmit}>
         <fieldset className="form-section">
@@ -327,6 +352,26 @@ export default function ProfileForm({ userId, userEmail }) {
               value={form.website}
               onChange={(event) => updateField('website', event.target.value)}
               placeholder="https://"
+            />
+          </label>
+
+          <label>
+            LinkedIn
+            <input
+              type="url"
+              value={form.linkedin_url}
+              onChange={(event) => updateField('linkedin_url', event.target.value)}
+              placeholder="https://linkedin.com/in/..."
+            />
+          </label>
+
+          <label>
+            Instagram
+            <input
+              type="url"
+              value={form.instagram_url}
+              onChange={(event) => updateField('instagram_url', event.target.value)}
+              placeholder="https://instagram.com/..."
             />
           </label>
         </fieldset>
@@ -465,7 +510,14 @@ export default function ProfileForm({ userId, userEmail }) {
         </button>
       </form>
 
-      {message ? <p className="status-message">{message}</p> : null}
+      {message ? (
+        <p className="status-message">
+          {message}{' '}
+          {message === 'Profile saved.' ? (
+            <Link to={`/profile/${userId}`}>View your profile</Link>
+          ) : null}
+        </p>
+      ) : null}
     </section>
   )
 }
