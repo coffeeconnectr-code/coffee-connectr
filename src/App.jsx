@@ -5,6 +5,8 @@ import Auth from './components/Auth'
 import DiscoverBrowse from './components/DiscoverBrowse'
 import DiscoverMap from './components/DiscoverMap'
 import DiscoverRoasters from './components/DiscoverRoasters'
+import MessageThread from './components/MessageThread'
+import MessagesInbox from './components/MessagesInbox'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
 import './App.css'
@@ -18,6 +20,24 @@ function ProfileViewRoute({ session }) {
       currentUserId={session?.user?.id ?? null}
     />
   )
+}
+
+function MessagesRoute({ session }) {
+  if (!session) {
+    return <Navigate to="/" replace />
+  }
+
+  return <MessagesInbox currentUserId={session.user.id} />
+}
+
+function MessageThreadRoute({ session }) {
+  const { userId } = useParams()
+
+  if (!session) {
+    return <Navigate to="/" replace />
+  }
+
+  return <MessageThread currentUserId={session.user.id} otherUserId={userId} />
 }
 
 function EditProfileRoute({ session }) {
@@ -73,6 +93,9 @@ function HomePage({ session }) {
         <Link to="/discover/roasters" className="secondary-button profile-action-link">
           Find roasters
         </Link>
+        <Link to="/messages" className="secondary-button profile-action-link">
+          Messages
+        </Link>
       </div>
     </section>
   )
@@ -90,9 +113,14 @@ function AppLayout({ session, onSignOut }) {
             Discover
           </Link>
           {session ? (
-            <button type="button" className="secondary-button" onClick={onSignOut}>
-              Sign out
-            </button>
+            <>
+              <Link to="/messages" className="secondary-button profile-action-link">
+                Messages
+              </Link>
+              <button type="button" className="secondary-button" onClick={onSignOut}>
+                Sign out
+              </button>
+            </>
           ) : null}
         </div>
       </header>
@@ -102,6 +130,8 @@ function AppLayout({ session, onSignOut }) {
         <Route path="/discover" element={<DiscoverBrowse />} />
         <Route path="/discover/map" element={<DiscoverMap />} />
         <Route path="/discover/roasters" element={<DiscoverRoasters />} />
+        <Route path="/messages" element={<MessagesRoute session={session} />} />
+        <Route path="/messages/:userId" element={<MessageThreadRoute session={session} />} />
         <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />
         <Route path="/profile/:userId" element={<ProfileViewRoute session={session} />} />
       </Routes>

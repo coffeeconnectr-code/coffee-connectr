@@ -255,6 +255,10 @@ export default function ProfileView({ userId, currentUserId }) {
                     {copied ? 'Link copied' : 'Copy link'}
                   </button>
                 </div>
+              ) : currentUserId ? (
+                <Link to={`/messages/${userId}`} className="primary-button profile-action-link">
+                  Send message
+                </Link>
               ) : null}
             </div>
 
