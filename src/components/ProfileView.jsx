@@ -4,6 +4,7 @@ import { fetchProfile } from '../lib/profileApi'
 import { getProfileCompletion, getSocialLinks } from '../lib/profileCompletion'
 import { formatBatchSize, formatCapacity, isRoastingProfile } from '../lib/roasterConstants'
 import { OPEN_TO_OPTIONS } from '../lib/profileConstants'
+import CategoryLabel from './CategoryLabel'
 import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
 
@@ -37,7 +38,7 @@ function TagList({ label, values }) {
       <dd className="tag-list">
         {values.map((value) => (
           <span key={value} className="tag">
-            {value}
+            <CategoryLabel category={value} />
           </span>
         ))}
       </dd>
@@ -258,7 +259,9 @@ export default function ProfileView({ userId, currentUserId }) {
             </div>
 
             {profile.primary_category ? (
-              <span className="tag tag-primary">{profile.primary_category}</span>
+              <span className="tag tag-primary">
+                <CategoryLabel category={profile.primary_category} />
+              </span>
             ) : null}
           </div>
         </div>
@@ -287,6 +290,7 @@ export default function ProfileView({ userId, currentUserId }) {
               latitude={profile.latitude}
               longitude={profile.longitude}
               location={profile.location}
+              primaryCategory={profile.primary_category}
             />
           </ProfileSection>
         ) : profile.location ? (

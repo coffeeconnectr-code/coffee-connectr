@@ -14,6 +14,26 @@ export const CATEGORIES = [
   'People/Recruitment',
 ]
 
+export const CATEGORY_ICONS = {
+  'Green Coffee/Origin': '🌱',
+  Roasting: '🔥',
+  'Equipment & Machinery': '⚙️',
+  'Roastery Technical Support': '🛠️',
+  'Café & Retail': '☕',
+  'Education & Training': '📚',
+  'Quality & Certification': '🏅',
+  'Consulting & Business': '💼',
+  'Creative & Marketing': '🎨',
+  'Supplies & Ancillary': '📦',
+  'Logistics & Trade': '🚢',
+  'Events & Media': '🎤',
+  'People/Recruitment': '👥',
+}
+
+export function getCategoryIcon(category) {
+  return CATEGORY_ICONS[category] ?? '☕'
+}
+
 export const OPEN_TO_OPTIONS = [
   { value: 'employment', label: 'Employment' },
   { value: 'freelance', label: 'Freelance' },

@@ -1,51 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
-import L from 'leaflet'
-import markerIcon from 'leaflet/dist/images/marker-icon.png'
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
-import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+import { useEffect, useState } from 'react'
 import { reverseGeocode, searchLocation } from '../lib/geocoding'
-import 'leaflet/dist/leaflet.css'
+import CoffeeMap from './CoffeeMap'
 
-const defaultIcon = L.icon({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
-
-L.Marker.prototype.options.icon = defaultIcon
-
-const DEFAULT_CENTER = [20, 0]
-const DEFAULT_ZOOM = 2
-const PIN_ZOOM = 13
-
-function MapRecenter({ latitude, longitude }) {
-  const map = useMap()
-
-  useEffect(() => {
-    if (latitude != null && longitude != null) {
-      map.setView([latitude, longitude], PIN_ZOOM)
-    }
-  }, [latitude, longitude, map])
-
-  return null
-}
-
-function MapClickHandler({ onPick }) {
-  useMapEvents({
-    click(event) {
-      onPick(event.latlng.lat, event.latlng.lng)
-    },
-  })
-
-  return null
-}
-
-export default function LocationPicker({ location, latitude, longitude, onChange }) {
+export default function LocationPicker({ location, latitude, longitude, primaryCategory, onChange }) {
   const [searchQuery, setSearchQuery] = useState(location ?? '')
   const [searching, setSearching] = useState(false)
   const [error, setError] = useState('')
@@ -55,13 +12,6 @@ export default function LocationPicker({ location, latitude, longitude, onChange
   }, [location])
 
   const hasPin = latitude != null && longitude != null
-
-  const mapCenter = useMemo(
-    () => (hasPin ? [latitude, longitude] : DEFAULT_CENTER),
-    [hasPin, latitude, longitude],
-  )
-
-  const mapZoom = hasPin ? PIN_ZOOM : DEFAULT_ZOOM
 
   async function applyLocation(nextLocation) {
     onChange(nextLocation)
@@ -109,12 +59,6 @@ export default function LocationPicker({ location, latitude, longitude, onChange
     }
   }
 
-  async function handleMarkerDrag(event) {
-    const marker = event.target
-    const position = marker.getLatLng()
-    await handleMapPick(position.lat, position.lng)
-  }
-
   function handleClearPin() {
     onChange({ location: '', latitude: null, longitude: null })
     setSearchQuery('')
@@ -146,21 +90,18 @@ export default function LocationPicker({ location, latitude, longitude, onChange
       <p className="location-hint">Or click the map to drop a pin. Drag the pin to fine-tune.</p>
 
       <div className="map-shell">
-        <MapContainer center={mapCenter} zoom={mapZoom} scrollWheelZoom className="location-map">
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <MapRecenter latitude={latitude} longitude={longitude} />
-          <MapClickHandler onPick={handleMapPick} />
-          {hasPin ? (
-            <Marker
-              position={[latitude, longitude]}
-              draggable
-              eventHandlers={{ dragend: handleMarkerDrag }}
-            />
-          ) : null}
-        </MapContainer>
+        <CoffeeMap
+          latitude={hasPin ? latitude : null}
+          longitude={hasPin ? longitude : null}
+          category={primaryCategory}
+          className="location-map"
+          interactive
+          scrollZoom
+          showMarker={hasPin}
+          draggableMarker
+          onLocationPick={handleMapPick}
+          onMarkerDragEnd={handleMapPick}
+        />
       </div>
 
       {hasPin ? (

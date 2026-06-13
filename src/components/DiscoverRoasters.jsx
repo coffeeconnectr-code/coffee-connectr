@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ROASTER_BRANDS, formatBatchSize, formatCapacity } from '../lib/roasterConstants'
 import { searchProfilesByRoaster } from '../lib/roasterApi'
+import CategoryLabel from './CategoryLabel'
 
 export default function DiscoverRoasters() {
   const [roasterBrand, setRoasterBrand] = useState('')
@@ -86,7 +87,9 @@ export default function DiscoverRoasters() {
                 <h3>{profile.name}</h3>
                 {profile.location ? <p className="discover-meta">{profile.location}</p> : null}
                 {profile.primary_category ? (
-                  <span className="tag">{profile.primary_category}</span>
+                  <span className="tag">
+                    <CategoryLabel category={profile.primary_category} />
+                  </span>
                 ) : null}
               </div>
             </div>

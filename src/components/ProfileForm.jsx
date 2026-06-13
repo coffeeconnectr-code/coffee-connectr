@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   CATEGORIES,
+  getCategoryIcon,
   OPEN_TO_OPTIONS,
   joinList,
   splitList,
 } from '../lib/profileConstants'
+import CategoryLabel from './CategoryLabel'
 import { fetchProfile, saveProfile, uploadProfileImage } from '../lib/profileApi'
 import { getProfileCompletion } from '../lib/profileCompletion'
 import { isRoastingProfile } from '../lib/roasterConstants'
@@ -323,6 +325,7 @@ export default function ProfileForm({ userId, userEmail }) {
             location={form.location}
             latitude={form.latitude}
             longitude={form.longitude}
+            primaryCategory={form.primary_category}
             onChange={({ location, latitude, longitude }) => {
               setForm((current) => ({
                 ...current,
@@ -343,7 +346,7 @@ export default function ProfileForm({ userId, userEmail }) {
               <option value="">Select a category</option>
               {CATEGORIES.map((category) => (
                 <option key={category} value={category}>
-                  {category}
+                  {getCategoryIcon(category)} {category}
                 </option>
               ))}
             </select>
@@ -359,7 +362,7 @@ export default function ProfileForm({ userId, userEmail }) {
                     checked={form.secondary_categories.includes(category)}
                     onChange={() => toggleArrayValue('secondary_categories', category)}
                   />
-                  {category}
+                  <CategoryLabel category={category} />
                 </label>
               ))}
             </div>
