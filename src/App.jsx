@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
+import ProfileForm from './components/ProfileForm'
 import './App.css'
 
 function App() {
@@ -29,24 +30,29 @@ function App() {
   if (loading) {
     return (
       <main className="page">
-        <p>Loading...</p>
+        <p className="status-message">Loading...</p>
       </main>
     )
   }
 
   return (
     <main className="page">
-      <h1>Coffee Connectr — coming soon</h1>
-
-      {session ? (
-        <section className="signed-in">
-          <p>Signed in as {session.user.email}</p>
-          <button type="button" onClick={handleSignOut}>
+      <header className="page-header">
+        <h1>Coffee Connectr</h1>
+        {session ? (
+          <button type="button" className="secondary-button" onClick={handleSignOut}>
             Sign out
           </button>
-        </section>
-      ) : (
+        ) : null}
+      </header>
+
+      {!session ? (
         <Auth />
+      ) : (
+        <ProfileForm
+          userId={session.user.id}
+          userEmail={session.user.email ?? 'your account'}
+        />
       )}
     </main>
   )
