@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { fetchFavouriteIds } from '../lib/favouritesApi'
 import useBrowseProfiles from '../hooks/useBrowseProfiles'
 import BrowseFilters from './BrowseFilters'
 import ProfileBrowseCard from './ProfileBrowseCard'
 
-export default function DiscoverBrowse() {
+export default function DiscoverBrowse({ currentUserId = null }) {
   const {
     search,
     setSearch,
@@ -15,6 +17,38 @@ export default function DiscoverBrowse() {
     loading,
     error,
   } = useBrowseProfiles()
+
+  const [favouriteIds, setFavouriteIds] = useState(new Set())
+
+  useEffect(() => {
+    let active = true
+
+    async function loadFavourites() {
+      if (!currentUserId) {
+        if (active) {
+          setFavouriteIds(new Set())
+        }
+        return
+      }
+
+      try {
+        const ids = await fetchFavouriteIds(currentUserId)
+        if (active) {
+          setFavouriteIds(ids)
+        }
+      } catch {
+        if (active) {
+          setFavouriteIds(new Set())
+        }
+      }
+    }
+
+    loadFavourites()
+
+    return () => {
+      active = false
+    }
+  }, [currentUserId])
 
   return (
     <section className="card discover-card">
@@ -59,7 +93,12 @@ export default function DiscoverBrowse() {
 
       <div className="browse-grid">
         {results.map((profile) => (
-          <ProfileBrowseCard key={profile.id} profile={profile} />
+          <ProfileBrowseCard
+            key={profile.id}
+            profile={profile}
+            currentUserId={currentUserId}
+            initialSaved={favouriteIds.has(profile.user_id)}
+          />
         ))}
       </div>
     </section>

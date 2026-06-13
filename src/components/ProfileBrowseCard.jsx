@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import CategoryLabel from './CategoryLabel'
+import FavouriteButton from './FavouriteButton'
 
 function truncateText(text, maxLength = 120) {
   if (!text || text.length <= maxLength) {
@@ -9,7 +10,12 @@ function truncateText(text, maxLength = 120) {
   return `${text.slice(0, maxLength).trim()}…`
 }
 
-export default function ProfileBrowseCard({ profile }) {
+export default function ProfileBrowseCard({
+  profile,
+  currentUserId = null,
+  initialSaved = false,
+  onUnsave,
+}) {
   const isIndividual = profile.profile_type === 'individual'
 
   return (
@@ -50,9 +56,21 @@ export default function ProfileBrowseCard({ profile }) {
         </div>
       ) : null}
 
-      <Link to={`/profile/${profile.user_id}`} className="secondary-button profile-action-link">
-        View profile
-      </Link>
+      <div className="browse-card-actions">
+        <Link to={`/profile/${profile.user_id}`} className="secondary-button profile-action-link">
+          View profile
+        </Link>
+        <FavouriteButton
+          currentUserId={currentUserId}
+          profileUserId={profile.user_id}
+          initialSaved={initialSaved}
+          onChange={(saved) => {
+            if (!saved) {
+              onUnsave?.()
+            }
+          }}
+        />
+      </div>
     </article>
   )
 }

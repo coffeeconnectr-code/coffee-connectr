@@ -1,0 +1,15 @@
+-- Email notifications setup (run AFTER favourites.sql and notification_preferences.sql)
+--
+-- 1. Create a free Resend account: https://resend.com
+-- 2. Create an API key in Resend → API Keys
+-- 3. Deploy the edge function from your project folder:
+--      npx supabase login
+--      npx supabase link --project-ref YOUR_PROJECT_REF
+--      npx supabase functions deploy send-message-notification
+-- 4. Add function secrets in Supabase Dashboard → Edge Functions → Secrets:
+--      RESEND_API_KEY = your Resend API key
+--      RESEND_FROM_EMAIL = Coffee Connectr <onboarding@resend.dev>
+--      SITE_URL = https://coffee-connectr.vercel.app
+--
+-- For testing, Resend lets you send from onboarding@resend.dev to your own email.
+-- For production, verify your own domain in Resend and update RESEND_FROM_EMAIL.

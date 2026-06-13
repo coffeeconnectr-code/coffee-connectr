@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchProfile } from '../lib/profileApi'
+import { isFavourite } from '../lib/favouritesApi'
 import { getProfileCompletion, getSocialLinks } from '../lib/profileCompletion'
 import { formatBatchSize, formatCapacity, isRoastingProfile } from '../lib/roasterConstants'
 import { OPEN_TO_OPTIONS } from '../lib/profileConstants'
 import CategoryLabel from './CategoryLabel'
+import FavouriteButton from './FavouriteButton'
 import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
 
@@ -64,8 +66,39 @@ export default function ProfileView({ userId, currentUserId }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)
 
   const isOwnProfile = userId === currentUserId
+
+  useEffect(() => {
+    let active = true
+
+    async function loadSavedState() {
+      if (!currentUserId || isOwnProfile) {
+        if (active) {
+          setIsSaved(false)
+        }
+        return
+      }
+
+      try {
+        const saved = await isFavourite(currentUserId, userId)
+        if (active) {
+          setIsSaved(saved)
+        }
+      } catch {
+        if (active) {
+          setIsSaved(false)
+        }
+      }
+    }
+
+    loadSavedState()
+
+    return () => {
+      active = false
+    }
+  }, [currentUserId, userId, isOwnProfile])
 
   useEffect(() => {
     let active = true
@@ -256,9 +289,16 @@ export default function ProfileView({ userId, currentUserId }) {
                   </button>
                 </div>
               ) : currentUserId ? (
-                <Link to={`/messages/${userId}`} className="primary-button profile-action-link">
-                  Send message
-                </Link>
+                <div className="profile-owner-actions">
+                  <Link to={`/messages/${userId}`} className="primary-button profile-action-link">
+                    Send message
+                  </Link>
+                  <FavouriteButton
+                    currentUserId={currentUserId}
+                    profileUserId={userId}
+                    initialSaved={isSaved}
+                  />
+                </div>
               ) : null}
             </div>
 

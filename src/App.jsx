@@ -7,6 +7,7 @@ import DiscoverMap from './components/DiscoverMap'
 import DiscoverRoasters from './components/DiscoverRoasters'
 import MessageThread from './components/MessageThread'
 import MessagesInbox from './components/MessagesInbox'
+import SavedProfiles from './components/SavedProfiles'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
 import './App.css'
@@ -38,6 +39,14 @@ function MessageThreadRoute({ session }) {
   }
 
   return <MessageThread currentUserId={session.user.id} otherUserId={userId} />
+}
+
+function SavedProfilesRoute({ session }) {
+  if (!session) {
+    return <Navigate to="/" replace />
+  }
+
+  return <SavedProfiles currentUserId={session.user.id} />
 }
 
 function EditProfileRoute({ session }) {
@@ -96,6 +105,9 @@ function HomePage({ session }) {
         <Link to="/messages" className="secondary-button profile-action-link">
           Messages
         </Link>
+        <Link to="/saved" className="secondary-button profile-action-link">
+          Saved
+        </Link>
       </div>
     </section>
   )
@@ -117,6 +129,9 @@ function AppLayout({ session, onSignOut }) {
               <Link to="/messages" className="secondary-button profile-action-link">
                 Messages
               </Link>
+              <Link to="/saved" className="secondary-button profile-action-link">
+                Saved
+              </Link>
               <button type="button" className="secondary-button" onClick={onSignOut}>
                 Sign out
               </button>
@@ -127,9 +142,10 @@ function AppLayout({ session, onSignOut }) {
 
       <Routes>
         <Route path="/" element={<HomePage session={session} />} />
-        <Route path="/discover" element={<DiscoverBrowse />} />
+        <Route path="/discover" element={<DiscoverBrowse currentUserId={session?.user?.id ?? null} />} />
         <Route path="/discover/map" element={<DiscoverMap />} />
         <Route path="/discover/roasters" element={<DiscoverRoasters />} />
+        <Route path="/saved" element={<SavedProfilesRoute session={session} />} />
         <Route path="/messages" element={<MessagesRoute session={session} />} />
         <Route path="/messages/:userId" element={<MessageThreadRoute session={session} />} />
         <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />

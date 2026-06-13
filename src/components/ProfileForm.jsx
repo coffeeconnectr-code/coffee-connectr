@@ -44,6 +44,7 @@ const emptyForm = {
   team_size: '',
   services_offered: '',
   opening_hours: '',
+  email_on_message: true,
 }
 
 function profileToForm(profile) {
@@ -76,6 +77,7 @@ function profileToForm(profile) {
     team_size: profile.team_size ?? '',
     services_offered: profile.services_offered ?? '',
     opening_hours: profile.opening_hours ?? '',
+    email_on_message: profile.email_on_message !== false,
   }
 }
 
@@ -203,6 +205,7 @@ export default function ProfileForm({ userId, userEmail }) {
       contract_roasting_capacity_kg: isRoastingProfile(form) && contractCapacity
         ? Number(contractCapacity)
         : null,
+      email_on_message: form.email_on_message,
     }
 
     try {
@@ -548,6 +551,18 @@ export default function ProfileForm({ userId, userEmail }) {
             onContractCapacityChange={setContractCapacity}
           />
         ) : null}
+
+        <fieldset className="form-section">
+          <legend>Notifications</legend>
+          <label className="notification-checkbox">
+            <input
+              type="checkbox"
+              checked={form.email_on_message}
+              onChange={(event) => updateField('email_on_message', event.target.checked)}
+            />
+            Email me when someone sends a new message
+          </label>
+        </fieldset>
 
         <button type="submit" className="primary-button" disabled={saving}>
           {saving ? 'Saving...' : 'Save profile'}

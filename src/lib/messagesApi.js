@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { notifyNewMessage } from './notificationsApi'
 
 function getOtherUserId(message, currentUserId) {
   return message.sender_id === currentUserId ? message.recipient_id : message.sender_id
@@ -110,6 +111,8 @@ export async function sendMessage({ senderId, recipientId, body }) {
   if (error) {
     throw error
   }
+
+  notifyNewMessage(data.id)
 
   return data
 }
