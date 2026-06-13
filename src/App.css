@@ -83,6 +83,13 @@
   gap: 1rem;
 }
 
+.discover-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
 .browse-filters {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -906,6 +913,59 @@ button:disabled {
 .location-map {
   height: 280px;
   width: 100%;
+}
+
+.browse-map-shell {
+  min-height: 420px;
+}
+
+.browse-map {
+  height: 420px;
+}
+
+.browse-map-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.15rem 0.1rem;
+  min-width: 160px;
+}
+
+.browse-map-popup-name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #0a0a0a;
+}
+
+.browse-map-popup-location,
+.browse-map-popup-category {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #4a4a4a;
+  line-height: 1.35;
+}
+
+.browse-map-popup-link {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #8b6a3e;
+  text-decoration: none;
+}
+
+.browse-map-popup-link:hover {
+  text-decoration: underline;
+}
+
+.maplibregl-popup-content {
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.maplibregl-popup-tip {
+  border-top-color: #f5f2ec !important;
 }
 
 .location-summary {

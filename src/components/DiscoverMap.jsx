@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom'
 import useBrowseProfiles from '../hooks/useBrowseProfiles'
 import BrowseFilters from './BrowseFilters'
-import ProfileBrowseCard from './ProfileBrowseCard'
+import BrowseMap from './BrowseMap'
 
-export default function DiscoverBrowse() {
+function profilesWithLocation(profiles) {
+  return profiles.filter((profile) => profile.latitude != null && profile.longitude != null)
+}
+
+export default function DiscoverMap() {
   const {
     search,
     setSearch,
@@ -16,18 +20,21 @@ export default function DiscoverBrowse() {
     error,
   } = useBrowseProfiles()
 
+  const onMap = profilesWithLocation(results)
+  const missingLocation = results.length - onMap.length
+
   return (
     <section className="card discover-card">
       <div className="discover-header">
         <div>
-          <h2>Discover members</h2>
+          <h2>Discover on map</h2>
           <p className="status-message">
-            Browse coffee professionals and businesses across the community.
+            See where coffee professionals and businesses are located around the world.
           </p>
         </div>
         <div className="discover-header-actions">
-          <Link to="/discover/map" className="secondary-button profile-action-link">
-            Map view
+          <Link to="/discover" className="secondary-button profile-action-link">
+            List view
           </Link>
           <Link to="/discover/roasters" className="secondary-button profile-action-link">
             Find roasters
@@ -49,19 +56,20 @@ export default function DiscoverBrowse() {
 
       {!loading && !error ? (
         <p className="status-message">
-          {results.length} member{results.length === 1 ? '' : 's'} found
+          {onMap.length} member{onMap.length === 1 ? '' : 's'} on map
+          {missingLocation > 0
+            ? ` (${missingLocation} without a map location hidden)`
+            : ''}
         </p>
       ) : null}
 
-      {!loading && !error && results.length === 0 ? (
-        <p className="status-message">No members match those filters yet.</p>
+      {!loading && !error && onMap.length === 0 ? (
+        <p className="status-message">
+          No members with a map location match those filters yet.
+        </p>
       ) : null}
 
-      <div className="browse-grid">
-        {results.map((profile) => (
-          <ProfileBrowseCard key={profile.id} profile={profile} />
-        ))}
-      </div>
+      {!loading && !error && onMap.length > 0 ? <BrowseMap profiles={results} /> : null}
     </section>
   )
 }

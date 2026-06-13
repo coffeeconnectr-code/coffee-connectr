@@ -3,6 +3,7 @@ import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import DiscoverBrowse from './components/DiscoverBrowse'
+import DiscoverMap from './components/DiscoverMap'
 import DiscoverRoasters from './components/DiscoverRoasters'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
@@ -99,6 +100,7 @@ function AppLayout({ session, onSignOut }) {
       <Routes>
         <Route path="/" element={<HomePage session={session} />} />
         <Route path="/discover" element={<DiscoverBrowse />} />
+        <Route path="/discover/map" element={<DiscoverMap />} />
         <Route path="/discover/roasters" element={<DiscoverRoasters />} />
         <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />
         <Route path="/profile/:userId" element={<ProfileViewRoute session={session} />} />
