@@ -50,6 +50,9 @@ export default function DiscoverRoasters() {
             machine type.
           </p>
         </div>
+        <Link to="/discover" className="secondary-button profile-action-link">
+          All members
+        </Link>
       </div>
 
       <label>

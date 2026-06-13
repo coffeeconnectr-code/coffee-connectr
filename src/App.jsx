@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
+import DiscoverBrowse from './components/DiscoverBrowse'
 import DiscoverRoasters from './components/DiscoverRoasters'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
@@ -37,13 +38,18 @@ function HomePage({ session }) {
       <>
         <Auth />
         <section className="card home-card">
-          <h2>Looking for roasting capacity?</h2>
+          <h2>Explore the community</h2>
           <p className="status-message">
-            Browse members by roaster brand — useful for contract roasting on specific equipment.
+            Browse coffee professionals and businesses, or search by roaster equipment.
           </p>
-          <Link to="/discover/roasters" className="secondary-button profile-action-link">
-            Find roasters
-          </Link>
+          <div className="home-actions">
+            <Link to="/discover" className="primary-button profile-action-link">
+              Discover members
+            </Link>
+            <Link to="/discover/roasters" className="secondary-button profile-action-link">
+              Find roasters
+            </Link>
+          </div>
         </section>
       </>
     )
@@ -59,6 +65,9 @@ function HomePage({ session }) {
         </Link>
         <Link to="/profile/edit" className="secondary-button profile-action-link">
           Edit profile
+        </Link>
+        <Link to="/discover" className="secondary-button profile-action-link">
+          Discover members
         </Link>
         <Link to="/discover/roasters" className="secondary-button profile-action-link">
           Find roasters
@@ -76,8 +85,8 @@ function AppLayout({ session, onSignOut }) {
           <h1>Coffee Connectr</h1>
         </Link>
         <div className="header-actions">
-          <Link to="/discover/roasters" className="secondary-button profile-action-link">
-            Find roasters
+          <Link to="/discover" className="secondary-button profile-action-link">
+            Discover
           </Link>
           {session ? (
             <button type="button" className="secondary-button" onClick={onSignOut}>
@@ -89,6 +98,7 @@ function AppLayout({ session, onSignOut }) {
 
       <Routes>
         <Route path="/" element={<HomePage session={session} />} />
+        <Route path="/discover" element={<DiscoverBrowse />} />
         <Route path="/discover/roasters" element={<DiscoverRoasters />} />
         <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />
         <Route path="/profile/:userId" element={<ProfileViewRoute session={session} />} />
