@@ -298,6 +298,11 @@ button:disabled {
   margin-bottom: 1rem;
 }
 
+.completion-banner.below-header {
+  margin-top: 1.25rem;
+  margin-bottom: 0;
+}
+
 .completion-copy {
   display: flex;
   flex-direction: column;
@@ -455,6 +460,8 @@ button:disabled {
 .profile-avatar-wrap {
   margin-top: -3rem;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .profile-avatar,

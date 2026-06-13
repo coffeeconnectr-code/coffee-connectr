@@ -212,18 +212,6 @@ export default function ProfileView({ userId, currentUserId }) {
       </div>
 
       <div className="profile-view-body card">
-        {completion && completion.percent < 100 ? (
-          <div className="completion-banner">
-            <div className="completion-copy">
-              <strong>Profile {completion.percent}% complete</strong>
-              <p>Add: {completion.missing.slice(0, 3).join(', ')}</p>
-            </div>
-            <Link to="/profile/edit" className="secondary-button profile-action-link">
-              Finish profile
-            </Link>
-          </div>
-        ) : null}
-
         <div className="profile-view-top">
           <div className="profile-avatar-wrap">
             {profile.profile_photo_url ? (
@@ -267,6 +255,18 @@ export default function ProfileView({ userId, currentUserId }) {
             ) : null}
           </div>
         </div>
+
+        {completion && completion.percent < 100 ? (
+          <div className="completion-banner below-header">
+            <div className="completion-copy">
+              <strong>Profile {completion.percent}% complete</strong>
+              <p>Add: {completion.missing.slice(0, 3).join(', ')}</p>
+            </div>
+            <Link to="/profile/edit" className="secondary-button profile-action-link">
+              Finish profile
+            </Link>
+          </div>
+        ) : null}
 
         {showAboutSection ? (
           <ProfileSection title="About">{aboutSection}</ProfileSection>
