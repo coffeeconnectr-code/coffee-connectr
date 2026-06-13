@@ -19,12 +19,16 @@ export async function uploadProfileImage(file, bucket, userId) {
 export async function fetchProfile(userId) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, profile_roasters(*)')
     .eq('user_id', userId)
     .maybeSingle()
 
   if (error) {
     throw error
+  }
+
+  if (data?.profile_roasters) {
+    data.profile_roasters.sort((a, b) => a.sort_order - b.sort_order)
   }
 
   return data

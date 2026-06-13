@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
+import DiscoverRoasters from './components/DiscoverRoasters'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
 import './App.css'
@@ -32,7 +33,20 @@ function EditProfileRoute({ session }) {
 
 function HomePage({ session }) {
   if (!session) {
-    return <Auth />
+    return (
+      <>
+        <Auth />
+        <section className="card home-card">
+          <h2>Looking for roasting capacity?</h2>
+          <p className="status-message">
+            Browse members by roaster brand — useful for contract roasting on specific equipment.
+          </p>
+          <Link to="/discover/roasters" className="secondary-button profile-action-link">
+            Find roasters
+          </Link>
+        </section>
+      </>
+    )
   }
 
   return (
@@ -46,6 +60,9 @@ function HomePage({ session }) {
         <Link to="/profile/edit" className="secondary-button profile-action-link">
           Edit profile
         </Link>
+        <Link to="/discover/roasters" className="secondary-button profile-action-link">
+          Find roasters
+        </Link>
       </div>
     </section>
   )
@@ -58,15 +75,21 @@ function AppLayout({ session, onSignOut }) {
         <Link to="/" className="brand-link">
           <h1>Coffee Connectr</h1>
         </Link>
-        {session ? (
-          <button type="button" className="secondary-button" onClick={onSignOut}>
-            Sign out
-          </button>
-        ) : null}
+        <div className="header-actions">
+          <Link to="/discover/roasters" className="secondary-button profile-action-link">
+            Find roasters
+          </Link>
+          {session ? (
+            <button type="button" className="secondary-button" onClick={onSignOut}>
+              Sign out
+            </button>
+          ) : null}
+        </div>
       </header>
 
       <Routes>
         <Route path="/" element={<HomePage session={session} />} />
+        <Route path="/discover/roasters" element={<DiscoverRoasters />} />
         <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />
         <Route path="/profile/:userId" element={<ProfileViewRoute session={session} />} />
       </Routes>

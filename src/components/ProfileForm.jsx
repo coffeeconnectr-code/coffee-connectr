@@ -8,7 +8,14 @@ import {
 } from '../lib/profileConstants'
 import { fetchProfile, saveProfile, uploadProfileImage } from '../lib/profileApi'
 import { getProfileCompletion } from '../lib/profileCompletion'
+import { isRoastingProfile } from '../lib/roasterConstants'
+import { saveProfileRoasters } from '../lib/roasterApi'
 import LocationPicker from './LocationPicker'
+import RoastingEquipmentForm, {
+  emptyMachine,
+  machinesFromDatabase,
+  normalizeMachinesForSave,
+} from './RoastingEquipmentForm'
 
 const emptyForm = {
   profile_type: 'individual',
@@ -72,6 +79,9 @@ function profileToForm(profile) {
 
 export default function ProfileForm({ userId, userEmail }) {
   const [form, setForm] = useState(emptyForm)
+  const [machines, setMachines] = useState([{ ...emptyMachine }])
+  const [totalCapacity, setTotalCapacity] = useState('')
+  const [contractCapacity, setContractCapacity] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
@@ -87,6 +97,9 @@ export default function ProfileForm({ userId, userEmail }) {
         const profile = await fetchProfile(userId)
         if (active) {
           setForm(profileToForm(profile))
+          setMachines(machinesFromDatabase(profile?.profile_roasters))
+          setTotalCapacity(profile?.total_roasting_capacity_kg?.toString() ?? '')
+          setContractCapacity(profile?.contract_roasting_capacity_kg?.toString() ?? '')
         }
       } catch (error) {
         if (active) {
@@ -182,10 +195,23 @@ export default function ProfileForm({ userId, userEmail }) {
       services_offered:
         form.profile_type === 'business' ? form.services_offered.trim() || null : null,
       opening_hours: form.profile_type === 'business' ? form.opening_hours.trim() || null : null,
+      total_roasting_capacity_kg: isRoastingProfile(form) && totalCapacity
+        ? Number(totalCapacity)
+        : null,
+      contract_roasting_capacity_kg: isRoastingProfile(form) && contractCapacity
+        ? Number(contractCapacity)
+        : null,
     }
 
     try {
-      await saveProfile(payload)
+      const savedProfile = await saveProfile(payload)
+
+      if (isRoastingProfile(form)) {
+        await saveProfileRoasters(savedProfile.id, normalizeMachinesForSave(machines))
+      } else {
+        await saveProfileRoasters(savedProfile.id, [])
+      }
+
       setMessage('Profile saved.')
     } catch (error) {
       setMessage(error.message)
@@ -199,12 +225,16 @@ export default function ProfileForm({ userId, userEmail }) {
   }
 
   const isIndividual = form.profile_type === 'individual'
+  const showRoastingSection = isRoastingProfile(form)
   const completion = getProfileCompletion({
     ...form,
     skills_specialties: splitList(form.skills_specialties),
     languages: splitList(form.languages),
     years_of_experience: form.years_of_experience ? Number(form.years_of_experience) : null,
     year_established: form.year_established ? Number(form.year_established) : null,
+    total_roasting_capacity_kg: totalCapacity ? Number(totalCapacity) : null,
+    contract_roasting_capacity_kg: contractCapacity ? Number(contractCapacity) : null,
+    profile_roasters: normalizeMachinesForSave(machines).filter((machine) => machine.batch_size_kg),
   })
 
   return (
@@ -504,6 +534,17 @@ export default function ProfileForm({ userId, userEmail }) {
             </label>
           </fieldset>
         )}
+
+        {showRoastingSection ? (
+          <RoastingEquipmentForm
+            machines={machines}
+            totalCapacity={totalCapacity}
+            contractCapacity={contractCapacity}
+            onMachinesChange={setMachines}
+            onTotalCapacityChange={setTotalCapacity}
+            onContractCapacityChange={setContractCapacity}
+          />
+        ) : null}
 
         <button type="submit" className="primary-button" disabled={saving}>
           {saving ? 'Saving...' : 'Save profile'}

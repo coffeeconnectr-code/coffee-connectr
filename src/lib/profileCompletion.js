@@ -32,21 +32,42 @@ const BUSINESS_CHECKS = [
   { label: 'Opening hours', test: (profile) => Boolean(profile.opening_hours?.trim()) },
 ]
 
+const ROASTING_CHECKS = [
+  {
+    label: 'At least one roaster listed',
+    test: (profile) => (profile.profile_roasters?.length ?? 0) > 0,
+  },
+  {
+    label: 'Total roasting capacity',
+    test: (profile) => profile.total_roasting_capacity_kg != null,
+  },
+  {
+    label: 'Contract roasting capacity',
+    test: (profile) => profile.contract_roasting_capacity_kg != null,
+  },
+]
+
 function hasSocialLink(profile) {
   return Boolean(
     profile.website?.trim() || profile.linkedin_url?.trim() || profile.instagram_url?.trim(),
   )
 }
 
+import { isRoastingProfile } from './roasterConstants'
+
 export function getProfileCompletion(profile) {
   if (!profile) {
     return { percent: 0, missing: ['Create your profile'] }
   }
 
-  const checks =
+  let checks =
     profile.profile_type === 'business'
       ? [...SHARED_CHECKS, ...BUSINESS_CHECKS]
       : [...SHARED_CHECKS, ...INDIVIDUAL_CHECKS]
+
+  if (isRoastingProfile(profile)) {
+    checks = [...checks, ...ROASTING_CHECKS]
+  }
 
   const completed = checks.filter((check) => check.test(profile))
   const missing = checks.filter((check) => !check.test(profile)).map((check) => check.label)

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchProfile } from '../lib/profileApi'
 import { getProfileCompletion, getSocialLinks } from '../lib/profileCompletion'
+import { formatBatchSize, formatCapacity, isRoastingProfile } from '../lib/roasterConstants'
 import { OPEN_TO_OPTIONS } from '../lib/profileConstants'
 import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
@@ -202,6 +203,12 @@ export default function ProfileView({ userId, currentUserId }) {
         profile.services_offered ||
         profile.opening_hours
 
+  const roasters = profile.profile_roasters ?? []
+  const showRoastingSection =
+    roasters.length > 0 ||
+    profile.total_roasting_capacity_kg != null ||
+    profile.contract_roasting_capacity_kg != null
+
   return (
     <article className="profile-view">
       <div
@@ -288,6 +295,36 @@ export default function ProfileView({ userId, currentUserId }) {
           </ProfileSection>
         ) : isOwnProfile ? (
           <p className="profile-empty-hint">Add a map pin in Edit profile so people know where you are.</p>
+        ) : null}
+
+        {showRoastingSection ? (
+          <ProfileSection title="Roasting equipment">
+            {roasters.length ? (
+              <div className="roaster-machine-list">
+                {roasters.map((machine) => (
+                  <div key={machine.id} className="roaster-machine-card">
+                    <strong>{machine.roaster_brand}</strong>
+                    <span>{formatBatchSize(machine.batch_size_kg)} batch size</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            <dl className="profile-details">
+              <Detail
+                label="Total roasting capacity"
+                value={formatCapacity(profile.total_roasting_capacity_kg)}
+              />
+              <Detail
+                label="Contract roasting available"
+                value={formatCapacity(profile.contract_roasting_capacity_kg)}
+              />
+            </dl>
+          </ProfileSection>
+        ) : isOwnProfile && isRoastingProfile(profile) ? (
+          <p className="profile-empty-hint">
+            Add your roasters and capacity in Edit profile so members can find you for contract
+            roasting.
+          </p>
         ) : null}
 
         {showDetailsSection ? (
