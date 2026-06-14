@@ -1,10 +1,8 @@
 import { Link } from 'react-router-dom'
 import { CATEGORIES, getCategoryIcon } from '../lib/profileConstants'
-import {
-  LANDING_CONTACT_EMAIL,
-  LANDING_SOCIAL_LINKS,
-  LANDING_STEPS,
-} from '../lib/landingConstants'
+import { LANDING_STEPS } from '../lib/landingConstants'
+import SiteFooter from './SiteFooter'
+import SiteTopNav from './SiteTopNav'
 import './LandingPage.css'
 
 export default function LandingPage({ session }) {
@@ -12,25 +10,7 @@ export default function LandingPage({ session }) {
 
   return (
     <div className="landing-page">
-      <header className="landing-topbar">
-        <Link to="/" className="landing-wordmark">
-          Coffee Connectr
-        </Link>
-        <nav className="landing-topnav" aria-label="Main">
-          <Link to="/discover/map" className="landing-topnav-link">
-            Explore map
-          </Link>
-          {session ? (
-            <Link to="/dashboard" className="landing-topnav-link">
-              Dashboard
-            </Link>
-          ) : (
-            <Link to="/sign-up" className="landing-topnav-link">
-              Sign in
-            </Link>
-          )}
-        </nav>
-      </header>
+      <SiteTopNav session={session} />
 
       <section className="landing-hero">
         <div className="landing-hero-copy">
@@ -65,6 +45,11 @@ export default function LandingPage({ session }) {
               </article>
             ))}
           </div>
+          <p className="landing-section-lead landing-section-follow">
+            <Link to="/how-to-use" className="landing-footer-link">
+              Read the full how-to guide
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -74,7 +59,10 @@ export default function LandingPage({ session }) {
             Explore the community
           </h2>
           <p className="landing-section-lead">
-            Thirteen ways to connect across the coffee supply chain — from origin to recruitment.
+            Thirteen ways to connect across the coffee supply chain — from origin to recruitment.{' '}
+            <Link to="/about" className="landing-footer-link">
+              Learn more about Coffee Connectr
+            </Link>
           </p>
           <div className="landing-category-grid">
             {CATEGORIES.map((category) => (
@@ -93,35 +81,7 @@ export default function LandingPage({ session }) {
         </div>
       </section>
 
-      <footer className="landing-footer">
-        <div className="landing-footer-inner">
-          <p className="landing-footer-mission">
-            Let&apos;s build a more profitable and sustainable coffee industry together.
-          </p>
-          <div className="landing-footer-links">
-            <a href={`mailto:${LANDING_CONTACT_EMAIL}`} className="landing-footer-link">
-              {LANDING_CONTACT_EMAIL}
-            </a>
-            <a
-              href={LANDING_SOCIAL_LINKS.instagram}
-              target="_blank"
-              rel="noreferrer"
-              className="landing-footer-link"
-            >
-              Instagram
-            </a>
-            <a
-              href={LANDING_SOCIAL_LINKS.facebook}
-              target="_blank"
-              rel="noreferrer"
-              className="landing-footer-link"
-            >
-              Facebook
-            </a>
-          </div>
-          <p className="landing-footer-note">Coffee Connectr</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }
