@@ -138,7 +138,7 @@ Deno.serve(async (request) => {
       throw senderProfileError
     }
 
-    const siteUrl = Deno.env.get('SITE_URL') ?? 'https://coffee-connectr.vercel.app'
+    const siteUrl = Deno.env.get('SITE_URL') ?? 'https://www.coffeeconnectr.com'
     const fromEmail =
       Deno.env.get('RESEND_FROM_EMAIL') ?? 'Coffee Connectr <onboarding@resend.dev>'
     const senderName = senderProfile?.name?.trim() || 'A Coffee Connectr member'

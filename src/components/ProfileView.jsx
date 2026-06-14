@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { buildShareUrl } from '../lib/siteConfig'
 import { fetchProfile } from '../lib/profileApi'
 import { isFavourite } from '../lib/favouritesApi'
 import { getProfileCompletion, getSocialLinks } from '../lib/profileCompletion'
@@ -135,7 +136,7 @@ export default function ProfileView({ userId, currentUserId }) {
 
   async function handleCopyLink() {
     try {
-      await navigator.clipboard.writeText(window.location.href)
+      await navigator.clipboard.writeText(buildShareUrl(`/profile/${userId}`))
       setCopied(true)
       window.setTimeout(() => setCopied(false), 2000)
     } catch {

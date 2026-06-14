@@ -9,7 +9,7 @@
 -- 4. Add function secrets in Supabase Dashboard → Edge Functions → Secrets:
 --      RESEND_API_KEY = your Resend API key
 --      RESEND_FROM_EMAIL = Coffee Connectr <onboarding@resend.dev>
---      SITE_URL = https://coffee-connectr.vercel.app
+--      SITE_URL = https://www.coffeeconnectr.com
 --
 -- For testing, Resend lets you send from onboarding@resend.dev to your own email.
 -- For production, verify your own domain in Resend and update RESEND_FROM_EMAIL.
