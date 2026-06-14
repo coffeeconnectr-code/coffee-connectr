@@ -77,6 +77,14 @@ function DashboardRoute({ session }) {
   )
 }
 
+function SignUpRoute({ session }) {
+  if (session) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return <SignUpPage />
+}
+
 function SavedProfilesRoute({ session }) {
   if (!session) {
     return <Navigate to="/sign-up" replace />
@@ -237,7 +245,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage session={session} />} />
-      <Route path="/sign-up" element={<SignUpPage />} />
+      <Route path="/sign-up" element={<SignUpRoute session={session} />} />
       <Route path="/admin" element={<AdminRoute session={session} />}>
         <Route index element={<AdminDashboard />} />
         <Route path="moderation" element={<AdminModeration />} />

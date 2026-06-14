@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 export default function Auth() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
@@ -13,12 +15,14 @@ export default function Auth() {
     setLoading(true)
     setMessage('')
 
-    const { error } = isSignUp
+    const { data, error } = isSignUp
       ? await supabase.auth.signUp({ email, password })
       : await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setMessage(error.message)
+    } else if (data.session) {
+      navigate(isSignUp ? '/profile/edit' : '/dashboard', { replace: true })
     } else if (isSignUp) {
       setMessage('Check your email to confirm your account (if confirmation is enabled).')
     }
@@ -33,7 +37,7 @@ export default function Auth() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: `${window.location.origin}/dashboard`,
       },
     })
 
