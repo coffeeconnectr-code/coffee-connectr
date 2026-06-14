@@ -2,16 +2,20 @@
 --
 -- 1. Create a free Resend account: https://resend.com
 -- 2. Create an API key in Resend → API Keys
--- 3. Deploy the edge function from your project folder:
+-- 3. Deploy the edge functions from your project folder:
 --      npx supabase login
 --      npx supabase link --project-ref YOUR_PROJECT_REF
 --      npx supabase functions deploy send-message-notification
 --      npx supabase functions deploy send-report-notification
--- 4. Add function secrets in Supabase Dashboard → Edge Functions → Secrets:
+--      npx supabase functions deploy send-contact-form
+--      npx supabase functions deploy send-welcome-email
+-- 4. Run welcome_email.sql in the SQL Editor (tracks one welcome email per member)
+-- 5. Add function secrets in Supabase Dashboard → Edge Functions → Secrets:
 --      RESEND_API_KEY = your Resend API key
 --      RESEND_FROM_EMAIL = Coffee Connectr <onboarding@resend.dev>
 --      SITE_URL = https://www.coffeeconnectr.com
 --      ADMIN_EMAIL = your-email@example.com  (optional fallback if admin profile email lookup fails)
 --
 -- Report notifications email all accounts with is_admin = true.
+-- Welcome emails send once when a new member signs in (includes the How to Use guide).
 -- For production, verify your own domain in Resend and update RESEND_FROM_EMAIL.

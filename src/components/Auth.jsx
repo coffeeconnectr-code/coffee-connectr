@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { notifyWelcomeEmail } from '../lib/notificationsApi'
 
 export default function Auth() {
   const navigate = useNavigate()
@@ -22,6 +23,9 @@ export default function Auth() {
     if (error) {
       setMessage(error.message)
     } else if (data.session) {
+      if (isSignUp) {
+        notifyWelcomeEmail(data.session.user.id)
+      }
       navigate(isSignUp ? '/profile/edit' : '/dashboard', { replace: true })
     } else if (isSignUp) {
       setMessage('Check your email to confirm your account (if confirmation is enabled).')

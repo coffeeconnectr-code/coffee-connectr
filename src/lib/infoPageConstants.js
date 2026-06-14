@@ -143,6 +143,15 @@ export const HOW_TO_USE_STEPS = [
       'Post your own listing with photos, a price, a category and a location, so the right buyer can find it.',
     ],
   },
+  {
+    number: '07',
+    title: 'Tools & resources',
+    intro: 'Share useful links, templates, and documents with the community.',
+    bullets: [
+      'Browse the Tools & Resources section for guides, spreadsheets, and online tools.',
+      'Post a link or upload a document to help other members.',
+    ],
+  },
 ]
 
 export const PROFILE_TIPS = [

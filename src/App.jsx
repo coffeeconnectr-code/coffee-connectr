@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import { fetchMemberAccess } from './lib/subscriptionApi'
+import { notifyWelcomeEmail } from './lib/notificationsApi'
 import DiscoverBrowse from './components/DiscoverBrowse'
 import DiscoverMap from './components/DiscoverMap'
 import DiscoverRoasters from './components/DiscoverRoasters'
@@ -306,6 +307,10 @@ export default function App() {
         (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED')
       ) {
         fetchMemberAccess().catch(() => {})
+      }
+
+      if (nextSession?.user?.id && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+        notifyWelcomeEmail(nextSession.user.id)
       }
     })
 
