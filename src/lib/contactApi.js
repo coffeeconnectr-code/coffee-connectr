@@ -35,3 +35,18 @@ export function profileMayShareContact(profile) {
 
   return Boolean(profile.show_contact_email || profile.show_contact_phone)
 }
+
+export async function fetchProfileContactStats(profileUserId) {
+  const { data, error } = await supabase.rpc('get_profile_contact_stats', {
+    target_user_id: profileUserId,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return {
+    contactedCount: data?.contacted_count ?? 0,
+    contactedByCount: data?.contacted_by_count ?? 0,
+  }
+}

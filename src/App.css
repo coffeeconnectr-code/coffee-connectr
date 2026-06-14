@@ -774,6 +774,42 @@ button:disabled {
   border-top: 1px solid var(--border);
 }
 
+.profile-contact-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.profile-contact-stat {
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--accent) 6%, var(--card));
+}
+
+.profile-contact-stat-value {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.profile-contact-stat-label {
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.profile-contact-stat-meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .completion-banner {
   display: flex;
   align-items: center;
@@ -1285,5 +1321,9 @@ button:disabled {
 
   .messages-thread-title {
     order: -1;
+  }
+
+  .profile-contact-stats {
+    grid-template-columns: 1fr;
   }
 }

@@ -8,6 +8,7 @@ import { OPEN_TO_OPTIONS } from '../lib/profileConstants'
 import CategoryLabel from './CategoryLabel'
 import FavouriteButton from './FavouriteButton'
 import ProfileContact from './ProfileContact'
+import ProfileContactStats from './ProfileContactStats'
 import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
 
@@ -308,6 +309,12 @@ export default function ProfileView({ userId, currentUserId }) {
                 <CategoryLabel category={profile.primary_category} />
               </span>
             ) : null}
+
+            <ProfileContactStats
+              profileUserId={userId}
+              profileName={profile.name}
+              isOwnProfile={isOwnProfile}
+            />
           </div>
         </div>
 
