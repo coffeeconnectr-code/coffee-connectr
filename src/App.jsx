@@ -15,6 +15,7 @@ import SavedProfiles from './components/SavedProfiles'
 import SignUpPage from './components/SignUpPage'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
+import MemberDashboard from './components/MemberDashboard'
 import AdminDashboard from './components/admin/AdminDashboard'
 import AdminGate from './components/admin/AdminGate'
 import AdminLayout from './components/admin/AdminLayout'
@@ -61,6 +62,19 @@ function MessageThreadRoute({ session }) {
   }
 
   return <MessageThread currentUserId={session.user.id} otherUserId={userId} />
+}
+
+function DashboardRoute({ session }) {
+  if (!session) {
+    return <Navigate to="/sign-up" replace />
+  }
+
+  return (
+    <MemberDashboard
+      userId={session.user.id}
+      userEmail={session.user.email ?? 'your account'}
+    />
+  )
 }
 
 function SavedProfilesRoute({ session }) {
@@ -158,6 +172,9 @@ function AppShell({ session, onSignOut }) {
           </Link>
           {session ? (
             <>
+              <Link to="/dashboard" className="secondary-button profile-action-link dashboard-nav-link">
+                Dashboard
+              </Link>
               {isAdmin ? (
                 <Link to="/admin" className="secondary-button profile-action-link">
                   Admin
@@ -232,6 +249,7 @@ export default function App() {
         <Route path="/discover" element={<DiscoverBrowse currentUserId={session?.user?.id ?? null} />} />
         <Route path="/discover/map" element={<DiscoverMap />} />
         <Route path="/discover/roasters" element={<DiscoverRoasters />} />
+        <Route path="/dashboard" element={<DashboardRoute session={session} />} />
         <Route path="/noticeboard" element={<NoticeboardBrowse currentUserId={session?.user?.id ?? null} />} />
         <Route path="/noticeboard/map" element={<NoticeboardMap />} />
         <Route path="/noticeboard/new" element={<NoticeboardNewRoute session={session} />} />

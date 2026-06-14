@@ -21,8 +21,8 @@ export default function LandingPage({ session }) {
             Explore map
           </Link>
           {session ? (
-            <Link to={`/profile/${session.user.id}`} className="landing-topnav-link">
-              My profile
+            <Link to="/dashboard" className="landing-topnav-link">
+              Dashboard
             </Link>
           ) : (
             <Link to="/sign-up" className="landing-topnav-link">

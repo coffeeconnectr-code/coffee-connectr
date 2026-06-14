@@ -21,6 +21,11 @@ export default function AdminLayout() {
         <Link to="/discover" className="secondary-button profile-action-link">
           Back to app
         </Link>
+        {session?.user?.id ? (
+          <Link to="/dashboard" className="secondary-button profile-action-link">
+            Dashboard
+          </Link>
+        ) : null}
       </div>
 
       <nav className="admin-nav">
