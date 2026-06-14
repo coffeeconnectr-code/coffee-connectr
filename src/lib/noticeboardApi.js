@@ -114,18 +114,28 @@ export async function fetchNoticeboardPost(postId) {
   return post
 }
 
-export async function fetchMyNoticeboardPosts(userId) {
-  const { data, error } = await supabase
+export async function fetchUserNoticeboardPosts(userId, { includeAll = false } = {}) {
+  let query = supabase
     .from('noticeboard_posts')
     .select(POST_SELECT)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
+
+  if (!includeAll) {
+    query = query.eq('status', 'active').gt('expires_at', new Date().toISOString())
+  }
+
+  const { data, error } = await query
 
   if (error) {
     throw error
   }
 
   return data ?? []
+}
+
+export async function fetchMyNoticeboardPosts(userId) {
+  return fetchUserNoticeboardPosts(userId, { includeAll: true })
 }
 
 export async function createNoticeboardPost(userId, payload) {

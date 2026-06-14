@@ -1,4 +1,5 @@
 import { getCategoryIcon } from './profileConstants'
+import { getSectionIcon } from './noticeboardConstants'
 
 export const MAP_COLORS = {
   water: '#C4A35A',
@@ -115,6 +116,13 @@ export function createMapPinElement(category) {
   const element = document.createElement('div')
   element.className = 'coffee-map-pin'
   element.innerHTML = `<span class="coffee-map-pin-icon" aria-hidden="true">${getCategoryIcon(category)}</span>`
+  return element
+}
+
+export function createListingPinElement(section) {
+  const element = document.createElement('div')
+  element.className = 'coffee-map-pin noticeboard-map-pin'
+  element.innerHTML = `<span class="coffee-map-pin-icon" aria-hidden="true">${getSectionIcon(section)}</span>`
   return element
 }
 

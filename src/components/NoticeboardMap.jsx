@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom'
 import useNoticeboardBrowse from '../hooks/useNoticeboardBrowse'
-import NoticeboardCard from './NoticeboardCard'
+import NoticeboardBrowseMap from './NoticeboardBrowseMap'
 import NoticeboardFilters from './NoticeboardFilters'
 
-export default function NoticeboardBrowse({ currentUserId = null }) {
+function postsWithLocation(posts) {
+  return posts.filter((post) => post.latitude != null && post.longitude != null)
+}
+
+export default function NoticeboardMap() {
   const {
     section,
     category,
@@ -17,28 +21,22 @@ export default function NoticeboardBrowse({ currentUserId = null }) {
     updateParam,
   } = useNoticeboardBrowse()
 
+  const onMap = postsWithLocation(results)
+  const missingLocation = results.length - onMap.length
+
   return (
     <section className="card discover-card noticeboard-page">
       <div className="discover-header">
         <div>
-          <h2>Noticeboard</h2>
+          <h2>Noticeboard map</h2>
           <p className="status-message">
-            Classifieds, jobs, events, and industry listings from the community.
+            See where listings are located — equipment for sale, jobs, events, and more.
           </p>
         </div>
         <div className="discover-header-actions">
-          <Link to="/noticeboard/map" className="secondary-button profile-action-link">
-            Map view
+          <Link to="/noticeboard" className="secondary-button profile-action-link">
+            List view
           </Link>
-          {currentUserId ? (
-            <Link to="/noticeboard/new" className="primary-button profile-action-link">
-              Post listing
-            </Link>
-          ) : (
-            <Link to="/sign-up" className="primary-button profile-action-link">
-              Sign in to post
-            </Link>
-          )}
         </div>
       </div>
 
@@ -96,19 +94,20 @@ export default function NoticeboardBrowse({ currentUserId = null }) {
 
       {!loading && !error ? (
         <p className="status-message">
-          {results.length} listing{results.length === 1 ? '' : 's'} found
+          {onMap.length} listing{onMap.length === 1 ? '' : 's'} on map
+          {missingLocation > 0
+            ? ` (${missingLocation} without a map location hidden)`
+            : ''}
         </p>
       ) : null}
 
-      {!loading && !error && results.length === 0 ? (
-        <p className="status-message">No listings match those filters yet.</p>
+      {!loading && !error && onMap.length === 0 ? (
+        <p className="status-message">
+          No listings with a map location match those filters yet.
+        </p>
       ) : null}
 
-      <div className="browse-grid">
-        {results.map((post) => (
-          <NoticeboardCard key={post.id} post={post} />
-        ))}
-      </div>
+      {!loading && !error && onMap.length > 0 ? <NoticeboardBrowseMap posts={results} /> : null}
     </section>
   )
 }

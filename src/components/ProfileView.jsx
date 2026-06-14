@@ -9,6 +9,7 @@ import CategoryLabel from './CategoryLabel'
 import FavouriteButton from './FavouriteButton'
 import ProfileContact from './ProfileContact'
 import ProfileContactStats from './ProfileContactStats'
+import ProfileListings from './ProfileListings'
 import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
 
@@ -352,6 +353,8 @@ export default function ProfileView({ userId, currentUserId }) {
         ) : isOwnProfile ? (
           <p className="profile-empty-hint">Add a map pin in Edit profile so people know where you are.</p>
         ) : null}
+
+        <ProfileListings userId={userId} isOwnProfile={isOwnProfile} />
 
         {showRoastingSection ? (
           <ProfileSection title="Roasting equipment">

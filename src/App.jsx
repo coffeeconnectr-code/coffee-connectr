@@ -9,6 +9,7 @@ import MessageThread from './components/MessageThread'
 import MessagesInbox from './components/MessagesInbox'
 import NoticeboardBrowse from './components/NoticeboardBrowse'
 import NoticeboardForm from './components/NoticeboardForm'
+import NoticeboardMap from './components/NoticeboardMap'
 import NoticeboardPostView from './components/NoticeboardPostView'
 import SavedProfiles from './components/SavedProfiles'
 import SignUpPage from './components/SignUpPage'
@@ -177,6 +178,7 @@ export default function App() {
         <Route path="/discover/map" element={<DiscoverMap />} />
         <Route path="/discover/roasters" element={<DiscoverRoasters />} />
         <Route path="/noticeboard" element={<NoticeboardBrowse currentUserId={session?.user?.id ?? null} />} />
+        <Route path="/noticeboard/map" element={<NoticeboardMap />} />
         <Route path="/noticeboard/new" element={<NoticeboardNewRoute session={session} />} />
         <Route path="/noticeboard/:postId/edit" element={<NoticeboardEditRoute session={session} />} />
         <Route path="/noticeboard/:postId" element={<NoticeboardPostRoute session={session} />} />

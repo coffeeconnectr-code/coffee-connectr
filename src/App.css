@@ -1196,6 +1196,16 @@ button:disabled {
   line-height: 1;
 }
 
+.noticeboard-map-pin {
+  border-color: #b08d57;
+  border-radius: 10px;
+  transform: none;
+}
+
+.noticeboard-map-pin .coffee-map-pin-icon {
+  transform: none;
+}
+
 .maplibregl-ctrl-group button {
   background: var(--card);
   border-color: var(--border);
@@ -1477,6 +1487,79 @@ button:disabled {
   border-color: color-mix(in srgb, #d46a6a 40%, var(--border));
 }
 
+.profile-listings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.profile-listings-header h3 {
+  margin: 0;
+}
+
+.profile-listings {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.profile-listing-card {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--accent) 4%, var(--input-bg));
+}
+
+.profile-listing-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profile-listing-top h4 {
+  margin: 0.4rem 0 0.25rem;
+  font-size: 1rem;
+}
+
+.profile-listing-top h4 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.profile-listing-top h4 a:hover {
+  color: var(--accent);
+}
+
+.profile-listing-status {
+  flex-shrink: 0;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.profile-listing-status-sold,
+.profile-listing-status-filled {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--text-muted);
+}
+
+.profile-listing-status-expired {
+  background: color-mix(in srgb, #d46a6a 12%, transparent);
+  color: #d46a6a;
+}
+
+.profile-listing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
 @media (max-width: 640px) {
   .page-header {
     flex-direction: column;
@@ -1507,6 +1590,11 @@ button:disabled {
 
   .noticeboard-post-header {
     flex-direction: column;
+  }
+
+  .profile-listings-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .discover-header {

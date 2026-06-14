@@ -12,6 +12,20 @@ export const NOTICEBOARD_SECTIONS = [
   { id: 'services', label: 'Services / Gigs', group: 'additions' },
 ]
 
+export const SECTION_ICONS = {
+  listings: '📋',
+  for_sale: '🏷️',
+  jobs: '💼',
+  news: '📰',
+  events: '📅',
+  green_coffee: '🌱',
+  wanted: '🔍',
+  wholesale: '📦',
+  premises: '🏪',
+  collaborations: '🤝',
+  services: '⚡',
+}
+
 export const NOTICEBOARD_STATUS = {
   active: 'Active',
   sold: 'Sold',
@@ -32,6 +46,10 @@ export const PRICE_SECTIONS = new Set([
 
 export function getSectionLabel(sectionId) {
   return NOTICEBOARD_SECTIONS.find((section) => section.id === sectionId)?.label ?? sectionId
+}
+
+export function getSectionIcon(sectionId) {
+  return SECTION_ICONS[sectionId] ?? '📌'
 }
 
 export function formatPostPrice(post) {
