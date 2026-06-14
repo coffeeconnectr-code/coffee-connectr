@@ -62,22 +62,46 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  v_subscription public.member_subscriptions%rowtype;
 begin
-  insert into public.member_subscriptions (
-    user_id,
-    plan_type,
-    status,
-    trial_started_at,
-    trial_ends_at
-  )
-  values (
-    p_user_id,
-    'individual',
-    'trialing',
-    now(),
-    now() + interval '30 days'
-  )
-  on conflict (user_id) do nothing;
+  select *
+  into v_subscription
+  from public.member_subscriptions
+  where user_id = p_user_id;
+
+  if not found then
+    insert into public.member_subscriptions (
+      user_id,
+      plan_type,
+      status,
+      trial_started_at,
+      trial_ends_at
+    )
+    values (
+      p_user_id,
+      'individual',
+      'trialing',
+      now(),
+      now() + interval '30 days'
+    );
+    return;
+  end if;
+
+  if v_subscription.status = 'active'
+    and (v_subscription.current_period_end is null or v_subscription.current_period_end > now()) then
+    return;
+  end if;
+
+  if v_subscription.status = 'past_due' then
+    return;
+  end if;
+
+  if v_subscription.status = 'trialing' and v_subscription.trial_ends_at > now() then
+    return;
+  end if;
+
+  return;
 end;
 $$;
 
@@ -231,6 +255,10 @@ begin
   into v_subscription
   from public.member_subscriptions
   where user_id = v_user_id;
+
+  if not found then
+    raise exception 'Could not provision member subscription for user %', v_user_id;
+  end if;
 
   v_has_access := public.has_active_member_access(v_user_id);
 

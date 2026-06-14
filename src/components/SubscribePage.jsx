@@ -23,13 +23,16 @@ export default function SubscribePage({ session }) {
     return <Navigate to="/dashboard" replace />
   }
 
+  const membershipUnavailable = access.status === 'unknown' || access.status === 'anonymous'
+
   return (
     <section className="card subscribe-page">
       <p className="info-eyebrow">Membership required</p>
-      <h2>Your free trial has ended</h2>
+      <h2>{membershipUnavailable ? 'We could not verify your membership' : 'Your free trial has ended'}</h2>
       <p className="status-message">
-        To keep your profile visible on the map and continue messaging, saving profiles, and
-        posting on the noticeboard, choose a monthly plan.
+        {membershipUnavailable
+          ? 'Your account does not have an active trial yet. Sign out and back in after your site admin runs the subscription setup in Supabase. If this keeps happening, contact us.'
+          : 'To keep your profile visible on the map and continue messaging, saving profiles, and posting on the noticeboard, choose a monthly plan.'}
       </p>
 
       <div className="subscribe-plan-summary">

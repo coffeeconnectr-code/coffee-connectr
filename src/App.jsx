@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom'
 import { supabase } from './lib/supabase'
+import { fetchMemberAccess } from './lib/subscriptionApi'
 import DiscoverBrowse from './components/DiscoverBrowse'
 import DiscoverMap from './components/DiscoverMap'
 import DiscoverRoasters from './components/DiscoverRoasters'
@@ -255,8 +256,15 @@ export default function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
       setSession(nextSession)
+
+      if (
+        nextSession?.user?.id &&
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED')
+      ) {
+        fetchMemberAccess().catch(() => {})
+      }
     })
 
     return () => subscription.unsubscribe()
