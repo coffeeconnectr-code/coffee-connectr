@@ -18,4 +18,10 @@
 --
 -- Report notifications email all accounts with is_admin = true.
 -- Welcome emails send once when a new member signs in (includes the How to Use guide).
+-- If welcome emails do not arrive, check:
+--   1. welcome_email.sql has been run
+--   2. send-welcome-email is deployed (Edge Functions list in Supabase)
+--   3. RESEND_API_KEY and RESEND_FROM_EMAIL secrets are set
+--   4. Resend can send to any address (verify coffeeconnectr.com domain in Resend)
+--   5. Edge Functions → send-welcome-email → Logs after a test sign-in
 -- For production, verify your own domain in Resend and update RESEND_FROM_EMAIL.

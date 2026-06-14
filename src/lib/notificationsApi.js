@@ -20,12 +20,31 @@ export async function notifyNewReport(reportId) {
   }
 }
 
-export async function notifyWelcomeEmail(userId) {
+export async function notifyWelcomeEmail(userId, accessToken = null) {
   try {
-    await supabase.functions.invoke('send-welcome-email', {
+    const options = {
       body: { userId },
-    })
-  } catch {
-    // Email delivery is best-effort and should not block sign-in.
+    }
+
+    if (accessToken) {
+      options.headers = { Authorization: `Bearer ${accessToken}` }
+    }
+
+    const { data, error } = await supabase.functions.invoke('send-welcome-email', options)
+
+    if (error) {
+      console.error('Welcome email failed:', error.message)
+      return { sent: false, error: error.message }
+    }
+
+    if (data?.skipped) {
+      console.info('Welcome email skipped:', data.reason)
+    }
+
+    return data ?? { sent: false }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Welcome email failed:', message)
+    return { sent: false, error: message }
   }
 }

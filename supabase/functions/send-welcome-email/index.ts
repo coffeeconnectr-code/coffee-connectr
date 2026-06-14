@@ -182,6 +182,19 @@ Deno.serve(async (request) => {
       .maybeSingle()
 
     if (existingError) {
+      const message = existingError.message ?? 'Could not check welcome email status'
+      if (message.includes('welcome_emails_sent')) {
+        return new Response(
+          JSON.stringify({
+            error: 'Database setup missing. Run supabase/welcome_email.sql in the SQL Editor.',
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 500,
+          },
+        )
+      }
+
       throw existingError
     }
 
@@ -267,7 +280,15 @@ Deno.serve(async (request) => {
     })
 
     if (emailError) {
-      throw emailError
+      const resendMessage =
+        typeof emailError === 'object' && emailError && 'message' in emailError
+          ? String(emailError.message)
+          : 'Resend rejected the email'
+
+      return new Response(JSON.stringify({ error: resendMessage }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      })
     }
 
     const { error: insertError } = await adminClient.from('welcome_emails_sent').insert({

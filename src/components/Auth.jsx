@@ -24,7 +24,7 @@ export default function Auth() {
       setMessage(error.message)
     } else if (data.session) {
       if (isSignUp) {
-        notifyWelcomeEmail(data.session.user.id)
+        notifyWelcomeEmail(data.session.user.id, data.session.access_token)
       }
       navigate(isSignUp ? '/profile/edit' : '/dashboard', { replace: true })
     } else if (isSignUp) {
