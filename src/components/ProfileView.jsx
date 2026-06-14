@@ -7,6 +7,7 @@ import { formatBatchSize, formatCapacity, isRoastingProfile } from '../lib/roast
 import { OPEN_TO_OPTIONS } from '../lib/profileConstants'
 import CategoryLabel from './CategoryLabel'
 import FavouriteButton from './FavouriteButton'
+import ProfileContact from './ProfileContact'
 import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
 
@@ -108,7 +109,7 @@ export default function ProfileView({ userId, currentUserId }) {
       setError('')
 
       try {
-        const data = await fetchProfile(userId)
+        const data = await fetchProfile(userId, currentUserId)
         if (active) {
           setProfile(data)
         }
@@ -380,6 +381,13 @@ export default function ProfileView({ userId, currentUserId }) {
             {detailsSection}
           </ProfileSection>
         ) : null}
+
+        <ProfileContact
+          profile={profile}
+          profileUserId={userId}
+          currentUserId={currentUserId}
+          isOwnProfile={isOwnProfile}
+        />
       </div>
     </article>
   )

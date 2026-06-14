@@ -752,6 +752,28 @@ button:disabled {
   justify-content: flex-end;
 }
 
+.profile-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.contact-detail-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.contact-detail-link:hover {
+  text-decoration: underline;
+}
+
+.contact-details-revealed {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
 .completion-banner {
   display: flex;
   align-items: center;

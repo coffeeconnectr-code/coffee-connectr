@@ -44,6 +44,10 @@ const emptyForm = {
   team_size: '',
   services_offered: '',
   opening_hours: '',
+  contact_email: '',
+  contact_phone: '',
+  show_contact_email: false,
+  show_contact_phone: false,
   email_on_message: true,
 }
 
@@ -77,6 +81,10 @@ function profileToForm(profile) {
     team_size: profile.team_size ?? '',
     services_offered: profile.services_offered ?? '',
     opening_hours: profile.opening_hours ?? '',
+    contact_email: profile.contact_email ?? '',
+    contact_phone: profile.contact_phone ?? '',
+    show_contact_email: Boolean(profile.show_contact_email),
+    show_contact_phone: Boolean(profile.show_contact_phone),
     email_on_message: profile.email_on_message !== false,
   }
 }
@@ -98,9 +106,15 @@ export default function ProfileForm({ userId, userEmail }) {
       setMessage('')
 
       try {
-        const profile = await fetchProfile(userId)
+        const profile = await fetchProfile(userId, userId)
         if (active) {
           setForm(profileToForm(profile))
+          if (!profile?.contact_email && userEmail) {
+            setForm((current) => ({
+              ...current,
+              contact_email: current.contact_email || userEmail,
+            }))
+          }
           setMachines(machinesFromDatabase(profile?.profile_roasters))
           setTotalCapacity(profile?.total_roasting_capacity_kg?.toString() ?? '')
           setContractCapacity(profile?.contract_roasting_capacity_kg?.toString() ?? '')
@@ -199,6 +213,10 @@ export default function ProfileForm({ userId, userEmail }) {
       services_offered:
         form.profile_type === 'business' ? form.services_offered.trim() || null : null,
       opening_hours: form.profile_type === 'business' ? form.opening_hours.trim() || null : null,
+      contact_email: form.contact_email.trim() || null,
+      contact_phone: form.contact_phone.trim() || null,
+      show_contact_email: form.show_contact_email,
+      show_contact_phone: form.show_contact_phone,
       total_roasting_capacity_kg: isRoastingProfile(form) && totalCapacity
         ? Number(totalCapacity)
         : null,
@@ -409,6 +427,52 @@ export default function ProfileForm({ userId, userEmail }) {
               onChange={(event) => updateField('instagram_url', event.target.value)}
               placeholder="https://instagram.com/..."
             />
+          </label>
+        </fieldset>
+
+        <fieldset className="form-section">
+          <legend>Contact details</legend>
+          <p className="status-message">
+            Members can message you in the app, or reveal your email and phone if you choose to
+            share them.
+          </p>
+
+          <label>
+            Contact email
+            <input
+              type="email"
+              value={form.contact_email}
+              onChange={(event) => updateField('contact_email', event.target.value)}
+              placeholder="you@company.com"
+            />
+          </label>
+
+          <label className="notification-checkbox">
+            <input
+              type="checkbox"
+              checked={form.show_contact_email}
+              onChange={(event) => updateField('show_contact_email', event.target.checked)}
+            />
+            Show email on my profile
+          </label>
+
+          <label>
+            Phone number
+            <input
+              type="tel"
+              value={form.contact_phone}
+              onChange={(event) => updateField('contact_phone', event.target.value)}
+              placeholder="+64 21 000 0000"
+            />
+          </label>
+
+          <label className="notification-checkbox">
+            <input
+              type="checkbox"
+              checked={form.show_contact_phone}
+              onChange={(event) => updateField('show_contact_phone', event.target.checked)}
+            />
+            Show phone number on my profile
           </label>
         </fieldset>
 
