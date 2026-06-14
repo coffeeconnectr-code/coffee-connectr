@@ -8,6 +8,8 @@ import LandingPage from './components/LandingPage'
 import AboutPage from './components/AboutPage'
 import HowToUsePage from './components/HowToUsePage'
 import PricingPage from './components/PricingPage'
+import TermsPage from './components/TermsPage'
+import PrivacyPage from './components/PrivacyPage'
 import MessageThread from './components/MessageThread'
 import MessagesInbox from './components/MessagesInbox'
 import NoticeboardBrowse from './components/NoticeboardBrowse'
@@ -260,6 +262,8 @@ export default function App() {
       <Route path="/about" element={<AboutPage session={session} />} />
       <Route path="/how-to-use" element={<HowToUsePage session={session} />} />
       <Route path="/pricing" element={<PricingPage session={session} />} />
+      <Route path="/terms" element={<TermsPage session={session} />} />
+      <Route path="/privacy" element={<PrivacyPage session={session} />} />
       <Route path="/sign-up" element={<SignUpRoute session={session} />} />
       <Route path="/admin" element={<AdminRoute session={session} />}>
         <Route index element={<AdminDashboard />} />

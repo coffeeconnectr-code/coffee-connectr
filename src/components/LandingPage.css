@@ -239,6 +239,22 @@
   padding: 2rem 0 3rem;
 }
 
+.sign-up-legal-note {
+  max-width: 520px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.sign-up-legal-note a {
+  color: #b08d57;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sign-up-legal-note a:hover {
+  text-decoration: underline;
+}
+
 .sign-up-header {
   width: 100%;
   max-width: 760px;

@@ -420,6 +420,35 @@
   font-size: 0.92rem;
 }
 
+.legal-updated {
+  margin: 1rem 0 0;
+  color: #c8c2b8;
+  font-size: 0.88rem;
+}
+
+.legal-section h2 {
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.legal-bullet-list {
+  margin: 0.65rem 0 0;
+  padding-left: 1.2rem;
+  color: #c8c2b8;
+  line-height: 1.55;
+}
+
+.legal-bullet-list li + li {
+  margin-top: 0.35rem;
+}
+
+.legal-disclaimer {
+  margin: 1rem 0 0;
+  color: #c8c2b8;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
 @media (max-width: 640px) {
   .info-feature-grid {
     grid-template-columns: 1fr;

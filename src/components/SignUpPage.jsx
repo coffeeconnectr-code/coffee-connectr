@@ -11,6 +11,10 @@ export default function SignUpPage() {
 
       <div className="sign-up-page">
         <Auth />
+        <p className="status-message sign-up-legal-note">
+          By creating an account, you agree to our{' '}
+          <Link to="/terms">Terms of Service</Link> and <Link to="/privacy">Privacy Policy</Link>.
+        </p>
         <p className="status-message">
           Already have an account? Sign in above, or{' '}
           <Link to="/">return to the homepage</Link>.
