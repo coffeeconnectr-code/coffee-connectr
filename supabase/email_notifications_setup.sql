@@ -25,3 +25,6 @@
 --   4. Resend can send to any address (verify coffeeconnectr.com domain in Resend)
 --   5. Edge Functions → send-welcome-email → Logs after a test sign-in
 -- For production, verify your own domain in Resend and update RESEND_FROM_EMAIL.
+--
+-- SIGN-UP CONFIRMATION EMAILS (separate from welcome emails):
+-- See supabase/auth_email_setup.sql for Resend SMTP + Supabase Auth URL settings.

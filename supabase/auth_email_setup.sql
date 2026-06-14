@@ -1,0 +1,58 @@
+-- Sign-up confirmation emails are sent by SUPABASE AUTH (not the welcome edge function).
+-- Run this checklist in the Supabase Dashboard if new members do not receive confirm emails.
+--
+-- ---------------------------------------------------------------------------
+-- A. Two different emails (do not mix them up)
+-- ---------------------------------------------------------------------------
+-- 1. CONFIRM SIGN-UP email — sent by Supabase when "Confirm email" is ON
+--    Subject is usually "Confirm your signup" from Supabase/your SMTP sender
+--    Member must click the link before they can sign in
+--
+-- 2. WELCOME email — sent by send-welcome-email edge function AFTER first sign-in
+--    Subject: "Welcome to Coffee Connectr - here's how to get started"
+--
+-- ---------------------------------------------------------------------------
+-- B. URL configuration (required)
+-- ---------------------------------------------------------------------------
+-- Dashboard → Authentication → URL Configuration
+--
+-- Site URL:
+--   https://www.coffeeconnectr.com
+--
+-- Redirect URLs (add all of these):
+--   https://www.coffeeconnectr.com/**
+--   https://coffeeconnectr.com/**
+--   http://localhost:5173/**
+--
+-- ---------------------------------------------------------------------------
+-- C. Enable custom SMTP with Resend (recommended for production)
+-- ---------------------------------------------------------------------------
+-- Without custom SMTP, Supabase's default mailer is unreliable and often lands in spam.
+-- You already use Resend for message/contact/welcome emails — connect the same account here.
+--
+-- Dashboard → Authentication → Emails → SMTP Settings → Enable Custom SMTP
+--
+--   Host:       smtp.resend.com
+--   Port:       465
+--   Username:   resend
+--   Password:   your Resend API key (starts with re_)
+--   Sender:     Coffee Connectr <hello@coffeeconnectr.com>
+--               (must use an address on your VERIFIED domain in Resend)
+--
+-- Then Authentication → Providers → Email:
+--   Confirm email = ON
+--   Secure email change = ON (optional)
+--
+-- ---------------------------------------------------------------------------
+-- D. Quick test option (for beta testing only)
+-- ---------------------------------------------------------------------------
+-- To skip confirmation emails entirely while testing:
+--   Authentication → Providers → Email → turn OFF "Confirm email"
+-- Members can sign in immediately after sign-up; welcome email still sends on sign-in.
+--
+-- ---------------------------------------------------------------------------
+-- E. Verify in Supabase after a test sign-up
+-- ---------------------------------------------------------------------------
+-- Dashboard → Authentication → Users → find the test user
+--   "Waiting for verification" = confirm email was never clicked OR email never arrived
+--   "Confirmed" = they clicked the link
