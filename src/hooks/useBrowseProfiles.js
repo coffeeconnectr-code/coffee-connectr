@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
 import { browseProfiles } from '../lib/browseApi'
 
-export default function useBrowseProfiles() {
+import { CATEGORIES } from '../lib/profileConstants'
+
+export default function useBrowseProfiles(initialCategory = '') {
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState(
+    initialCategory && CATEGORIES.includes(initialCategory) ? initialCategory : '',
+  )
   const [profileType, setProfileType] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(true)

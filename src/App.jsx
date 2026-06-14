@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom'
+import { Link, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom'
 import { supabase } from './lib/supabase'
-import Auth from './components/Auth'
 import DiscoverBrowse from './components/DiscoverBrowse'
 import DiscoverMap from './components/DiscoverMap'
 import DiscoverRoasters from './components/DiscoverRoasters'
+import LandingPage from './components/LandingPage'
 import MessageThread from './components/MessageThread'
 import MessagesInbox from './components/MessagesInbox'
 import SavedProfiles from './components/SavedProfiles'
+import SignUpPage from './components/SignUpPage'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
 import './App.css'
@@ -25,7 +26,7 @@ function ProfileViewRoute({ session }) {
 
 function MessagesRoute({ session }) {
   if (!session) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/sign-up" replace />
   }
 
   return <MessagesInbox currentUserId={session.user.id} />
@@ -35,7 +36,7 @@ function MessageThreadRoute({ session }) {
   const { userId } = useParams()
 
   if (!session) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/sign-up" replace />
   }
 
   return <MessageThread currentUserId={session.user.id} otherUserId={userId} />
@@ -43,7 +44,7 @@ function MessageThreadRoute({ session }) {
 
 function SavedProfilesRoute({ session }) {
   if (!session) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/sign-up" replace />
   }
 
   return <SavedProfiles currentUserId={session.user.id} />
@@ -51,7 +52,7 @@ function SavedProfilesRoute({ session }) {
 
 function EditProfileRoute({ session }) {
   if (!session) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/sign-up" replace />
   }
 
   return (
@@ -62,58 +63,7 @@ function EditProfileRoute({ session }) {
   )
 }
 
-function HomePage({ session }) {
-  if (!session) {
-    return (
-      <>
-        <Auth />
-        <section className="card home-card">
-          <h2>Explore the community</h2>
-          <p className="status-message">
-            Browse coffee professionals and businesses, or search by roaster equipment.
-          </p>
-          <div className="home-actions">
-            <Link to="/discover" className="primary-button profile-action-link">
-              Discover members
-            </Link>
-            <Link to="/discover/roasters" className="secondary-button profile-action-link">
-              Find roasters
-            </Link>
-          </div>
-        </section>
-      </>
-    )
-  }
-
-  return (
-    <section className="card home-card">
-      <h2>Welcome back</h2>
-      <p className="status-message">Signed in as {session.user.email}</p>
-      <div className="home-actions">
-        <Link to={`/profile/${session.user.id}`} className="primary-button profile-action-link">
-          View my profile
-        </Link>
-        <Link to="/profile/edit" className="secondary-button profile-action-link">
-          Edit profile
-        </Link>
-        <Link to="/discover" className="secondary-button profile-action-link">
-          Discover members
-        </Link>
-        <Link to="/discover/roasters" className="secondary-button profile-action-link">
-          Find roasters
-        </Link>
-        <Link to="/messages" className="secondary-button profile-action-link">
-          Messages
-        </Link>
-        <Link to="/saved" className="secondary-button profile-action-link">
-          Saved
-        </Link>
-      </div>
-    </section>
-  )
-}
-
-function AppLayout({ session, onSignOut }) {
+function AppShell({ session, onSignOut }) {
   return (
     <main className="page">
       <header className="page-header">
@@ -121,6 +71,9 @@ function AppLayout({ session, onSignOut }) {
           <h1>Coffee Connectr</h1>
         </Link>
         <div className="header-actions">
+          <Link to="/discover/map" className="secondary-button profile-action-link">
+            Map
+          </Link>
           <Link to="/discover" className="secondary-button profile-action-link">
             Discover
           </Link>
@@ -136,21 +89,15 @@ function AppLayout({ session, onSignOut }) {
                 Sign out
               </button>
             </>
-          ) : null}
+          ) : (
+            <Link to="/sign-up" className="secondary-button profile-action-link">
+              Sign in
+            </Link>
+          )}
         </div>
       </header>
 
-      <Routes>
-        <Route path="/" element={<HomePage session={session} />} />
-        <Route path="/discover" element={<DiscoverBrowse currentUserId={session?.user?.id ?? null} />} />
-        <Route path="/discover/map" element={<DiscoverMap />} />
-        <Route path="/discover/roasters" element={<DiscoverRoasters />} />
-        <Route path="/saved" element={<SavedProfilesRoute session={session} />} />
-        <Route path="/messages" element={<MessagesRoute session={session} />} />
-        <Route path="/messages/:userId" element={<MessageThreadRoute session={session} />} />
-        <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />
-        <Route path="/profile/:userId" element={<ProfileViewRoute session={session} />} />
-      </Routes>
+      <Outlet />
     </main>
   )
 }
@@ -186,5 +133,20 @@ export default function App() {
     )
   }
 
-  return <AppLayout session={session} onSignOut={handleSignOut} />
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage session={session} />} />
+      <Route path="/sign-up" element={<SignUpPage />} />
+      <Route element={<AppShell session={session} onSignOut={handleSignOut} />}>
+        <Route path="/discover" element={<DiscoverBrowse currentUserId={session?.user?.id ?? null} />} />
+        <Route path="/discover/map" element={<DiscoverMap />} />
+        <Route path="/discover/roasters" element={<DiscoverRoasters />} />
+        <Route path="/saved" element={<SavedProfilesRoute session={session} />} />
+        <Route path="/messages" element={<MessagesRoute session={session} />} />
+        <Route path="/messages/:userId" element={<MessageThreadRoute session={session} />} />
+        <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />
+        <Route path="/profile/:userId" element={<ProfileViewRoute session={session} />} />
+      </Route>
+    </Routes>
+  )
 }
