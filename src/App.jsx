@@ -18,6 +18,9 @@ import NoticeboardBrowse from './components/NoticeboardBrowse'
 import NoticeboardForm from './components/NoticeboardForm'
 import NoticeboardMap from './components/NoticeboardMap'
 import NoticeboardPostView from './components/NoticeboardPostView'
+import ResourcesBrowse from './components/ResourcesBrowse'
+import ResourceForm from './components/ResourceForm'
+import ResourcePostView from './components/ResourcePostView'
 import SavedProfiles from './components/SavedProfiles'
 import SignUpPage from './components/SignUpPage'
 import ProfileForm from './components/ProfileForm'
@@ -162,6 +165,42 @@ function NoticeboardEditRoute({ session }) {
   )
 }
 
+function ResourcesNewRoute({ session }) {
+  return (
+    <MemberGate session={session}>
+      <ResourceForm userId={session.user.id} />
+    </MemberGate>
+  )
+}
+
+function ResourcePostRoute({ session }) {
+  const { resourceId } = useParams()
+
+  if (resourceId === 'new') {
+    return <Navigate to="/resources/new" replace />
+  }
+
+  if (!isUuid(resourceId)) {
+    return <Navigate to="/resources" replace />
+  }
+
+  return <ResourcePostView resourceId={resourceId} currentUserId={session?.user?.id ?? null} />
+}
+
+function ResourcesEditRoute({ session }) {
+  const { resourceId } = useParams()
+
+  if (!isUuid(resourceId)) {
+    return <Navigate to="/resources" replace />
+  }
+
+  return (
+    <MemberGate session={session}>
+      <ResourceForm userId={session.user.id} resourceId={resourceId} />
+    </MemberGate>
+  )
+}
+
 function SubscribeRoute({ session }) {
   if (!session) {
     return <Navigate to="/sign-up" replace />
@@ -197,6 +236,9 @@ function AppShell({ session, onSignOut }) {
           </Link>
           <Link to="/noticeboard" className="secondary-button profile-action-link">
             Noticeboard
+          </Link>
+          <Link to="/resources" className="secondary-button profile-action-link">
+            Resources
           </Link>
           <Link to="/about" className="secondary-button profile-action-link">
             About
@@ -310,6 +352,10 @@ export default function App() {
         <Route path="/noticeboard/new" element={<NoticeboardNewRoute session={session} />} />
         <Route path="/noticeboard/:postId/edit" element={<NoticeboardEditRoute session={session} />} />
         <Route path="/noticeboard/:postId" element={<NoticeboardPostRoute session={session} />} />
+        <Route path="/resources" element={<ResourcesBrowse currentUserId={session?.user?.id ?? null} />} />
+        <Route path="/resources/new" element={<ResourcesNewRoute session={session} />} />
+        <Route path="/resources/:resourceId/edit" element={<ResourcesEditRoute session={session} />} />
+        <Route path="/resources/:resourceId" element={<ResourcePostRoute session={session} />} />
         <Route path="/saved" element={<SavedProfilesRoute session={session} />} />
         <Route path="/messages" element={<MessagesRoute session={session} />} />
         <Route path="/messages/:userId" element={<MessageThreadRoute session={session} />} />
