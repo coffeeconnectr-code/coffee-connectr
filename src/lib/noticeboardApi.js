@@ -27,7 +27,7 @@ async function attachPosters(posts) {
 
   const { data: posters, error } = await supabase
     .from('profiles')
-    .select('user_id, name, profile_photo_url')
+    .select('user_id, name, profile_photo_url, is_verified')
     .in('user_id', userIds)
 
   if (error) {

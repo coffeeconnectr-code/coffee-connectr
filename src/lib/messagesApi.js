@@ -66,7 +66,7 @@ export async function fetchInbox(currentUserId) {
 
   const { data: profiles, error: profileError } = await supabase
     .from('profiles')
-    .select('user_id, name, profile_photo_url, primary_category')
+    .select('user_id, name, profile_photo_url, primary_category, is_verified')
     .in('user_id', partnerIds)
 
   if (profileError) {

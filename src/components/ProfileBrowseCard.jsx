@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import CategoryLabel from './CategoryLabel'
 import FavouriteButton from './FavouriteButton'
+import VerifiedBadge from './VerifiedBadge'
 
 function truncateText(text, maxLength = 120) {
   if (!text || text.length <= maxLength) {
@@ -31,7 +32,10 @@ export default function ProfileBrowseCard({
 
         <div className="browse-card-copy">
           <p className="browse-type">{isIndividual ? 'Individual' : 'Business'}</p>
-          <h3>{profile.name}</h3>
+          <h3>
+            {profile.name}
+            {profile.is_verified ? <VerifiedBadge compact /> : null}
+          </h3>
           {profile.location ? <p className="browse-meta">{profile.location}</p> : null}
         </div>
       </div>

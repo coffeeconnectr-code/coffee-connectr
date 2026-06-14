@@ -8,6 +8,7 @@ import {
   subscribeToConversation,
 } from '../lib/messagesApi'
 import ReportButton from './ReportButton'
+import VerifiedBadge from './VerifiedBadge'
 
 function formatMessageStamp(value) {
   return new Date(value).toLocaleString([], {
@@ -134,7 +135,10 @@ export default function MessageThread({ currentUserId, otherUserId }) {
           )}
 
           <div>
-            <h2>{name}</h2>
+            <h2>
+              {name}
+              {profile?.is_verified ? <VerifiedBadge compact /> : null}
+            </h2>
             {profile?.location ? <p className="status-message">{profile.location}</p> : null}
           </div>
         </div>

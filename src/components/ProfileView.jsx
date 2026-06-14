@@ -14,6 +14,7 @@ import ProfileListings from './ProfileListings'
 import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
 import ReportButton from './ReportButton'
+import VerifiedBadge from './VerifiedBadge'
 import { submitVerificationRequest } from '../lib/adminApi'
 
 function formatOpenTo(values) {
@@ -295,10 +296,10 @@ export default function ProfileView({ userId, currentUserId }) {
                 <p className="profile-type-badge">
                   {isIndividual ? 'Individual' : 'Business'}
                 </p>
-                <h2>{profile.name}</h2>
-                {profile.is_verified ? (
-                  <span className="tag tag-verified">Verified</span>
-                ) : null}
+                <h2>
+                  {profile.name}
+                  {profile.is_verified ? <VerifiedBadge /> : null}
+                </h2>
                 {isIndividual && profile.job_title_role ? (
                   <p className="profile-headline">{profile.job_title_role}</p>
                 ) : null}

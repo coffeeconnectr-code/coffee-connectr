@@ -71,7 +71,7 @@ export async function fetchSavedProfiles(userId) {
   const { data: profiles, error: profileError } = await supabase
     .from('profiles')
     .select(
-      'id, user_id, name, profile_type, profile_photo_url, location, primary_category, secondary_categories, about_bio, latitude, longitude',
+      'id, user_id, name, profile_type, profile_photo_url, location, primary_category, secondary_categories, about_bio, latitude, longitude, is_verified',
     )
     .in('user_id', favouriteUserIds)
 

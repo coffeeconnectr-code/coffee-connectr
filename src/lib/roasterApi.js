@@ -64,7 +64,8 @@ export async function searchProfilesByRoaster(roasterBrand) {
         primary_category,
         profile_photo_url,
         total_roasting_capacity_kg,
-        contract_roasting_capacity_kg
+        contract_roasting_capacity_kg,
+        is_verified
       )
     `,
     )

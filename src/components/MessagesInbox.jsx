@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchInbox } from '../lib/messagesApi'
 import CategoryLabel from './CategoryLabel'
+import VerifiedBadge from './VerifiedBadge'
 
 function formatMessageTime(value) {
   const date = new Date(value)
@@ -108,7 +109,10 @@ export default function MessagesInbox({ currentUserId }) {
 
               <div className="messages-inbox-copy">
                 <div className="messages-inbox-top">
-                  <h3>{name}</h3>
+                  <h3>
+                    {name}
+                    {profile?.is_verified ? <VerifiedBadge compact /> : null}
+                  </h3>
                   <time dateTime={lastMessage.created_at}>
                     {formatMessageTime(lastMessage.created_at)}
                   </time>

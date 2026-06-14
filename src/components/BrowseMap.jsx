@@ -13,6 +13,13 @@ function createPopupContent(profile) {
   name.textContent = profile.name ?? 'Member'
   popup.appendChild(name)
 
+  if (profile.is_verified) {
+    const verified = document.createElement('p')
+    verified.className = 'browse-map-popup-category'
+    verified.textContent = '✓ Verified member'
+    popup.appendChild(verified)
+  }
+
   if (profile.location) {
     const location = document.createElement('p')
     location.className = 'browse-map-popup-location'

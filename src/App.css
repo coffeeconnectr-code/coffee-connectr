@@ -1725,6 +1725,44 @@ button:disabled {
   color: var(--text);
 }
 
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: #b08d57;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.verified-badge-compact {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.profile-view-heading h2,
+.browse-card-copy h3,
+.messages-inbox-top h3,
+.messages-thread-title h2,
+.discover-result-top h3,
+.noticeboard-poster span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 640px) {
   .page-header {
     flex-direction: column;

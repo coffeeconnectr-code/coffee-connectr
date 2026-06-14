@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ROASTER_BRANDS, formatBatchSize, formatCapacity } from '../lib/roasterConstants'
 import { searchProfilesByRoaster } from '../lib/roasterApi'
 import CategoryLabel from './CategoryLabel'
+import VerifiedBadge from './VerifiedBadge'
 
 export default function DiscoverRoasters() {
   const [roasterBrand, setRoasterBrand] = useState('')
@@ -87,7 +88,10 @@ export default function DiscoverRoasters() {
               )}
 
               <div>
-                <h3>{profile.name}</h3>
+                <h3>
+                  {profile.name}
+                  {profile.is_verified ? <VerifiedBadge compact /> : null}
+                </h3>
                 {profile.location ? <p className="discover-meta">{profile.location}</p> : null}
                 {profile.primary_category ? (
                   <span className="tag">

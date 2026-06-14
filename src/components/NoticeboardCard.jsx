@@ -5,6 +5,7 @@ import {
   formatPostPrice,
   getSectionLabel,
 } from '../lib/noticeboardConstants'
+import VerifiedBadge from './VerifiedBadge'
 
 function truncateText(text, maxLength = 140) {
   if (!text || text.length <= maxLength) {
@@ -55,7 +56,10 @@ export default function NoticeboardCard({ post }) {
                 {post.poster.name?.charAt(0)?.toUpperCase() ?? '?'}
               </span>
             )}
-            <span>{post.poster.name}</span>
+            <span>
+              {post.poster.name}
+              {post.poster.is_verified ? <VerifiedBadge compact /> : null}
+            </span>
           </Link>
         ) : null}
         <span className="noticeboard-date">{formatPostDate(post.created_at)}</span>

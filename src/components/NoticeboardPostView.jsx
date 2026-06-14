@@ -14,6 +14,7 @@ import {
   NOTICEBOARD_STATUS,
 } from '../lib/noticeboardConstants'
 import ReportButton from './ReportButton'
+import VerifiedBadge from './VerifiedBadge'
 
 export default function NoticeboardPostView({ postId, currentUserId = null }) {
   const navigate = useNavigate()
@@ -167,7 +168,10 @@ export default function NoticeboardPostView({ postId, currentUserId = null }) {
                 {post.poster.name?.charAt(0)?.toUpperCase() ?? '?'}
               </span>
             )}
-            <span>{post.poster.name}</span>
+            <span>
+              {post.poster.name}
+              {post.poster.is_verified ? <VerifiedBadge compact /> : null}
+            </span>
           </Link>
         </div>
       ) : null}
