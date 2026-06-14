@@ -25,7 +25,13 @@ function ContactValue({ label, value, hrefPrefix }) {
   )
 }
 
-export default function ProfileContact({ profile, profileUserId, currentUserId, isOwnProfile }) {
+export default function ProfileContact({
+  profile,
+  profileUserId,
+  currentUserId,
+  isOwnProfile,
+  memberHasAccess = true,
+}) {
   const [contact, setContact] = useState(null)
   const [revealed, setRevealed] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -113,9 +119,15 @@ export default function ProfileContact({ profile, profileUserId, currentUserId, 
       </p>
 
       <div className="profile-contact-actions">
-        <Link to={`/messages/${profileUserId}`} className="primary-button profile-action-link">
-          Send message
-        </Link>
+        {memberHasAccess ? (
+          <Link to={`/messages/${profileUserId}`} className="primary-button profile-action-link">
+            Send message
+          </Link>
+        ) : (
+          <Link to="/subscribe" className="primary-button profile-action-link">
+            Subscribe to message
+          </Link>
+        )}
         {mayShareContact ? (
           <button
             type="button"

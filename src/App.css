@@ -1763,6 +1763,96 @@ button:disabled {
   flex-wrap: wrap;
 }
 
+.member-access-banner {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.member-access-banner strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.member-access-banner p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.member-access-banner-trial {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, var(--card));
+}
+
+.member-access-banner-warning {
+  border-color: color-mix(in srgb, #d17b5a 45%, var(--border));
+  background: color-mix(in srgb, #d17b5a 10%, var(--card));
+}
+
+.subscribe-page h2 {
+  margin: 0.35rem 0 0;
+}
+
+.subscribe-plan-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1.25rem 0;
+}
+
+.subscribe-plan-card {
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--accent) 4%, var(--input-bg));
+}
+
+.subscribe-plan-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.subscribe-plan-price {
+  margin: 0.45rem 0 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.subscribe-plan-card p:last-child {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.subscribe-billing-note {
+  margin: 1.25rem 0 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.subscribe-billing-note a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.subscribe-billing-note a:hover {
+  text-decoration: underline;
+}
+
 .dashboard-page {
   display: flex;
   flex-direction: column;
@@ -2015,5 +2105,14 @@ button:disabled {
   .dashboard-panel-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .member-access-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .subscribe-plan-summary {
+    grid-template-columns: 1fr;
   }
 }

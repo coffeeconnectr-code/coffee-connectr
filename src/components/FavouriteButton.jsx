@@ -7,6 +7,7 @@ export default function FavouriteButton({
   initialSaved = false,
   onChange,
   className = '',
+  disabled = false,
 }) {
   const [saved, setSaved] = useState(initialSaved)
   const [loading, setLoading] = useState(false)
@@ -20,7 +21,7 @@ export default function FavouriteButton({
   }
 
   async function handleToggle() {
-    if (loading) {
+    if (loading || disabled) {
       return
     }
 
@@ -48,7 +49,7 @@ export default function FavouriteButton({
       type="button"
       className={`secondary-button favourite-button${saved ? ' favourite-button-saved' : ''} ${className}`.trim()}
       onClick={handleToggle}
-      disabled={loading}
+      disabled={loading || disabled}
       aria-pressed={saved}
     >
       {loading ? 'Saving...' : saved ? 'Saved' : 'Save profile'}

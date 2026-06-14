@@ -16,6 +16,7 @@ import ProfileSkeleton from './ProfileSkeleton'
 import ReportButton from './ReportButton'
 import VerifiedBadge from './VerifiedBadge'
 import { submitVerificationRequest } from '../lib/adminApi'
+import useMemberAccess from '../hooks/useMemberAccess'
 
 function formatOpenTo(values) {
   return values
@@ -79,6 +80,9 @@ export default function ProfileView({ userId, currentUserId }) {
   const [verificationLoading, setVerificationLoading] = useState(false)
 
   const isOwnProfile = userId === currentUserId
+  const { hasAccess: memberHasAccess } = useMemberAccess(
+    currentUserId ? { user: { id: currentUserId } } : null,
+  )
 
   useEffect(() => {
     let active = true
@@ -319,13 +323,20 @@ export default function ProfileView({ userId, currentUserId }) {
                 </div>
               ) : currentUserId ? (
                 <div className="profile-owner-actions">
-                  <Link to={`/messages/${userId}`} className="primary-button profile-action-link">
-                    Send message
-                  </Link>
+                  {memberHasAccess ? (
+                    <Link to={`/messages/${userId}`} className="primary-button profile-action-link">
+                      Send message
+                    </Link>
+                  ) : (
+                    <Link to="/subscribe" className="primary-button profile-action-link">
+                      Subscribe to message
+                    </Link>
+                  )}
                   <FavouriteButton
                     currentUserId={currentUserId}
                     profileUserId={userId}
                     initialSaved={isSaved}
+                    disabled={!memberHasAccess}
                   />
                 </div>
               ) : null}
@@ -429,6 +440,7 @@ export default function ProfileView({ userId, currentUserId }) {
           profileUserId={userId}
           currentUserId={currentUserId}
           isOwnProfile={isOwnProfile}
+          memberHasAccess={memberHasAccess}
         />
 
         {!isOwnProfile ? (

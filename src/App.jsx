@@ -21,6 +21,9 @@ import SignUpPage from './components/SignUpPage'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
 import MemberDashboard from './components/MemberDashboard'
+import MemberGate from './components/MemberGate'
+import MemberAccessBanner from './components/MemberAccessBanner'
+import SubscribePage from './components/SubscribePage'
 import AdminDashboard from './components/admin/AdminDashboard'
 import AdminGate from './components/admin/AdminGate'
 import AdminLayout from './components/admin/AdminLayout'
@@ -29,6 +32,7 @@ import AdminReports from './components/admin/AdminReports'
 import AdminVerification from './components/admin/AdminVerification'
 import AdminAudit from './components/admin/AdminAudit'
 import useAdminAccess from './hooks/useAdminAccess'
+import useMemberAccess from './hooks/useMemberAccess'
 import { isUuid } from './lib/uuid'
 import './App.css'
 
@@ -48,25 +52,25 @@ function ProfileViewRoute({ session }) {
 }
 
 function MessagesRoute({ session }) {
-  if (!session) {
-    return <Navigate to="/sign-up" replace />
-  }
-
-  return <MessagesInbox currentUserId={session.user.id} />
+  return (
+    <MemberGate session={session}>
+      <MessagesInbox currentUserId={session.user.id} />
+    </MemberGate>
+  )
 }
 
 function MessageThreadRoute({ session }) {
   const { userId } = useParams()
 
-  if (!session) {
-    return <Navigate to="/sign-up" replace />
-  }
-
   if (!isUuid(userId)) {
     return <Navigate to="/messages" replace />
   }
 
-  return <MessageThread currentUserId={session.user.id} otherUserId={userId} />
+  return (
+    <MemberGate session={session}>
+      <MessageThread currentUserId={session.user.id} otherUserId={userId} />
+    </MemberGate>
+  )
 }
 
 function DashboardRoute({ session }) {
@@ -91,11 +95,11 @@ function SignUpRoute({ session }) {
 }
 
 function SavedProfilesRoute({ session }) {
-  if (!session) {
-    return <Navigate to="/sign-up" replace />
-  }
-
-  return <SavedProfiles currentUserId={session.user.id} />
+  return (
+    <MemberGate session={session}>
+      <SavedProfiles currentUserId={session.user.id} />
+    </MemberGate>
+  )
 }
 
 function EditProfileRoute({ session }) {
@@ -112,11 +116,11 @@ function EditProfileRoute({ session }) {
 }
 
 function NoticeboardNewRoute({ session }) {
-  if (!session) {
-    return <Navigate to="/sign-up" replace />
-  }
-
-  return <NoticeboardForm userId={session.user.id} />
+  return (
+    <MemberGate session={session}>
+      <NoticeboardForm userId={session.user.id} />
+    </MemberGate>
+  )
 }
 
 function NoticeboardPostRoute({ session }) {
@@ -145,15 +149,23 @@ function NoticeboardPostRoute({ session }) {
 function NoticeboardEditRoute({ session }) {
   const { postId } = useParams()
 
-  if (!session) {
-    return <Navigate to="/sign-up" replace />
-  }
-
   if (!isUuid(postId)) {
     return <Navigate to="/noticeboard" replace />
   }
 
-  return <NoticeboardForm userId={session.user.id} postId={postId} />
+  return (
+    <MemberGate session={session}>
+      <NoticeboardForm userId={session.user.id} postId={postId} />
+    </MemberGate>
+  )
+}
+
+function SubscribeRoute({ session }) {
+  if (!session) {
+    return <Navigate to="/sign-up" replace />
+  }
+
+  return <SubscribePage session={session} />
 }
 
 function AdminRoute({ session }) {
@@ -166,6 +178,7 @@ function AdminRoute({ session }) {
 
 function AppShell({ session, onSignOut }) {
   const { isAdmin } = useAdminAccess(session)
+  const { access, loading: accessLoading } = useMemberAccess(session)
 
   return (
     <main className="page">
@@ -219,6 +232,10 @@ function AppShell({ session, onSignOut }) {
           )}
         </div>
       </header>
+
+      {session ? (
+        <MemberAccessBanner access={access} loading={accessLoading} />
+      ) : null}
 
       <Outlet />
     </main>
@@ -277,6 +294,7 @@ export default function App() {
         <Route path="/discover/map" element={<DiscoverMap />} />
         <Route path="/discover/roasters" element={<DiscoverRoasters />} />
         <Route path="/dashboard" element={<DashboardRoute session={session} />} />
+        <Route path="/subscribe" element={<SubscribeRoute session={session} />} />
         <Route path="/noticeboard" element={<NoticeboardBrowse currentUserId={session?.user?.id ?? null} />} />
         <Route path="/noticeboard/map" element={<NoticeboardMap />} />
         <Route path="/noticeboard/new" element={<NoticeboardNewRoute session={session} />} />
