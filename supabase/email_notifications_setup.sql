@@ -6,10 +6,12 @@
 --      npx supabase login
 --      npx supabase link --project-ref YOUR_PROJECT_REF
 --      npx supabase functions deploy send-message-notification
+--      npx supabase functions deploy send-report-notification
 -- 4. Add function secrets in Supabase Dashboard → Edge Functions → Secrets:
 --      RESEND_API_KEY = your Resend API key
 --      RESEND_FROM_EMAIL = Coffee Connectr <onboarding@resend.dev>
 --      SITE_URL = https://www.coffeeconnectr.com
+--      ADMIN_EMAIL = your-email@example.com  (optional fallback if admin profile email lookup fails)
 --
--- For testing, Resend lets you send from onboarding@resend.dev to your own email.
+-- Report notifications email all accounts with is_admin = true.
 -- For production, verify your own domain in Resend and update RESEND_FROM_EMAIL.

@@ -397,6 +397,28 @@
   color: var(--text-muted);
 }
 
+.message-bubble-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.message-bubble-footer time {
+  margin-top: 0;
+}
+
+.report-block-compact {
+  padding-top: 0;
+  border-top: none;
+}
+
+.report-block-compact .secondary-button {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
 .messages-compose {
   display: flex;
   flex-direction: column;

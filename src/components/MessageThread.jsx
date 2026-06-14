@@ -7,6 +7,7 @@ import {
   sendMessage,
   subscribeToConversation,
 } from '../lib/messagesApi'
+import ReportButton from './ReportButton'
 
 function formatMessageStamp(value) {
   return new Date(value).toLocaleString([], {
@@ -163,7 +164,18 @@ export default function MessageThread({ currentUserId, otherUserId }) {
             >
               <div className={`message-bubble${isMine ? ' message-bubble-mine' : ''}`}>
                 <p>{message.body}</p>
-                <time dateTime={message.created_at}>{formatMessageStamp(message.created_at)}</time>
+                <div className="message-bubble-footer">
+                  <time dateTime={message.created_at}>{formatMessageStamp(message.created_at)}</time>
+                  {!isMine ? (
+                    <ReportButton
+                      currentUserId={currentUserId}
+                      targetType="message"
+                      targetId={message.id}
+                      targetLabel="message"
+                      compact
+                    />
+                  ) : null}
+                </div>
               </div>
             </div>
           )

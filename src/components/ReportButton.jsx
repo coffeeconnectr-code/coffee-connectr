@@ -14,6 +14,7 @@ export default function ReportButton({
   targetType,
   targetId,
   targetLabel = 'content',
+  compact = false,
 }) {
   const [open, setOpen] = useState(false)
   const [reason, setReason] = useState(REPORT_REASONS[0])
@@ -48,9 +49,9 @@ export default function ReportButton({
   }
 
   return (
-    <div className="report-block">
+    <div className={compact ? 'report-block report-block-compact' : 'report-block'}>
       <button type="button" className="secondary-button" onClick={() => setOpen((value) => !value)}>
-        Report {targetLabel}
+        {compact ? 'Report' : `Report ${targetLabel}`}
       </button>
 
       {open ? (

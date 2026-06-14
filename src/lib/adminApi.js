@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { notifyNewReport } from './notificationsApi'
 
 export async function checkIsAdmin() {
   const { data, error } = await supabase.rpc('is_current_user_admin')
@@ -149,6 +150,18 @@ export async function adminReviewVerification(requestId, approved, reason = '') 
   }
 }
 
+export async function fetchAdminAuditLog(limit = 100) {
+  const { data, error } = await supabase.rpc('admin_list_audit_log', {
+    p_limit: limit,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
 export async function submitContentReport({ targetType, targetId, reason, details = '' }) {
   const { data, error } = await supabase.rpc('submit_content_report', {
     p_target_type: targetType,
@@ -160,6 +173,8 @@ export async function submitContentReport({ targetType, targetId, reason, detail
   if (error) {
     throw error
   }
+
+  notifyNewReport(data)
 
   return data
 }

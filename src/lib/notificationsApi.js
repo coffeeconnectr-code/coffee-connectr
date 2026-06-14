@@ -9,3 +9,13 @@ export async function notifyNewMessage(messageId) {
     // Email delivery is best-effort and should not block sending messages.
   }
 }
+
+export async function notifyNewReport(reportId) {
+  try {
+    await supabase.functions.invoke('send-report-notification', {
+      body: { reportId },
+    })
+  } catch {
+    // Email delivery is best-effort and should not block submitting reports.
+  }
+}

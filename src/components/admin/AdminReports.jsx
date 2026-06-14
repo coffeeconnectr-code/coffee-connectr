@@ -83,6 +83,9 @@ export default function AdminReports() {
               <strong>
                 {report.target_type} report · {report.status}
               </strong>
+              {report.target_summary ? (
+                <p className="browse-meta">Target: {report.target_summary}</p>
+              ) : null}
               <p className="browse-meta">Reason: {report.reason}</p>
               {report.details ? <p className="browse-bio">{report.details}</p> : null}
               {report.admin_notes ? (
@@ -94,9 +97,9 @@ export default function AdminReports() {
               <Link to={targetLink(report)} className="secondary-button profile-action-link">
                 View target
               </Link>
-            ) : (
-              <p className="browse-meta">Message id: {report.target_id}</p>
-            )}
+            ) : report.target_type === 'message' ? (
+              <p className="browse-meta">Reported message id: {report.target_id}</p>
+            ) : null}
 
             {report.status === 'open' ? (
               <div className="admin-report-actions">

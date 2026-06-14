@@ -21,6 +21,7 @@ import AdminLayout from './components/admin/AdminLayout'
 import AdminModeration from './components/admin/AdminModeration'
 import AdminReports from './components/admin/AdminReports'
 import AdminVerification from './components/admin/AdminVerification'
+import AdminAudit from './components/admin/AdminAudit'
 import useAdminAccess from './hooks/useAdminAccess'
 import { isUuid } from './lib/uuid'
 import './App.css'
@@ -225,6 +226,7 @@ export default function App() {
         <Route path="moderation" element={<AdminModeration />} />
         <Route path="reports" element={<AdminReports />} />
         <Route path="verification" element={<AdminVerification />} />
+        <Route path="audit" element={<AdminAudit />} />
       </Route>
       <Route element={<AppShell session={session} onSignOut={handleSignOut} />}>
         <Route path="/discover" element={<DiscoverBrowse currentUserId={session?.user?.id ?? null} />} />

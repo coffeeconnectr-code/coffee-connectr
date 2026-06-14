@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { to: '/admin/moderation', label: 'Moderation' },
   { to: '/admin/reports', label: 'Reports' },
   { to: '/admin/verification', label: 'Verification' },
+  { to: '/admin/audit', label: 'Audit log' },
 ]
 
 export default function AdminLayout() {
