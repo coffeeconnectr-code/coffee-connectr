@@ -16,6 +16,9 @@ export default function SiteTopNav({ session }) {
         <Link to="/how-to-use" className="landing-topnav-link">
           How to use
         </Link>
+        <Link to="/pricing" className="landing-topnav-link">
+          Pricing
+        </Link>
         {session ? (
           <Link to="/dashboard" className="landing-topnav-link">
             Dashboard

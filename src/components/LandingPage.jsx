@@ -27,6 +27,9 @@ export default function LandingPage({ session }) {
             <Link to={profileCta} className="secondary-button profile-action-link">
               Create your profile
             </Link>
+            <Link to="/pricing" className="secondary-button profile-action-link">
+              View pricing
+            </Link>
           </div>
         </div>
       </section>

@@ -7,6 +7,7 @@ import DiscoverRoasters from './components/DiscoverRoasters'
 import LandingPage from './components/LandingPage'
 import AboutPage from './components/AboutPage'
 import HowToUsePage from './components/HowToUsePage'
+import PricingPage from './components/PricingPage'
 import MessageThread from './components/MessageThread'
 import MessagesInbox from './components/MessagesInbox'
 import NoticeboardBrowse from './components/NoticeboardBrowse'
@@ -186,6 +187,9 @@ function AppShell({ session, onSignOut }) {
           <Link to="/how-to-use" className="secondary-button profile-action-link">
             How to use
           </Link>
+          <Link to="/pricing" className="secondary-button profile-action-link">
+            Pricing
+          </Link>
           {session ? (
             <>
               <Link to="/dashboard" className="secondary-button profile-action-link dashboard-nav-link">
@@ -255,6 +259,7 @@ export default function App() {
       <Route path="/" element={<LandingPage session={session} />} />
       <Route path="/about" element={<AboutPage session={session} />} />
       <Route path="/how-to-use" element={<HowToUsePage session={session} />} />
+      <Route path="/pricing" element={<PricingPage session={session} />} />
       <Route path="/sign-up" element={<SignUpRoute session={session} />} />
       <Route path="/admin" element={<AdminRoute session={session} />}>
         <Route index element={<AdminDashboard />} />

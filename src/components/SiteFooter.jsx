@@ -15,6 +15,9 @@ export default function SiteFooter() {
           <Link to="/how-to-use" className="landing-footer-link">
             How to use
           </Link>
+          <Link to="/pricing" className="landing-footer-link">
+            Pricing
+          </Link>
           <a href={`mailto:${LANDING_CONTACT_EMAIL}`} className="landing-footer-link">
             {LANDING_CONTACT_EMAIL}
           </a>
