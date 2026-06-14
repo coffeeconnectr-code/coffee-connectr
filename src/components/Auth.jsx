@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { notifyWelcomeEmail } from '../lib/notificationsApi'
 
-export default function Auth() {
+export default function Auth({ defaultIsSignUp = false }) {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isSignUp, setIsSignUp] = useState(false)
+  const [isSignUp, setIsSignUp] = useState(defaultIsSignUp)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -17,18 +17,30 @@ export default function Auth() {
     setMessage('')
 
     const { data, error } = isSignUp
-      ? await supabase.auth.signUp({ email, password })
+      ? await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+          },
+        })
       : await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setMessage(error.message)
+      setMessage(
+        isSignUp && error.message.toLowerCase().includes('already registered')
+          ? 'An account with this email already exists. Switch to Sign in below.'
+          : error.message,
+      )
     } else if (data.session) {
       if (isSignUp) {
         notifyWelcomeEmail(data.session.user.id, data.session.access_token)
       }
       navigate(isSignUp ? '/profile/edit' : '/dashboard', { replace: true })
     } else if (isSignUp) {
-      setMessage('Check your email to confirm your account (if confirmation is enabled).')
+      setMessage(
+        'Account created. Check your email and click the confirmation link, then sign in here.',
+      )
     }
 
     setLoading(false)
@@ -90,7 +102,7 @@ export default function Auth() {
         onClick={handleGoogleSignIn}
         disabled={loading}
       >
-        Sign in with Google
+        {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
       </button>
 
       <button
