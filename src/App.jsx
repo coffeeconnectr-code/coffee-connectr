@@ -309,7 +309,7 @@ export default function App() {
         fetchMemberAccess().catch(() => {})
       }
 
-      if (nextSession?.user?.id && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+      if (nextSession?.user?.id && event === 'SIGNED_IN') {
         notifyWelcomeEmail(nextSession.user.id)
       }
     })

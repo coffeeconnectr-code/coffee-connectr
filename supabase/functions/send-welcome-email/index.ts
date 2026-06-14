@@ -119,6 +119,20 @@ function hoursSince(dateValue: string) {
   return (Date.now() - new Date(dateValue).getTime()) / (1000 * 60 * 60)
 }
 
+function isMissingWelcomeTable(error: { message?: string; code?: string } | null) {
+  const message = error?.message ?? ''
+  return (
+    error?.code === '42P01' ||
+    error?.code === 'PGRST205' ||
+    message.includes('welcome_emails_sent') ||
+    message.includes('schema cache')
+  )
+}
+
+function isDuplicateWelcomeRow(error: { message?: string; code?: string } | null) {
+  return error?.code === '23505'
+}
+
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -165,7 +179,7 @@ Deno.serve(async (request) => {
       })
     }
 
-    const { userId } = await request.json()
+    const { userId } = await request.json().catch(() => ({}))
     if (!userId || userId !== caller.id) {
       return new Response(JSON.stringify({ error: 'Forbidden.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -182,8 +196,7 @@ Deno.serve(async (request) => {
       .maybeSingle()
 
     if (existingError) {
-      const message = existingError.message ?? 'Could not check welcome email status'
-      if (message.includes('welcome_emails_sent')) {
+      if (isMissingWelcomeTable(existingError)) {
         return new Response(
           JSON.stringify({
             error: 'Database setup missing. Run supabase/welcome_email.sql in the SQL Editor.',
@@ -229,7 +242,19 @@ Deno.serve(async (request) => {
         status: 'skipped_legacy',
       })
 
-      if (skipError) {
+      if (skipError && !isDuplicateWelcomeRow(skipError)) {
+        if (isMissingWelcomeTable(skipError)) {
+          return new Response(
+            JSON.stringify({
+              error: 'Database setup missing. Run supabase/welcome_email.sql in the SQL Editor.',
+            }),
+            {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 500,
+            },
+          )
+        }
+
         throw skipError
       }
 
@@ -237,6 +262,34 @@ Deno.serve(async (request) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       })
+    }
+
+    const { error: lockError } = await adminClient.from('welcome_emails_sent').insert({
+      user_id: userId,
+      status: 'sent',
+    })
+
+    if (lockError) {
+      if (isDuplicateWelcomeRow(lockError)) {
+        return new Response(JSON.stringify({ skipped: true, reason: 'already_processed' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        })
+      }
+
+      if (isMissingWelcomeTable(lockError)) {
+        return new Response(
+          JSON.stringify({
+            error: 'Database setup missing. Run supabase/welcome_email.sql in the SQL Editor.',
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 500,
+          },
+        )
+      }
+
+      throw lockError
     }
 
     const siteUrl = Deno.env.get('SITE_URL') ?? 'https://www.coffeeconnectr.com'
@@ -250,7 +303,7 @@ Deno.serve(async (request) => {
     const { error: emailError } = await resend.emails.send({
       from: fromEmail,
       to: user.email,
-      subject: 'Welcome to Coffee Connectr — here’s how to get started',
+      subject: "Welcome to Coffee Connectr - here's how to get started",
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.55; color: #0a0a0a; max-width: 640px;">
           <p style="margin-top: 0;">Welcome to <strong>Coffee Connectr</strong>.</p>
@@ -280,6 +333,8 @@ Deno.serve(async (request) => {
     })
 
     if (emailError) {
+      await adminClient.from('welcome_emails_sent').delete().eq('user_id', userId)
+
       const resendMessage =
         typeof emailError === 'object' && emailError && 'message' in emailError
           ? String(emailError.message)
@@ -289,15 +344,6 @@ Deno.serve(async (request) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       })
-    }
-
-    const { error: insertError } = await adminClient.from('welcome_emails_sent').insert({
-      user_id: userId,
-      status: 'sent',
-    })
-
-    if (insertError) {
-      throw insertError
     }
 
     return new Response(JSON.stringify({ sent: true }), {
