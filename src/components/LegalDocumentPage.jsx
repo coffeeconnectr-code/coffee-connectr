@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { LANDING_CONTACT_EMAIL } from '../lib/landingConstants'
 import InfoPageLayout from './InfoPageLayout'
 
 function LegalSection({ section }) {
@@ -50,8 +49,7 @@ export default function LegalDocumentPage({
       <section className="info-section">
         <h2>Questions</h2>
         <p className="info-contact">
-          Contact us at{' '}
-          <a href={`mailto:${LANDING_CONTACT_EMAIL}`}>{LANDING_CONTACT_EMAIL}</a>
+          <Link to="/contact">Contact us</Link> with any questions.
         </p>
         <p className="legal-disclaimer">
           This document is provided for general information. Consider independent legal advice

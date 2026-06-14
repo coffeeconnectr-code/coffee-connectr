@@ -5,6 +5,8 @@ export const LANDING_SOCIAL_LINKS = {
 
 export const LANDING_CONTACT_EMAIL = 'coffeeconnectr@gmail.com'
 
+export const CONTACT_PAGE_PATH = '/contact'
+
 export const LANDING_STEPS = [
   {
     number: '01',

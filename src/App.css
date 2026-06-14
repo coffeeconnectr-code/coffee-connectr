@@ -569,7 +569,38 @@
   color: var(--text);
 }
 
+.contact-form {
+  max-width: 560px;
+}
+
+.contact-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.contact-success-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.info-contact a {
+  color: #b08d57;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.info-contact a:hover {
+  text-decoration: underline;
+}
+
 .auth-form input,
+.auth-form select,
+.auth-form textarea,
 .profile-form input,
 .profile-form select,
 .profile-form textarea {
@@ -581,6 +612,8 @@
 }
 
 .auth-form input:focus,
+.auth-form select:focus,
+.auth-form textarea:focus,
 .profile-form input:focus,
 .profile-form select:focus,
 .profile-form textarea:focus {

@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { LANDING_CONTACT_EMAIL } from '../lib/landingConstants'
 import { HOW_TO_USE_STEPS, PROFILE_TIPS } from '../lib/infoPageConstants'
 import InfoPageLayout from './InfoPageLayout'
 
@@ -51,8 +50,7 @@ export default function HowToUsePage({ session }) {
       <section className="info-section">
         <h2>Need a hand?</h2>
         <p className="info-contact">
-          Got a question or run into a problem? Get in touch at{' '}
-          <a href={`mailto:${LANDING_CONTACT_EMAIL}`}>{LANDING_CONTACT_EMAIL}</a> — we&apos;re
+          Got a question or run into a problem? <Link to="/contact">Contact us</Link> — we&apos;re
           happy to help.
         </p>
         <div className="info-actions">

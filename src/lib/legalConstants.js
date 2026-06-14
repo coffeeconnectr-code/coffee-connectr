@@ -1,4 +1,3 @@
-import { LANDING_CONTACT_EMAIL } from './landingConstants'
 import { CANONICAL_ORIGIN } from './siteConfig'
 
 export const LEGAL_LAST_UPDATED = '14 June 2026'
@@ -99,7 +98,7 @@ export const TERMS_SECTIONS = [
   {
     title: '13. Contact',
     paragraphs: [
-      `Questions about these Terms: ${LANDING_CONTACT_EMAIL}`,
+      'Questions about these Terms: please use our Contact page.',
       `Website: ${CANONICAL_ORIGIN}`,
     ],
   },
@@ -195,7 +194,7 @@ export const PRIVACY_SECTIONS = [
   {
     title: '12. Contact',
     paragraphs: [
-      `Privacy questions or requests: ${LANDING_CONTACT_EMAIL}`,
+      'Privacy questions or requests: please use our Contact page.',
       `Website: ${CANONICAL_ORIGIN}`,
     ],
   },

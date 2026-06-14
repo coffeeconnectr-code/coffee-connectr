@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { LANDING_CONTACT_EMAIL } from '../lib/landingConstants'
 import { PRICING_FAQ, PRICING_LAUNCH_NOTE, PRICING_PLANS, PRICING_TRIAL_NOTE } from '../lib/pricingConstants'
 import InfoPageLayout from './InfoPageLayout'
 
@@ -157,8 +156,7 @@ export default function PricingPage({ session }) {
           </Link>
         </div>
         <p className="info-contact info-contact-spaced">
-          Questions about plans? Email{' '}
-          <a href={`mailto:${LANDING_CONTACT_EMAIL}`}>{LANDING_CONTACT_EMAIL}</a>
+          Questions about plans? <Link to="/contact">Contact us</Link>
         </p>
       </section>
     </InfoPageLayout>

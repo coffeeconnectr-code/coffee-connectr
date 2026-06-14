@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { LANDING_CONTACT_EMAIL, LANDING_SOCIAL_LINKS } from '../lib/landingConstants'
+import { LANDING_SOCIAL_LINKS } from '../lib/landingConstants'
 
 export default function SiteFooter() {
   return (
@@ -24,9 +24,9 @@ export default function SiteFooter() {
           <Link to="/privacy" className="landing-footer-link">
             Privacy
           </Link>
-          <a href={`mailto:${LANDING_CONTACT_EMAIL}`} className="landing-footer-link">
-            {LANDING_CONTACT_EMAIL}
-          </a>
+          <Link to="/contact" className="landing-footer-link">
+            Contact us
+          </Link>
           <a
             href={LANDING_SOCIAL_LINKS.instagram}
             target="_blank"

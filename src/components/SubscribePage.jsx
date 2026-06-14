@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { LANDING_CONTACT_EMAIL } from '../lib/landingConstants'
 import { getPlanPriceLabel } from '../lib/memberAccess'
 import { PRICING_PLANS } from '../lib/pricingConstants'
 import useMemberAccess from '../hooks/useMemberAccess'
@@ -62,9 +61,9 @@ export default function SubscribePage({ session }) {
       </div>
 
       <p className="subscribe-billing-note">
-        Online card billing is coming soon. Until then, email{' '}
-        <a href={`mailto:${LANDING_CONTACT_EMAIL}`}>{LANDING_CONTACT_EMAIL}</a> to subscribe and
-        we will activate your account manually.
+        Online card billing is coming soon. Until then,{' '}
+        <Link to="/contact?topic=billing">contact us</Link> to subscribe and we will activate your
+        account manually.
       </p>
     </section>
   )
