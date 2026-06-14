@@ -11,7 +11,7 @@ const PUBLIC_PROFILE_SELECT = `
   open_to_status, languages, business_type, year_established, team_size,
   services_offered, opening_hours, total_roasting_capacity_kg,
   contract_roasting_capacity_kg, email_on_message,
-  show_contact_email, show_contact_phone,
+  show_contact_email, show_contact_phone, is_verified,
   created_at, updated_at,
   profile_roasters(*)
 `

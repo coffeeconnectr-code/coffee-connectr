@@ -13,6 +13,7 @@ import {
   getSectionLabel,
   NOTICEBOARD_STATUS,
 } from '../lib/noticeboardConstants'
+import ReportButton from './ReportButton'
 
 export default function NoticeboardPostView({ postId, currentUserId = null }) {
   const navigate = useNavigate()
@@ -209,7 +210,14 @@ export default function NoticeboardPostView({ postId, currentUserId = null }) {
           </div>
           {actionError ? <p className="status-message profile-error">{actionError}</p> : null}
         </div>
-      ) : null}
+      ) : (
+        <ReportButton
+          currentUserId={currentUserId}
+          targetType="listing"
+          targetId={post.id}
+          targetLabel="listing"
+        />
+      )}
     </section>
   )
 }

@@ -13,6 +13,8 @@ import ProfileContactStats from './ProfileContactStats'
 import ProfileListings from './ProfileListings'
 import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
+import ReportButton from './ReportButton'
+import { submitVerificationRequest } from '../lib/adminApi'
 
 function formatOpenTo(values) {
   return values
@@ -71,6 +73,9 @@ export default function ProfileView({ userId, currentUserId }) {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const [verificationMessage, setVerificationMessage] = useState('')
+  const [verificationStatus, setVerificationStatus] = useState('')
+  const [verificationLoading, setVerificationLoading] = useState(false)
 
   const isOwnProfile = userId === currentUserId
 
@@ -141,6 +146,22 @@ export default function ProfileView({ userId, currentUserId }) {
       window.setTimeout(() => setCopied(false), 2000)
     } catch {
       setCopied(false)
+    }
+  }
+
+  async function handleVerificationRequest(event) {
+    event.preventDefault()
+    setVerificationLoading(true)
+    setVerificationStatus('')
+
+    try {
+      await submitVerificationRequest(verificationMessage)
+      setVerificationStatus('Verification request submitted.')
+      setVerificationMessage('')
+    } catch (requestError) {
+      setVerificationStatus(requestError.message)
+    } finally {
+      setVerificationLoading(false)
     }
   }
 
@@ -275,6 +296,9 @@ export default function ProfileView({ userId, currentUserId }) {
                   {isIndividual ? 'Individual' : 'Business'}
                 </p>
                 <h2>{profile.name}</h2>
+                {profile.is_verified ? (
+                  <span className="tag tag-verified">Verified</span>
+                ) : null}
                 {isIndividual && profile.job_title_role ? (
                   <p className="profile-headline">{profile.job_title_role}</p>
                 ) : null}
@@ -319,6 +343,12 @@ export default function ProfileView({ userId, currentUserId }) {
             />
           </div>
         </div>
+
+        {profile.is_suspended && isOwnProfile ? (
+          <p className="noticeboard-status-banner">
+            Your account is suspended. Your profile is hidden and you cannot post or message.
+          </p>
+        ) : null}
 
         {completion && completion.percent < 100 ? (
           <div className="completion-banner below-header">
@@ -399,6 +429,39 @@ export default function ProfileView({ userId, currentUserId }) {
           currentUserId={currentUserId}
           isOwnProfile={isOwnProfile}
         />
+
+        {!isOwnProfile ? (
+          <ReportButton
+            currentUserId={currentUserId}
+            targetType="profile"
+            targetId={userId}
+            targetLabel="profile"
+          />
+        ) : null}
+
+        {isOwnProfile && !profile.is_verified ? (
+          <section className="profile-section">
+            <h3>Request verification badge</h3>
+            <p className="field-hint">
+              Tell us why your profile should be verified. An admin will review your request.
+            </p>
+            <form className="report-form" onSubmit={handleVerificationRequest}>
+              <label>
+                Message (optional)
+                <textarea
+                  value={verificationMessage}
+                  onChange={(event) => setVerificationMessage(event.target.value)}
+                  rows={3}
+                  placeholder="e.g. I am a certified Q grader with 10 years experience"
+                />
+              </label>
+              <button type="submit" className="secondary-button" disabled={verificationLoading}>
+                {verificationLoading ? 'Submitting...' : 'Request verification'}
+              </button>
+            </form>
+            {verificationStatus ? <p className="status-message">{verificationStatus}</p> : null}
+          </section>
+        ) : null}
       </div>
     </article>
   )

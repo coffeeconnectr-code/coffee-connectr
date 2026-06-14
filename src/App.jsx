@@ -15,6 +15,13 @@ import SavedProfiles from './components/SavedProfiles'
 import SignUpPage from './components/SignUpPage'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
+import AdminDashboard from './components/admin/AdminDashboard'
+import AdminGate from './components/admin/AdminGate'
+import AdminLayout from './components/admin/AdminLayout'
+import AdminModeration from './components/admin/AdminModeration'
+import AdminReports from './components/admin/AdminReports'
+import AdminVerification from './components/admin/AdminVerification'
+import useAdminAccess from './hooks/useAdminAccess'
 import { isUuid } from './lib/uuid'
 import './App.css'
 
@@ -121,7 +128,17 @@ function NoticeboardEditRoute({ session }) {
   return <NoticeboardForm userId={session.user.id} postId={postId} />
 }
 
+function AdminRoute({ session }) {
+  return (
+    <AdminGate session={session}>
+      <AdminLayout />
+    </AdminGate>
+  )
+}
+
 function AppShell({ session, onSignOut }) {
+  const { isAdmin } = useAdminAccess(session)
+
   return (
     <main className="page">
       <header className="page-header">
@@ -140,6 +157,11 @@ function AppShell({ session, onSignOut }) {
           </Link>
           {session ? (
             <>
+              {isAdmin ? (
+                <Link to="/admin" className="secondary-button profile-action-link">
+                  Admin
+                </Link>
+              ) : null}
               <Link to="/messages" className="secondary-button profile-action-link">
                 Messages
               </Link>
@@ -198,6 +220,12 @@ export default function App() {
     <Routes>
       <Route path="/" element={<LandingPage session={session} />} />
       <Route path="/sign-up" element={<SignUpPage />} />
+      <Route path="/admin" element={<AdminRoute session={session} />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="moderation" element={<AdminModeration />} />
+        <Route path="reports" element={<AdminReports />} />
+        <Route path="verification" element={<AdminVerification />} />
+      </Route>
       <Route element={<AppShell session={session} onSignOut={handleSignOut} />}>
         <Route path="/discover" element={<DiscoverBrowse currentUserId={session?.user?.id ?? null} />} />
         <Route path="/discover/map" element={<DiscoverMap />} />
