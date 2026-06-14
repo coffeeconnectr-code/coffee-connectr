@@ -1,6 +1,11 @@
 import { supabase } from './supabase'
+import { isUuid } from './uuid'
 
 export async function fetchProfileContact(profileUserId) {
+  if (!isUuid(profileUserId)) {
+    return { email: null, phone: null }
+  }
+
   const { data, error } = await supabase.rpc('get_profile_contact', {
     target_user_id: profileUserId,
   })
@@ -37,6 +42,10 @@ export function profileMayShareContact(profile) {
 }
 
 export async function fetchProfileContactStats(profileUserId) {
+  if (!isUuid(profileUserId)) {
+    return { contactedCount: 0, contactedByCount: 0 }
+  }
+
   const { data, error } = await supabase.rpc('get_profile_contact_stats', {
     target_user_id: profileUserId,
   })

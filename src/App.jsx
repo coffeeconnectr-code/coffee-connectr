@@ -15,10 +15,15 @@ import SavedProfiles from './components/SavedProfiles'
 import SignUpPage from './components/SignUpPage'
 import ProfileForm from './components/ProfileForm'
 import ProfileView from './components/ProfileView'
+import { isUuid } from './lib/uuid'
 import './App.css'
 
 function ProfileViewRoute({ session }) {
   const { userId } = useParams()
+
+  if (!isUuid(userId)) {
+    return <Navigate to="/discover" replace />
+  }
 
   return (
     <ProfileView
@@ -41,6 +46,10 @@ function MessageThreadRoute({ session }) {
 
   if (!session) {
     return <Navigate to="/sign-up" replace />
+  }
+
+  if (!isUuid(userId)) {
+    return <Navigate to="/messages" replace />
   }
 
   return <MessageThread currentUserId={session.user.id} otherUserId={userId} />
@@ -78,6 +87,18 @@ function NoticeboardNewRoute({ session }) {
 function NoticeboardPostRoute({ session }) {
   const { postId } = useParams()
 
+  if (postId === 'map') {
+    return <Navigate to="/noticeboard/map" replace />
+  }
+
+  if (postId === 'new') {
+    return <Navigate to="/noticeboard/new" replace />
+  }
+
+  if (!isUuid(postId)) {
+    return <Navigate to="/noticeboard" replace />
+  }
+
   return (
     <NoticeboardPostView
       postId={postId}
@@ -91,6 +112,10 @@ function NoticeboardEditRoute({ session }) {
 
   if (!session) {
     return <Navigate to="/sign-up" replace />
+  }
+
+  if (!isUuid(postId)) {
+    return <Navigate to="/noticeboard" replace />
   }
 
   return <NoticeboardForm userId={session.user.id} postId={postId} />

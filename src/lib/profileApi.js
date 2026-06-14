@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { isUuid } from './uuid'
 
 const OWN_PROFILE_SELECT = '*, profile_roasters(*)'
 
@@ -32,6 +33,10 @@ export async function uploadProfileImage(file, bucket, userId) {
 }
 
 export async function fetchProfile(userId, currentUserId = null) {
+  if (!isUuid(userId)) {
+    return null
+  }
+
   const isOwnProfile = currentUserId != null && currentUserId === userId
   const selectFields = isOwnProfile ? OWN_PROFILE_SELECT : PUBLIC_PROFILE_SELECT
 

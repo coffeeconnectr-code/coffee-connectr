@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { DEFAULT_LISTING_DAYS } from './noticeboardConstants'
+import { isUuid } from './uuid'
 
 const POST_SELECT = `
   id, user_id, section, title, body, primary_category, secondary_categories,
@@ -19,6 +20,11 @@ async function attachPosters(posts) {
   }
 
   const userIds = [...new Set(posts.map((post) => post.user_id))]
+
+  if (!userIds.length) {
+    return posts.map((post) => ({ ...post, poster: null }))
+  }
+
   const { data: posters, error } = await supabase
     .from('profiles')
     .select('user_id, name, profile_photo_url')
@@ -96,6 +102,10 @@ export async function browseNoticeboardPosts({
 }
 
 export async function fetchNoticeboardPost(postId) {
+  if (!isUuid(postId)) {
+    return null
+  }
+
   const { data, error } = await supabase
     .from('noticeboard_posts')
     .select(POST_SELECT)
@@ -115,6 +125,10 @@ export async function fetchNoticeboardPost(postId) {
 }
 
 export async function fetchUserNoticeboardPosts(userId, { includeAll = false } = {}) {
+  if (!isUuid(userId)) {
+    return []
+  }
+
   let query = supabase
     .from('noticeboard_posts')
     .select(POST_SELECT)
@@ -168,6 +182,10 @@ export async function createNoticeboardPost(userId, payload) {
 }
 
 export async function updateNoticeboardPost(postId, payload) {
+  if (!isUuid(postId)) {
+    throw new Error('Invalid listing id')
+  }
+
   const { data, error } = await supabase
     .from('noticeboard_posts')
     .update({
@@ -197,6 +215,10 @@ export async function updateNoticeboardPost(postId, payload) {
 }
 
 export async function updateNoticeboardPostStatus(postId, status) {
+  if (!isUuid(postId)) {
+    throw new Error('Invalid listing id')
+  }
+
   const { data, error } = await supabase
     .from('noticeboard_posts')
     .update({ status })
@@ -212,6 +234,10 @@ export async function updateNoticeboardPostStatus(postId, status) {
 }
 
 export async function deleteNoticeboardPost(postId) {
+  if (!isUuid(postId)) {
+    throw new Error('Invalid listing id')
+  }
+
   const { error } = await supabase.from('noticeboard_posts').delete().eq('id', postId)
 
   if (error) {
