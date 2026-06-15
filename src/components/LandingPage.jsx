@@ -18,7 +18,7 @@ export default function LandingPage({ session }) {
           <SiteTopNav session={session} />
 
           <div className="landing-hero-copy">
-            <h1>The global network for the coffee industry.</h1>
+            <h1>A global network for the coffee industry</h1>
             <p className="landing-hero-subline">
               Find roasters, technicians, trainers, suppliers, importers and more — wherever you are
               in the world.

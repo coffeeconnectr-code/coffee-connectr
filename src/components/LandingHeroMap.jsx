@@ -57,7 +57,40 @@ export default function LandingHeroMap() {
 
     resizeObserver.observe(containerRef.current)
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let animationFrame = 0
+    let startTime = 0
+    const startLongitude = 12
+    const latitude = 24
+    const rotationSeconds = 150
+
+    const spinGlobe = (timestamp) => {
+      if (!startTime) {
+        startTime = timestamp
+      }
+
+      const elapsedSeconds = (timestamp - startTime) / 1000
+      const longitude = startLongitude + (elapsedSeconds / rotationSeconds) * 360
+      const normalizedLongitude = ((longitude + 180) % 360) - 180
+
+      map.setCenter([normalizedLongitude, latitude])
+      animationFrame = window.requestAnimationFrame(spinGlobe)
+    }
+
+    const startSpin = () => {
+      if (!prefersReducedMotion) {
+        animationFrame = window.requestAnimationFrame(spinGlobe)
+      }
+    }
+
+    if (map.isStyleLoaded()) {
+      startSpin()
+    } else {
+      map.once('load', startSpin)
+    }
+
     return () => {
+      window.cancelAnimationFrame(animationFrame)
       resizeObserver.disconnect()
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
