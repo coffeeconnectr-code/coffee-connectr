@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import CategoryLabel from './CategoryLabel'
 import FavouriteButton from './FavouriteButton'
 import VerifiedBadge from './VerifiedBadge'
+import FeaturedBadge from './FeaturedBadge'
 
 function truncateText(text, maxLength = 120) {
   if (!text || text.length <= maxLength) {
@@ -20,7 +21,7 @@ export default function ProfileBrowseCard({
   const isIndividual = profile.profile_type === 'individual'
 
   return (
-    <article className="browse-card">
+    <article className={`browse-card${profile.is_featured ? ' browse-card-featured' : ''}`}>
       <div className="browse-card-top">
         {profile.profile_photo_url ? (
           <img src={profile.profile_photo_url} alt="" className="browse-avatar" />
@@ -34,6 +35,7 @@ export default function ProfileBrowseCard({
           <p className="browse-type">{isIndividual ? 'Individual' : 'Business'}</p>
           <h3>
             {profile.name}
+            {profile.is_featured ? <FeaturedBadge compact /> : null}
             {profile.is_verified ? <VerifiedBadge compact /> : null}
           </h3>
           {profile.location ? <p className="browse-meta">{profile.location}</p> : null}

@@ -119,6 +119,21 @@ export function createMapPinElement(category) {
   return element
 }
 
+export function createFeaturedMapPinElement() {
+  const element = document.createElement('div')
+  element.className = 'coffee-map-pin coffee-map-pin-featured'
+  element.innerHTML = '<span class="coffee-map-pin-star" aria-hidden="true">★</span>'
+  return element
+}
+
+export function createBrowseMapPinElement(pin) {
+  if (pin.is_featured) {
+    return createFeaturedMapPinElement()
+  }
+
+  return createMapPinElement(pin.primary_category)
+}
+
 export function createMapPinCountElement(count) {
   const element = document.createElement('div')
   element.className = 'coffee-map-pin coffee-map-pin-count'

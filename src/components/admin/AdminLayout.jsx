@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { to: '/admin/welcome-emails', label: 'Welcome emails' },
   { to: '/admin/reports', label: 'Reports' },
   { to: '/admin/verification', label: 'Verification' },
+  { to: '/admin/featured', label: 'Featured' },
   { to: '/admin/audit', label: 'Audit log' },
 ]
 

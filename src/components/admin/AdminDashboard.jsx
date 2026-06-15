@@ -73,6 +73,11 @@ export default function AdminDashboard() {
           value={stats.pending_verifications}
           to="/admin/verification"
         />
+        <StatCard
+          label="Pending featured"
+          value={stats.pending_featured ?? 0}
+          to="/admin/featured"
+        />
       </div>
     </div>
   )

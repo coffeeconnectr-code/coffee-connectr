@@ -124,6 +124,12 @@ export default function PricingPage({ session }) {
                 <td>—</td>
                 <td>✓</td>
               </tr>
+              <tr>
+                <th scope="row">Featured profile application</th>
+                <td>—</td>
+                <td>—</td>
+                <td>✓</td>
+              </tr>
             </tbody>
           </table>
         </div>

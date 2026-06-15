@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { MAP_STYLE_URL, applyCoffeeMapTheme, createMapPinCountElement, createMapPinElement } from '../lib/mapTheme'
+import { MAP_STYLE_URL, applyCoffeeMapTheme, createBrowseMapPinElement, createMapPinCountElement } from '../lib/mapTheme'
 import { groupMapPins, profilesToMapPins } from '../lib/mapPins'
 import { getCategoryIcon } from '../lib/profileConstants'
 
@@ -57,6 +57,13 @@ function appendProfileLink(listItem, pin) {
     listItem.appendChild(verified)
   }
 
+  if (pin.is_featured) {
+    const featured = document.createElement('span')
+    featured.className = 'browse-map-popup-featured'
+    featured.textContent = '★ Featured'
+    listItem.appendChild(featured)
+  }
+
   if (pin.primary_category) {
     const category = document.createElement('span')
     category.className = 'browse-map-popup-profile-category'
@@ -79,6 +86,13 @@ function createPopupContent(pin) {
     verified.className = 'browse-map-popup-category'
     verified.textContent = '✓ Verified member'
     popup.appendChild(verified)
+  }
+
+  if (pin.is_featured) {
+    const featured = document.createElement('p')
+    featured.className = 'browse-map-popup-category'
+    featured.textContent = '★ Featured member'
+    popup.appendChild(featured)
   }
 
   if (pin.location) {
@@ -193,7 +207,7 @@ export default function BrowseMap({ profiles, previewMode = false }) {
           element:
             group.count > 1
               ? createMapPinCountElement(group.count)
-              : createMapPinElement(group.pins[0].primary_category),
+              : createBrowseMapPinElement(group.pins[0]),
         }).setLngLat([group.longitude, group.latitude])
 
         if (previewMode) {

@@ -112,6 +112,7 @@ export default function AdminModeration() {
                   {profile.is_hidden ? ' · Hidden' : ''}
                   {profile.is_suspended ? ' · Suspended' : ''}
                   {profile.is_verified ? ' · Verified' : ''}
+                  {profile.is_featured ? ' · Featured' : ''}
                   {profile.is_admin ? ' · Admin' : ''}
                 </p>
               </div>

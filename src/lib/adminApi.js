@@ -254,3 +254,39 @@ export async function submitVerificationRequest(message = '') {
 
   return data
 }
+
+export async function submitFeaturedRequest(message = '') {
+  const { data, error } = await supabase.rpc('submit_featured_request', {
+    p_message: message,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data
+}
+
+export async function fetchAdminFeaturedRequests(status = 'pending') {
+  const { data, error } = await supabase.rpc('admin_list_featured_requests', {
+    p_status: status,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
+export async function adminReviewFeatured(requestId, approved, reason = '') {
+  const { error } = await supabase.rpc('admin_review_featured', {
+    p_request_id: requestId,
+    p_approved: approved,
+    p_reason: reason,
+  })
+
+  if (error) {
+    throw error
+  }
+}

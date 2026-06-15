@@ -37,6 +37,7 @@ export function profileToMapPins(profile) {
         location: site.location,
         site_name: site.site_name,
         is_verified: profile.is_verified,
+        is_featured: profile.is_featured,
         profile_type: profile.profile_type,
       }))
 
@@ -58,6 +59,7 @@ export function profileToMapPins(profile) {
         location: profile.location,
         site_name: null,
         is_verified: profile.is_verified,
+        is_featured: profile.is_featured,
         profile_type: profile.profile_type,
       },
     ]
@@ -77,6 +79,7 @@ export function profileToMapPins(profile) {
       location: profile.location,
       site_name: null,
       is_verified: profile.is_verified,
+      is_featured: profile.is_featured,
       profile_type: profile.profile_type,
     },
   ]

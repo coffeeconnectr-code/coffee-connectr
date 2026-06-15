@@ -89,6 +89,8 @@ using (
 );
 
 -- Include business site pins in the public homepage / preview map.
+drop function if exists public.get_public_map_pins(text, text);
+
 create or replace function public.get_public_map_pins(
   p_category text default '',
   p_profile_type text default ''
@@ -96,7 +98,8 @@ create or replace function public.get_public_map_pins(
 returns table (
   latitude double precision,
   longitude double precision,
-  primary_category text
+  primary_category text,
+  is_featured boolean
 )
 language sql
 stable
@@ -106,7 +109,8 @@ as $$
   select
     p.latitude,
     p.longitude,
-    p.primary_category
+    p.primary_category,
+    p.is_featured
   from public.profiles p
   where
     p.profile_type = 'individual'
@@ -130,7 +134,8 @@ as $$
   select
     ps.latitude,
     ps.longitude,
-    p.primary_category
+    p.primary_category,
+    p.is_featured
   from public.profile_sites ps
   join public.profiles p on p.id = ps.profile_id
   where
@@ -155,7 +160,8 @@ as $$
   select
     p.latitude,
     p.longitude,
-    p.primary_category
+    p.primary_category,
+    p.is_featured
   from public.profiles p
   where
     p.profile_type = 'business'

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { browsePublicMapPins } from '../lib/browseApi'
-import { MAP_STYLE_URL, applyCoffeeMapTheme, createMapPinElement } from '../lib/mapTheme'
+import { MAP_STYLE_URL, applyCoffeeMapTheme, createBrowseMapPinElement } from '../lib/mapTheme'
 
 export default function LandingHeroMap() {
   const containerRef = useRef(null)
@@ -115,7 +115,7 @@ export default function LandingHeroMap() {
         }
 
         const marker = new maplibregl.Marker({
-          element: createMapPinElement(pin.primary_category),
+          element: createBrowseMapPinElement(pin),
         })
           .setLngLat([pin.longitude, pin.latitude])
           .addTo(map)

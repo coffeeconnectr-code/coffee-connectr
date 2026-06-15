@@ -27,6 +27,7 @@ import RoastingEquipmentForm, {
   normalizeMachinesForSave,
 } from './RoastingEquipmentForm'
 import VerificationRequestForm from './VerificationRequestForm'
+import FeaturedRequestForm from './FeaturedRequestForm'
 
 const emptyForm = {
   profile_type: 'individual',
@@ -108,6 +109,7 @@ export default function ProfileForm({ userId, userEmail }) {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [isVerified, setIsVerified] = useState(false)
+  const [isFeatured, setIsFeatured] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -121,6 +123,7 @@ export default function ProfileForm({ userId, userEmail }) {
         if (active) {
           setForm(profileToForm(profile))
           setIsVerified(Boolean(profile?.is_verified))
+          setIsFeatured(Boolean(profile?.is_featured))
           if (!profile?.contact_email && userEmail) {
             setForm((current) => ({
               ...current,
@@ -717,6 +720,8 @@ export default function ProfileForm({ userId, userEmail }) {
       ) : null}
 
       {!isVerified ? <VerificationRequestForm id="verification" /> : null}
+
+      {!isFeatured ? <FeaturedRequestForm id="featured" /> : null}
     </section>
   )
 }

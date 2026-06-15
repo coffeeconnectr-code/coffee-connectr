@@ -9,7 +9,9 @@ import CategoryLabel from './CategoryLabel'
 import ProfileContactStats from './ProfileContactStats'
 import ProfileListings from './ProfileListings'
 import VerifiedBadge from './VerifiedBadge'
+import FeaturedBadge from './FeaturedBadge'
 import VerificationRequestForm from './VerificationRequestForm'
+import FeaturedRequestForm from './FeaturedRequestForm'
 
 function formatMessageTime(value) {
   const date = new Date(value)
@@ -137,6 +139,7 @@ export default function MemberDashboard({ userId, userEmail }) {
               </p>
               <h3>
                 {profile.name}
+                {profile.is_featured ? <FeaturedBadge compact /> : null}
                 {profile.is_verified ? <VerifiedBadge compact /> : null}
               </h3>
               {profile.location ? <p className="browse-meta">{profile.location}</p> : null}
@@ -171,6 +174,10 @@ export default function MemberDashboard({ userId, userEmail }) {
 
           {!profile.is_verified ? (
             <VerificationRequestForm compact id="verification" />
+          ) : null}
+
+          {!profile.is_featured ? (
+            <FeaturedRequestForm compact id="featured" />
           ) : null}
         </div>
       )}

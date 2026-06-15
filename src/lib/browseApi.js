@@ -17,8 +17,9 @@ export async function browseProfiles({ search = '', category = '', profileType =
   let query = supabase
     .from('profiles')
     .select(
-      'id, user_id, name, profile_type, profile_photo_url, location, primary_category, secondary_categories, about_bio, latitude, longitude, is_verified, profile_sites(id, site_name, location, latitude, longitude, sort_order)',
+      'id, user_id, name, profile_type, profile_photo_url, location, primary_category, secondary_categories, about_bio, latitude, longitude, is_verified, is_featured, profile_sites(id, site_name, location, latitude, longitude, sort_order)',
     )
+    .order('is_featured', { ascending: false })
     .order('name', { ascending: true })
 
   if (profileType) {
@@ -54,5 +55,15 @@ export async function browseProfiles({ search = '', category = '', profileType =
     })
   }
 
-  return results
+  return sortBrowseProfiles(results)
+}
+
+export function sortBrowseProfiles(profiles) {
+  return [...profiles].sort((left, right) => {
+    if (Boolean(left.is_featured) !== Boolean(right.is_featured)) {
+      return left.is_featured ? -1 : 1
+    }
+
+    return (left.name ?? '').localeCompare(right.name ?? '', undefined, { sensitivity: 'base' })
+  })
 }

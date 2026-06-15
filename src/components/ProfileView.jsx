@@ -15,7 +15,9 @@ import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
 import ReportButton from './ReportButton'
 import VerifiedBadge from './VerifiedBadge'
+import FeaturedBadge from './FeaturedBadge'
 import VerificationRequestForm from './VerificationRequestForm'
+import FeaturedRequestForm from './FeaturedRequestForm'
 import useMemberAccess from '../hooks/useMemberAccess'
 import { profileHasMapPin } from '../lib/mapPins'
 
@@ -284,6 +286,7 @@ export default function ProfileView({ userId, currentUserId }) {
                 </p>
                 <h2>
                   {profile.name}
+                  {profile.is_featured ? <FeaturedBadge /> : null}
                   {profile.is_verified ? <VerifiedBadge /> : null}
                 </h2>
                 {isIndividual && profile.job_title_role ? (
@@ -357,6 +360,8 @@ export default function ProfileView({ userId, currentUserId }) {
         ) : null}
 
         {isOwnProfile && !profile.is_verified ? <VerificationRequestForm /> : null}
+
+        {isOwnProfile && !profile.is_featured ? <FeaturedRequestForm /> : null}
 
         {showAboutSection ? (
           <ProfileSection title="About">{aboutSection}</ProfileSection>

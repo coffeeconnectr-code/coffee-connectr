@@ -37,6 +37,7 @@ import AdminLayout from './components/admin/AdminLayout'
 import AdminModeration from './components/admin/AdminModeration'
 import AdminReports from './components/admin/AdminReports'
 import AdminVerification from './components/admin/AdminVerification'
+import AdminFeatured from './components/admin/AdminFeatured'
 import AdminAudit from './components/admin/AdminAudit'
 import AdminWelcomeEmails from './components/admin/AdminWelcomeEmails'
 import useAdminAccess from './hooks/useAdminAccess'
@@ -373,6 +374,7 @@ export default function App() {
         <Route path="welcome-emails" element={<AdminWelcomeEmails />} />
         <Route path="reports" element={<AdminReports />} />
         <Route path="verification" element={<AdminVerification />} />
+        <Route path="featured" element={<AdminFeatured />} />
         <Route path="audit" element={<AdminAudit />} />
       </Route>
       <Route element={<AppShell session={session} onSignOut={handleSignOut} />}>

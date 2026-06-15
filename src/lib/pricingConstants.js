@@ -58,6 +58,7 @@ export const PRICING_PLANS = [
       'Roaster equipment listings',
       'Enhanced business visibility',
       'Verified badge application',
+      'Featured profile application',
       'Cancel anytime',
     ],
   },
