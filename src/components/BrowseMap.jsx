@@ -1,16 +1,12 @@
 import { useEffect, useMemo, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { MAP_STYLE_URL, applyCoffeeMapTheme, createBrowseMapPinElement, createMapPinCountElement } from '../lib/mapTheme'
 import { groupMapPins, profilesToMapPins } from '../lib/mapPins'
 import { getCategoryIcon } from '../lib/profileConstants'
 
-function navigateTo(path) {
-  window.history.pushState({}, '', path)
-  window.dispatchEvent(new PopStateEvent('popstate'))
-}
-
-function createJoinPopup(memberCount = 1) {
+function createJoinPopup(memberCount = 1, onNavigate) {
   const popup = document.createElement('div')
   popup.className = 'browse-map-popup browse-map-popup-preview'
 
@@ -28,7 +24,7 @@ function createJoinPopup(memberCount = 1) {
   link.textContent = 'Sign up free'
   link.addEventListener('click', (event) => {
     event.preventDefault()
-    navigateTo(link.href)
+    onNavigate(link.href)
   })
   popup.appendChild(link)
 
@@ -39,14 +35,14 @@ function formatPinLabel(pin) {
   return pin.site_name ? `${pin.name} — ${pin.site_name}` : (pin.name ?? 'Member')
 }
 
-function appendProfileLink(listItem, pin) {
+function appendProfileLink(listItem, pin, onNavigate) {
   const link = document.createElement('a')
   link.href = `/profile/${pin.user_id}`
   link.className = 'browse-map-popup-profile-link'
   link.textContent = formatPinLabel(pin)
   link.addEventListener('click', (event) => {
     event.preventDefault()
-    navigateTo(link.href)
+    onNavigate(link.href)
   })
   listItem.appendChild(link)
 
@@ -72,7 +68,7 @@ function appendProfileLink(listItem, pin) {
   }
 }
 
-function createPopupContent(pin) {
+function createPopupContent(pin, onNavigate) {
   const popup = document.createElement('div')
   popup.className = 'browse-map-popup'
 
@@ -115,16 +111,16 @@ function createPopupContent(pin) {
   link.textContent = 'View profile'
   link.addEventListener('click', (event) => {
     event.preventDefault()
-    navigateTo(link.href)
+    onNavigate(link.href)
   })
   popup.appendChild(link)
 
   return popup
 }
 
-function createGroupedPopupContent(group) {
+function createGroupedPopupContent(group, onNavigate) {
   if (group.count === 1) {
-    return createPopupContent(group.pins[0])
+    return createPopupContent(group.pins[0], onNavigate)
   }
 
   const popup = document.createElement('div')
@@ -148,7 +144,7 @@ function createGroupedPopupContent(group) {
 
   group.pins.forEach((pin) => {
     const listItem = document.createElement('li')
-    appendProfileLink(listItem, pin)
+    appendProfileLink(listItem, pin, onNavigate)
     list.appendChild(listItem)
   })
 
@@ -157,6 +153,7 @@ function createGroupedPopupContent(group) {
 }
 
 export default function BrowseMap({ profiles, previewMode = false }) {
+  const navigate = useNavigate()
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const markersRef = useRef([])
@@ -198,6 +195,10 @@ export default function BrowseMap({ profiles, previewMode = false }) {
       return
     }
 
+    const onNavigate = (path) => {
+      navigate(path)
+    }
+
     const updateMarkers = () => {
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
@@ -213,13 +214,13 @@ export default function BrowseMap({ profiles, previewMode = false }) {
         if (previewMode) {
           marker.setPopup(
             new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
-              createJoinPopup(group.count),
+              createJoinPopup(group.count, onNavigate),
             ),
           )
         } else {
           marker.setPopup(
             new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
-              createGroupedPopupContent(group),
+              createGroupedPopupContent(group, onNavigate),
             ),
           )
         }
@@ -258,7 +259,7 @@ export default function BrowseMap({ profiles, previewMode = false }) {
     } else {
       map.once('load', updateMarkers)
     }
-  }, [pinGroups, previewMode])
+  }, [pinGroups, previewMode, navigate])
 
   return (
     <div className="map-shell browse-map-shell">

@@ -13,7 +13,7 @@ function listingStatus(post) {
     return 'active'
   }
 
-  if (post.status === 'active' && new Date(post.expires_at) <= new Date()) {
+  if (post.status === 'active' && post.expires_at && new Date(post.expires_at) <= new Date()) {
     return 'expired'
   }
 

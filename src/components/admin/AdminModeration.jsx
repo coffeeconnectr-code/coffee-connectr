@@ -50,7 +50,17 @@ export default function AdminModeration() {
   }
 
   useEffect(() => {
-    loadData()
+    let active = true
+    const timeout = window.setTimeout(() => {
+      if (active) {
+        void loadData()
+      }
+    }, 0)
+
+    return () => {
+      active = false
+      window.clearTimeout(timeout)
+    }
   }, [tab])
 
   async function runAction(action) {

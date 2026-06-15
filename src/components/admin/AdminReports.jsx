@@ -36,7 +36,17 @@ export default function AdminReports() {
   }
 
   useEffect(() => {
-    loadReports()
+    let active = true
+    const timeout = window.setTimeout(() => {
+      if (active) {
+        void loadReports()
+      }
+    }, 0)
+
+    return () => {
+      active = false
+      window.clearTimeout(timeout)
+    }
   }, [status])
 
   async function handleResolve(reportId, nextStatus) {

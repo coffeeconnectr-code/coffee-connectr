@@ -22,6 +22,10 @@ import useMemberAccess from '../hooks/useMemberAccess'
 import { profileHasMapPin } from '../lib/mapPins'
 
 function formatOpenTo(values) {
+  if (!Array.isArray(values) || values.length === 0) {
+    return null
+  }
+
   return values
     .map((value) => OPEN_TO_OPTIONS.find((option) => option.value === value)?.label ?? value)
     .join(', ')
@@ -142,7 +146,7 @@ export default function ProfileView({ userId, currentUserId }) {
     return () => {
       active = false
     }
-  }, [userId])
+  }, [userId, currentUserId])
 
   async function handleCopyLink() {
     try {

@@ -159,7 +159,7 @@ export default function ResourcePostView({ resourceId, currentUserId = null }) {
       </div>
 
       <div className="resource-access-panel">
-        {resource.post_type === 'link' ? (
+        {resource.post_type === 'link' && resource.external_url ? (
           <a
             href={resource.external_url}
             target="_blank"
@@ -168,6 +168,8 @@ export default function ResourcePostView({ resourceId, currentUserId = null }) {
           >
             Open link
           </a>
+        ) : resource.post_type === 'link' ? (
+          <p className="status-message">No link URL provided for this resource.</p>
         ) : (
           <div className="resource-document-panel">
             <p className="resource-document-name">

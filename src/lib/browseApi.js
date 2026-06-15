@@ -45,13 +45,15 @@ export async function browseProfiles({ search = '', category = '', profileType =
   const queryText = search.trim().toLowerCase()
 
   if (queryText) {
+    const terms = queryText.split(/\s+/).filter(Boolean)
+
     results = results.filter((profile) => {
       const searchable = [profile.name, profile.location, profile.about_bio, profile.primary_category]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
 
-      return searchable.includes(queryText)
+      return terms.every((term) => searchable.includes(term))
     })
   }
 

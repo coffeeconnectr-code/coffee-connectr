@@ -30,6 +30,7 @@ import ProfileView from './components/ProfileView'
 import MemberDashboard from './components/MemberDashboard'
 import MemberGate from './components/MemberGate'
 import MemberAccessBanner from './components/MemberAccessBanner'
+import ErrorBoundary from './components/ErrorBoundary'
 import SubscribePage from './components/SubscribePage'
 import AdminDashboard from './components/admin/AdminDashboard'
 import AdminGate from './components/admin/AdminGate'
@@ -97,6 +98,7 @@ function DashboardRoute({ session }) {
     <MemberDashboard
       userId={session.user.id}
       userEmail={session.user.email ?? 'your account'}
+      session={session}
     />
   )
 }
@@ -311,7 +313,9 @@ function AppShell({ session, onSignOut }) {
         <MemberAccessBanner access={access} loading={accessLoading} />
       ) : null}
 
-      <Outlet />
+      <ErrorBoundary>
+        <Outlet />
+      </ErrorBoundary>
     </main>
   )
 }
@@ -359,80 +363,82 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage session={session} />} />
-      <Route path="/about" element={<AboutPage session={session} />} />
-      <Route path="/how-to-use" element={<HowToUsePage session={session} />} />
-      <Route path="/pricing" element={<PricingPage session={session} />} />
-      <Route path="/terms" element={<TermsPage session={session} />} />
-      <Route path="/privacy" element={<PrivacyPage session={session} />} />
-      <Route path="/contact" element={<ContactPage session={session} />} />
-      <Route path="/sign-up" element={<SignUpRoute session={session} />} />
-      <Route path="/admin" element={<AdminRoute session={session} />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="moderation" element={<AdminModeration />} />
-        <Route path="welcome-emails" element={<AdminWelcomeEmails />} />
-        <Route path="reports" element={<AdminReports />} />
-        <Route path="verification" element={<AdminVerification />} />
-        <Route path="featured" element={<AdminFeatured />} />
-        <Route path="audit" element={<AdminAudit />} />
-      </Route>
-      <Route element={<AppShell session={session} onSignOut={handleSignOut} />}>
-        <Route
-          path="/discover"
-          element={
-            <MemberFeatureRoute session={session}>
-              <DiscoverBrowse currentUserId={session?.user?.id ?? null} />
-            </MemberFeatureRoute>
-          }
-        />
-        <Route path="/discover/map" element={<DiscoverMap session={session} />} />
-        <Route
-          path="/discover/roasters"
-          element={
-            <MemberFeatureRoute session={session}>
-              <DiscoverRoasters />
-            </MemberFeatureRoute>
-          }
-        />
-        <Route path="/dashboard" element={<DashboardRoute session={session} />} />
-        <Route path="/subscribe" element={<SubscribeRoute session={session} />} />
-        <Route
-          path="/noticeboard"
-          element={
-            <MemberFeatureRoute session={session}>
-              <NoticeboardBrowse currentUserId={session?.user?.id ?? null} />
-            </MemberFeatureRoute>
-          }
-        />
-        <Route
-          path="/noticeboard/map"
-          element={
-            <MemberFeatureRoute session={session}>
-              <NoticeboardMap />
-            </MemberFeatureRoute>
-          }
-        />
-        <Route path="/noticeboard/new" element={<NoticeboardNewRoute session={session} />} />
-        <Route path="/noticeboard/:postId/edit" element={<NoticeboardEditRoute session={session} />} />
-        <Route path="/noticeboard/:postId" element={<NoticeboardPostRoute session={session} />} />
-        <Route
-          path="/resources"
-          element={
-            <MemberFeatureRoute session={session}>
-              <ResourcesBrowse currentUserId={session?.user?.id ?? null} />
-            </MemberFeatureRoute>
-          }
-        />
-        <Route path="/resources/new" element={<ResourcesNewRoute session={session} />} />
-        <Route path="/resources/:resourceId/edit" element={<ResourcesEditRoute session={session} />} />
-        <Route path="/resources/:resourceId" element={<ResourcePostRoute session={session} />} />
-        <Route path="/saved" element={<SavedProfilesRoute session={session} />} />
-        <Route path="/messages" element={<MessagesRoute session={session} />} />
-        <Route path="/messages/:userId" element={<MessageThreadRoute session={session} />} />
-        <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />
-        <Route path="/profile/:userId" element={<ProfileViewRoute session={session} />} />
-      </Route>
-    </Routes>
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/" element={<LandingPage session={session} />} />
+        <Route path="/about" element={<AboutPage session={session} />} />
+        <Route path="/how-to-use" element={<HowToUsePage session={session} />} />
+        <Route path="/pricing" element={<PricingPage session={session} />} />
+        <Route path="/terms" element={<TermsPage session={session} />} />
+        <Route path="/privacy" element={<PrivacyPage session={session} />} />
+        <Route path="/contact" element={<ContactPage session={session} />} />
+        <Route path="/sign-up" element={<SignUpRoute session={session} />} />
+        <Route path="/admin" element={<AdminRoute session={session} />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="moderation" element={<AdminModeration />} />
+          <Route path="welcome-emails" element={<AdminWelcomeEmails />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="verification" element={<AdminVerification />} />
+          <Route path="featured" element={<AdminFeatured />} />
+          <Route path="audit" element={<AdminAudit />} />
+        </Route>
+        <Route element={<AppShell session={session} onSignOut={handleSignOut} />}>
+          <Route
+            path="/discover"
+            element={
+              <MemberFeatureRoute session={session}>
+                <DiscoverBrowse currentUserId={session?.user?.id ?? null} />
+              </MemberFeatureRoute>
+            }
+          />
+          <Route path="/discover/map" element={<DiscoverMap session={session} />} />
+          <Route
+            path="/discover/roasters"
+            element={
+              <MemberFeatureRoute session={session}>
+                <DiscoverRoasters />
+              </MemberFeatureRoute>
+            }
+          />
+          <Route path="/dashboard" element={<DashboardRoute session={session} />} />
+          <Route path="/subscribe" element={<SubscribeRoute session={session} />} />
+          <Route
+            path="/noticeboard"
+            element={
+              <MemberFeatureRoute session={session}>
+                <NoticeboardBrowse currentUserId={session?.user?.id ?? null} />
+              </MemberFeatureRoute>
+            }
+          />
+          <Route
+            path="/noticeboard/map"
+            element={
+              <MemberFeatureRoute session={session}>
+                <NoticeboardMap />
+              </MemberFeatureRoute>
+            }
+          />
+          <Route path="/noticeboard/new" element={<NoticeboardNewRoute session={session} />} />
+          <Route path="/noticeboard/:postId/edit" element={<NoticeboardEditRoute session={session} />} />
+          <Route path="/noticeboard/:postId" element={<NoticeboardPostRoute session={session} />} />
+          <Route
+            path="/resources"
+            element={
+              <MemberFeatureRoute session={session}>
+                <ResourcesBrowse currentUserId={session?.user?.id ?? null} />
+              </MemberFeatureRoute>
+            }
+          />
+          <Route path="/resources/new" element={<ResourcesNewRoute session={session} />} />
+          <Route path="/resources/:resourceId/edit" element={<ResourcesEditRoute session={session} />} />
+          <Route path="/resources/:resourceId" element={<ResourcePostRoute session={session} />} />
+          <Route path="/saved" element={<SavedProfilesRoute session={session} />} />
+          <Route path="/messages" element={<MessagesRoute session={session} />} />
+          <Route path="/messages/:userId" element={<MessageThreadRoute session={session} />} />
+          <Route path="/profile/edit" element={<EditProfileRoute session={session} />} />
+          <Route path="/profile/:userId" element={<ProfileViewRoute session={session} />} />
+        </Route>
+      </Routes>
+    </ErrorBoundary>
   )
 }

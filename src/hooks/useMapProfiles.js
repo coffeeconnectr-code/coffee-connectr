@@ -4,20 +4,38 @@ import { browseProfiles, browsePublicMapPins } from '../lib/browseApi'
 import useMemberAccess from './useMemberAccess'
 import { CATEGORIES } from '../lib/profileConstants'
 
+function categoryFromSearchParams(searchParams) {
+  const value = searchParams.get('category') ?? ''
+  return value && CATEGORIES.includes(value) ? value : ''
+}
+
+function updateCategorySearchParam(searchParams, value) {
+  const next = new URLSearchParams(searchParams)
+
+  if (value && CATEGORIES.includes(value)) {
+    next.set('category', value)
+  } else {
+    next.delete('category')
+  }
+
+  return next
+}
+
 export default function useMapProfiles(session) {
-  const [searchParams] = useSearchParams()
-  const initialCategory = searchParams.get('category') ?? ''
+  const [searchParams, setSearchParams] = useSearchParams()
+  const category = categoryFromSearchParams(searchParams)
   const { hasAccess, loading: accessLoading } = useMemberAccess(session)
   const previewMode = !hasAccess
 
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState(
-    initialCategory && CATEGORIES.includes(initialCategory) ? initialCategory : '',
-  )
   const [profileType, setProfileType] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  function setCategory(value) {
+    setSearchParams(updateCategorySearchParam(searchParams, value), { replace: true })
+  }
 
   useEffect(() => {
     if (accessLoading) {

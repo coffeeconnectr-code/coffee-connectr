@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import {
@@ -11,7 +12,7 @@ import {
   getSectionLabel,
 } from '../lib/noticeboardConstants'
 
-function createPopupContent(post) {
+function createPopupContent(post, onNavigate) {
   const popup = document.createElement('div')
   popup.className = 'browse-map-popup'
 
@@ -46,8 +47,7 @@ function createPopupContent(post) {
   link.textContent = 'View listing'
   link.addEventListener('click', (event) => {
     event.preventDefault()
-    window.history.pushState({}, '', link.href)
-    window.dispatchEvent(new PopStateEvent('popstate'))
+    onNavigate(link.href)
   })
   popup.appendChild(link)
 
@@ -55,6 +55,7 @@ function createPopupContent(post) {
 }
 
 export default function NoticeboardBrowseMap({ posts }) {
+  const navigate = useNavigate()
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const markersRef = useRef([])
@@ -99,6 +100,10 @@ export default function NoticeboardBrowseMap({ posts }) {
       return
     }
 
+    const onNavigate = (path) => {
+      navigate(path)
+    }
+
     const updateMarkers = () => {
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
@@ -110,7 +115,7 @@ export default function NoticeboardBrowseMap({ posts }) {
           .setLngLat([post.longitude, post.latitude])
           .setPopup(
             new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
-              createPopupContent(post),
+              createPopupContent(post, onNavigate),
             ),
           )
           .addTo(map)
@@ -147,7 +152,7 @@ export default function NoticeboardBrowseMap({ posts }) {
     } else {
       map.once('load', updateMarkers)
     }
-  }, [locatedPosts])
+  }, [locatedPosts, navigate])
 
   return (
     <div className="map-shell browse-map-shell">

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { getAccessSummary } from '../lib/memberAccess'
 
 export default function MemberAccessBanner({ access, loading }) {
-  const [now, setNow] = useState(Date.now())
+  const [, setTick] = useState(0)
 
   useEffect(() => {
     if (loading || access?.status !== 'trialing' || !access?.trialEndsAt) {
@@ -11,7 +11,7 @@ export default function MemberAccessBanner({ access, loading }) {
     }
 
     const interval = window.setInterval(() => {
-      setNow(Date.now())
+      setTick((current) => current + 1)
     }, 60_000)
 
     return () => {
@@ -23,7 +23,7 @@ export default function MemberAccessBanner({ access, loading }) {
     return null
   }
 
-  const summary = getAccessSummary(access, now)
+  const summary = getAccessSummary(access)
 
   if (!summary) {
     return null

@@ -12,6 +12,7 @@ import VerifiedBadge from './VerifiedBadge'
 import FeaturedBadge from './FeaturedBadge'
 import VerificationRequestForm from './VerificationRequestForm'
 import FeaturedRequestForm from './FeaturedRequestForm'
+import useMemberAccess from '../hooks/useMemberAccess'
 
 function formatMessageTime(value) {
   const date = new Date(value)
@@ -33,7 +34,8 @@ function truncatePreview(text, maxLength = 72) {
   return `${text.slice(0, maxLength).trim()}…`
 }
 
-export default function MemberDashboard({ userId, userEmail }) {
+export default function MemberDashboard({ userId, userEmail, session }) {
+  const { hasAccess, loading: accessLoading } = useMemberAccess(session)
   const [profile, setProfile] = useState(null)
   const [conversations, setConversations] = useState([])
   const [savedProfiles, setSavedProfiles] = useState([])
@@ -49,12 +51,19 @@ export default function MemberDashboard({ userId, userEmail }) {
       setError('')
 
       try {
-        const [profileData, inbox, saved, posts] = await Promise.all([
-          fetchProfile(userId, userId),
-          fetchInbox(userId),
-          fetchSavedProfiles(userId),
-          fetchUserNoticeboardPosts(userId, { includeAll: true }),
-        ])
+        const profileData = await fetchProfile(userId, userId)
+
+        let inbox = []
+        let saved = []
+        let posts = []
+
+        if (hasAccess) {
+          ;[inbox, saved, posts] = await Promise.all([
+            fetchInbox(userId),
+            fetchSavedProfiles(userId),
+            fetchUserNoticeboardPosts(userId, { includeAll: true }),
+          ])
+        }
 
         if (active) {
           setProfile(profileData)
@@ -73,14 +82,18 @@ export default function MemberDashboard({ userId, userEmail }) {
       }
     }
 
+    if (accessLoading) {
+      return undefined
+    }
+
     loadDashboard()
 
     return () => {
       active = false
     }
-  }, [userId])
+  }, [userId, hasAccess, accessLoading])
 
-  if (loading) {
+  if (loading || accessLoading) {
     return <p className="status-message">Loading your dashboard...</p>
   }
 
@@ -105,11 +118,29 @@ export default function MemberDashboard({ userId, userEmail }) {
           <Link to="/profile/edit" className="secondary-button profile-action-link">
             Edit profile
           </Link>
-          <Link to="/messages" className="primary-button profile-action-link">
-            Messages{unreadTotal > 0 ? ` (${unreadTotal})` : ''}
-          </Link>
+          {hasAccess ? (
+            <Link to="/messages" className="primary-button profile-action-link">
+              Messages{unreadTotal > 0 ? ` (${unreadTotal})` : ''}
+            </Link>
+          ) : (
+            <Link to="/subscribe" className="primary-button profile-action-link">
+              Subscribe
+            </Link>
+          )}
         </div>
       </div>
+
+      {!hasAccess ? (
+        <section className="member-access-banner member-access-banner-warning">
+          <div>
+            <strong>Membership inactive</strong>
+            <p>Subscribe to restore messaging, saved profiles, and noticeboard tools.</p>
+          </div>
+          <Link to="/subscribe" className="secondary-button profile-action-link">
+            Subscribe
+          </Link>
+        </section>
+      ) : null}
 
       {!profile ? (
         <div className="dashboard-empty-profile">
@@ -155,9 +186,11 @@ export default function MemberDashboard({ userId, userEmail }) {
             <Link to={`/profile/${userId}`} className="secondary-button profile-action-link">
               View public profile
             </Link>
-            <Link to="/noticeboard/new" className="secondary-button profile-action-link">
-              Post listing
-            </Link>
+            {hasAccess ? (
+              <Link to="/noticeboard/new" className="secondary-button profile-action-link">
+                Post listing
+              </Link>
+            ) : null}
           </div>
 
           {completion && completion.percent < 100 ? (
@@ -182,7 +215,9 @@ export default function MemberDashboard({ userId, userEmail }) {
         </div>
       )}
 
-      <div className="dashboard-stat-grid">
+      {hasAccess ? (
+        <>
+          <div className="dashboard-stat-grid">
         <Link to="/messages" className="dashboard-stat-card dashboard-stat-link">
           <p className="dashboard-stat-value">{conversations.length}</p>
           <p className="dashboard-stat-label">Conversations</p>
@@ -340,6 +375,8 @@ export default function MemberDashboard({ userId, userEmail }) {
       </div>
 
       {profile ? <ProfileListings userId={userId} isOwnProfile /> : null}
+        </>
+      ) : null}
     </section>
   )
 }

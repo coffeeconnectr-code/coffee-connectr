@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { addFavourite, removeFavourite } from '../lib/favouritesApi'
 
 export default function FavouriteButton({
@@ -9,12 +9,9 @@ export default function FavouriteButton({
   className = '',
   disabled = false,
 }) {
-  const [saved, setSaved] = useState(initialSaved)
+  const [savedOverride, setSavedOverride] = useState(null)
   const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    setSaved(initialSaved)
-  }, [initialSaved])
+  const saved = savedOverride ?? initialSaved
 
   if (!currentUserId || currentUserId === profileUserId) {
     return null
@@ -30,11 +27,11 @@ export default function FavouriteButton({
     try {
       if (saved) {
         await removeFavourite(currentUserId, profileUserId)
-        setSaved(false)
+        setSavedOverride(false)
         onChange?.(false)
       } else {
         await addFavourite(currentUserId, profileUserId)
-        setSaved(true)
+        setSavedOverride(true)
         onChange?.(true)
       }
     } catch (error) {

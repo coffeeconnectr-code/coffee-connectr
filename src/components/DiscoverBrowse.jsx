@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { fetchFavouriteIds } from '../lib/favouritesApi'
 import useBrowseProfiles from '../hooks/useBrowseProfiles'
 import BrowseFilters from './BrowseFilters'
 import ProfileBrowseCard from './ProfileBrowseCard'
 
 export default function DiscoverBrowse({ currentUserId = null }) {
-  const [searchParams] = useSearchParams()
-  const initialCategory = searchParams.get('category') ?? ''
-
   const {
     search,
     setSearch,
@@ -19,7 +16,7 @@ export default function DiscoverBrowse({ currentUserId = null }) {
     results,
     loading,
     error,
-  } = useBrowseProfiles(initialCategory)
+  } = useBrowseProfiles()
 
   const [favouriteIds, setFavouriteIds] = useState(new Set())
 

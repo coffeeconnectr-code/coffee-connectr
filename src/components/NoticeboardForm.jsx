@@ -127,7 +127,7 @@ export default function NoticeboardForm({ userId, postId = null }) {
     const file = event.target.files?.[0]
     event.target.value = ''
 
-    if (!file || form.photo_urls.length >= MAX_PHOTOS) {
+    if (!file || !Array.isArray(form.photo_urls) || form.photo_urls.length >= MAX_PHOTOS) {
       return
     }
 

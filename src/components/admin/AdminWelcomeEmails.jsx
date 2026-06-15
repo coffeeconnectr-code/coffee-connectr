@@ -41,7 +41,17 @@ export default function AdminWelcomeEmails() {
   }
 
   useEffect(() => {
-    loadMembers()
+    let active = true
+    const timeout = window.setTimeout(() => {
+      if (active) {
+        void loadMembers()
+      }
+    }, 0)
+
+    return () => {
+      active = false
+      window.clearTimeout(timeout)
+    }
   }, [])
 
   async function handleSend(member) {

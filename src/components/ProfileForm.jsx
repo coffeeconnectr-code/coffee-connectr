@@ -21,11 +21,12 @@ import {
 } from '../lib/profileSitesApi'
 import LocationPicker from './LocationPicker'
 import ProfileSitesForm from './ProfileSitesForm'
-import RoastingEquipmentForm, {
+import RoastingEquipmentForm from './RoastingEquipmentForm'
+import {
   emptyMachine,
   machinesFromDatabase,
   normalizeMachinesForSave,
-} from './RoastingEquipmentForm'
+} from '../lib/roastingEquipment'
 import VerificationRequestForm from './VerificationRequestForm'
 import FeaturedRequestForm from './FeaturedRequestForm'
 

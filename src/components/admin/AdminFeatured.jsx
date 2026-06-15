@@ -24,7 +24,17 @@ export default function AdminFeatured() {
   }
 
   useEffect(() => {
-    loadRequests()
+    let active = true
+    const timeout = window.setTimeout(() => {
+      if (active) {
+        void loadRequests()
+      }
+    }, 0)
+
+    return () => {
+      active = false
+      window.clearTimeout(timeout)
+    }
   }, [status])
 
   async function handleReview(requestId, approved) {

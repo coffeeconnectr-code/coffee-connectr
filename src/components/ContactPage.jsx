@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { CONTACT_TOPICS } from '../lib/contactConstants'
 import { submitContactForm } from '../lib/contactFormApi'
@@ -14,21 +14,15 @@ const EMPTY_FORM = {
 
 export default function ContactPage({ session }) {
   const [searchParams] = useSearchParams()
+  const topicParam = searchParams.get('topic')
+  const validTopic = CONTACT_TOPICS.some((item) => item.value === topicParam)
+  const topicFromUrl = validTopic ? topicParam : null
   const [form, setForm] = useState(EMPTY_FORM)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
-
-  useEffect(() => {
-    const topic = searchParams.get('topic')
-    const validTopic = CONTACT_TOPICS.some((item) => item.value === topic)
-
-    setForm((current) => ({
-      ...current,
-      email: session?.user?.email ?? current.email,
-      topic: validTopic ? topic : current.topic,
-    }))
-  }, [searchParams, session?.user?.email])
+  const topic = topicFromUrl ?? form.topic
+  const email = form.email || session?.user?.email || ''
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }))
@@ -40,7 +34,11 @@ export default function ContactPage({ session }) {
     setMessage('')
 
     try {
-      const result = await submitContactForm(form)
+      const result = await submitContactForm({
+        ...form,
+        email,
+        topic,
+      })
 
       if (result?.skipped) {
         setMessage('Contact delivery is not configured yet. Please try again later.')
@@ -108,7 +106,7 @@ export default function ContactPage({ session }) {
               Email
               <input
                 type="email"
-                value={form.email}
+                value={email}
                 onChange={(event) => updateField('email', event.target.value)}
                 placeholder="you@example.com"
                 required
@@ -119,7 +117,7 @@ export default function ContactPage({ session }) {
             <label>
               Topic
               <select
-                value={form.topic}
+                value={topic}
                 onChange={(event) => updateField('topic', event.target.value)}
                 required
               >

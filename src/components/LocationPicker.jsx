@@ -1,21 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { reverseGeocode, searchLocation } from '../lib/geocoding'
 import CoffeeMap from './CoffeeMap'
 
 export default function LocationPicker({ location, latitude, longitude, primaryCategory, onChange }) {
-  const [searchQuery, setSearchQuery] = useState(location ?? '')
+  const [localQuery, setLocalQuery] = useState(null)
   const [searching, setSearching] = useState(false)
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    setSearchQuery(location ?? '')
-  }, [location])
+  const searchQuery = localQuery ?? location ?? ''
 
   const hasPin = latitude != null && longitude != null
 
   async function applyLocation(nextLocation) {
     onChange(nextLocation)
-    setSearchQuery(nextLocation.location)
+    setLocalQuery(null)
   }
 
   async function handleSearch() {
@@ -61,7 +58,7 @@ export default function LocationPicker({ location, latitude, longitude, primaryC
 
   function handleClearPin() {
     onChange({ location: '', latitude: null, longitude: null })
-    setSearchQuery('')
+    setLocalQuery('')
     setError('')
   }
 
@@ -73,7 +70,7 @@ export default function LocationPicker({ location, latitude, longitude, primaryC
         <input
           type="text"
           value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
+          onChange={(event) => setLocalQuery(event.target.value)}
           onKeyDown={handleSearchKeyDown}
           placeholder="Search city or address"
         />
