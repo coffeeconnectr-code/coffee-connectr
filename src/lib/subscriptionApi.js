@@ -18,12 +18,12 @@ export async function fetchMemberAccess() {
   }
 
   return {
-    hasAccess: Boolean(data?.hasAccess),
-    isAdmin: Boolean(data?.isAdmin),
+    hasAccess: Boolean(data?.hasAccess ?? data?.has_access),
+    isAdmin: Boolean(data?.isAdmin ?? data?.is_admin),
     status: data?.status ?? DEFAULT_ACCESS.status,
-    planType: data?.planType ?? null,
-    trialEndsAt: data?.trialEndsAt ?? null,
-    currentPeriodEnd: data?.currentPeriodEnd ?? null,
-    daysRemaining: Number(data?.daysRemaining ?? 0),
+    planType: data?.planType ?? data?.plan_type ?? null,
+    trialEndsAt: data?.trialEndsAt ?? data?.trial_ends_at ?? null,
+    currentPeriodEnd: data?.currentPeriodEnd ?? data?.current_period_end ?? null,
+    daysRemaining: Number(data?.daysRemaining ?? data?.days_remaining ?? 0),
   }
 }

@@ -47,8 +47,25 @@ export default function useMemberAccess(session) {
 
     loadAccess()
 
+    function handleFocus() {
+      if (!session?.user?.id) {
+        return
+      }
+
+      fetchMemberAccess()
+        .then((result) => {
+          if (active) {
+            setAccess(result)
+          }
+        })
+        .catch(() => {})
+    }
+
+    window.addEventListener('focus', handleFocus)
+
     return () => {
       active = false
+      window.removeEventListener('focus', handleFocus)
     }
   }, [session?.user?.id])
 

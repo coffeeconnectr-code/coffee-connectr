@@ -1,3 +1,21 @@
+export function getTrialDaysRemaining(trialEndsAt, now = Date.now()) {
+  if (!trialEndsAt) {
+    return null
+  }
+
+  const endMs = new Date(trialEndsAt).getTime()
+  if (Number.isNaN(endMs)) {
+    return null
+  }
+
+  const diffMs = endMs - now
+  if (diffMs <= 0) {
+    return 0
+  }
+
+  return Math.ceil(diffMs / 86_400_000)
+}
+
 export function getPlanPriceLabel(planType) {
   if (planType === 'business') {
     return 'US$10 per month'
@@ -6,7 +24,7 @@ export function getPlanPriceLabel(planType) {
   return 'US$5 per month'
 }
 
-export function getAccessSummary(access) {
+export function getAccessSummary(access, now = Date.now()) {
   if (!access) {
     return null
   }
@@ -16,7 +34,12 @@ export function getAccessSummary(access) {
   }
 
   if (access.hasAccess && access.status === 'trialing') {
-    const days = access.daysRemaining
+    const days = getTrialDaysRemaining(access.trialEndsAt, now) ?? access.daysRemaining ?? 0
+
+    if (days <= 0) {
+      return 'Free trial — ends today'
+    }
+
     if (days === 1) {
       return 'Free trial — 1 day left'
     }

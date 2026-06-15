@@ -1,12 +1,29 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getAccessSummary } from '../lib/memberAccess'
 
 export default function MemberAccessBanner({ access, loading }) {
+  const [now, setNow] = useState(Date.now())
+
+  useEffect(() => {
+    if (loading || access?.status !== 'trialing' || !access?.trialEndsAt) {
+      return undefined
+    }
+
+    const interval = window.setInterval(() => {
+      setNow(Date.now())
+    }, 60_000)
+
+    return () => {
+      window.clearInterval(interval)
+    }
+  }, [loading, access?.status, access?.trialEndsAt])
+
   if (loading || !access) {
     return null
   }
 
-  const summary = getAccessSummary(access)
+  const summary = getAccessSummary(access, now)
 
   if (!summary) {
     return null
