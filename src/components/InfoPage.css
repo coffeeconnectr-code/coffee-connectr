@@ -4,6 +4,12 @@
   color: #f5f2ec;
 }
 
+.info-page .landing-topbar {
+  width: min(1080px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding-top: 1.5rem;
+}
+
 .info-page-main {
   width: min(760px, calc(100% - 2rem));
   margin: 0 auto;

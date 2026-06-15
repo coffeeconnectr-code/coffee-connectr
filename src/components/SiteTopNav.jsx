@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import BrandMark from './BrandMark'
 
-export default function SiteTopNav({ session }) {
+export default function SiteTopNav({ session, centered = false }) {
   return (
-    <header className="landing-topbar">
+    <header className={`landing-topbar${centered ? ' landing-topbar-centered' : ''}`}>
       <Link to="/" className="landing-wordmark">
         <BrandMark titleClassName="landing-wordmark-title" />
       </Link>

@@ -13,6 +13,16 @@
   gap: 1rem;
 }
 
+.landing-topbar-centered {
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.landing-topbar-centered .landing-topnav {
+  justify-content: center;
+}
+
 .landing-wordmark {
   color: #f5f2ec;
   text-decoration: none;
@@ -318,6 +328,14 @@
   .sign-up-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .landing-topbar-centered {
+    align-items: center;
+  }
+
+  .landing-topbar-centered .landing-topnav {
+    justify-content: center;
   }
 
   .landing-header {
