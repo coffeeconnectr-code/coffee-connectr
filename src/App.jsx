@@ -310,7 +310,7 @@ export default function App() {
       }
 
       if (nextSession?.user?.id && event === 'SIGNED_IN') {
-        notifyWelcomeEmail(nextSession.user.id)
+        notifyWelcomeEmail(nextSession.user.id, nextSession.access_token)
       }
     })
 

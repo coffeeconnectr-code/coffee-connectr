@@ -33,8 +33,19 @@ export async function notifyWelcomeEmail(userId, accessToken = null) {
     const { data, error } = await supabase.functions.invoke('send-welcome-email', options)
 
     if (error) {
-      console.error('Welcome email failed:', error.message)
-      return { sent: false, error: error.message }
+      let details = error.message
+
+      try {
+        if (error.context) {
+          const body = await error.context.json()
+          details = body?.error ?? details
+        }
+      } catch {
+        // Keep the default invoke error message.
+      }
+
+      console.error('Welcome email failed:', details)
+      return { sent: false, error: details }
     }
 
     if (data?.skipped) {

@@ -119,6 +119,35 @@ function hoursSince(dateValue: string) {
   return (Date.now() - new Date(dateValue).getTime()) / (1000 * 60 * 60)
 }
 
+function resolveFromEmail() {
+  const configured = Deno.env.get('RESEND_FROM_EMAIL')?.trim()
+  const fallback = 'Coffee Connectr <hello@coffeeconnectr.com>'
+
+  if (!configured) {
+    return fallback
+  }
+
+  if (configured.includes('onboarding@resend.dev')) {
+    return fallback
+  }
+
+  return configured
+}
+
+function getResendErrorMessage(emailError: unknown) {
+  if (typeof emailError === 'object' && emailError !== null) {
+    if ('message' in emailError && emailError.message) {
+      return String(emailError.message)
+    }
+
+    if ('error' in emailError && emailError.error) {
+      return String(emailError.error)
+    }
+  }
+
+  return 'Resend rejected the email'
+}
+
 function isMissingWelcomeTable(error: { message?: string; code?: string } | null) {
   const message = error?.message ?? ''
   return (
@@ -293,8 +322,7 @@ Deno.serve(async (request) => {
     }
 
     const siteUrl = Deno.env.get('SITE_URL') ?? 'https://www.coffeeconnectr.com'
-    const fromEmail =
-      Deno.env.get('RESEND_FROM_EMAIL') ?? 'Coffee Connectr <onboarding@resend.dev>'
+    const fromEmail = resolveFromEmail()
     const profileUrl = `${siteUrl}/profile/edit`
     const mapUrl = `${siteUrl}/discover/map`
     const howToUrl = `${siteUrl}/how-to-use`
@@ -335,12 +363,9 @@ Deno.serve(async (request) => {
     if (emailError) {
       await adminClient.from('welcome_emails_sent').delete().eq('user_id', userId)
 
-      const resendMessage =
-        typeof emailError === 'object' && emailError && 'message' in emailError
-          ? String(emailError.message)
-          : 'Resend rejected the email'
+      const resendMessage = getResendErrorMessage(emailError)
 
-      return new Response(JSON.stringify({ error: resendMessage }), {
+      return new Response(JSON.stringify({ error: resendMessage, from: fromEmail }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       })

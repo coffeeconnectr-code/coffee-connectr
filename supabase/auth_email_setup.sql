@@ -32,12 +32,23 @@
 --
 -- Dashboard → Authentication → Emails → SMTP Settings → Enable Custom SMTP
 --
---   Host:       smtp.resend.com
---   Port:       465
---   Username:   resend
---   Password:   your Resend API key (starts with re_)
---   Sender:     Coffee Connectr <hello@coffeeconnectr.com>
---               (must use an address on your VERIFIED domain in Resend)
+--   Host:         smtp.resend.com
+--   Port:         587   (try this first — STARTTLS)
+--                 465   (alternative — SMTPS)
+--   Username:     resend          (literally the word "resend", NOT your email)
+--   Password:     your Resend API key (starts with re_, no spaces)
+--   Sender email: hello@coffeeconnectr.com   (address on your VERIFIED domain)
+--   Sender name:  Coffee Connectr
+--
+-- COMMON MISTAKES that cause "Error sending confirmation email":
+--   - Username set to your email instead of "resend"
+--   - Password is not the API key (or has a trailing space)
+--   - Sender email not on the verified domain (e.g. @gmail.com)
+--   - Domain in Resend not fully Verified (DKIM still pending)
+--   - Wrong port — switch between 587 and 465
+--
+-- DEBUG: Supabase → Logs → filter Auth / signup to see the real SMTP error
+-- DEBUG: Resend → Emails — check if a send attempt appears after sign-up
 --
 -- Then Authentication → Providers → Email:
 --   Confirm email = ON

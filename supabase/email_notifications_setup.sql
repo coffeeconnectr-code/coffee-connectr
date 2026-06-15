@@ -12,7 +12,7 @@
 -- 4. Run welcome_email.sql in the SQL Editor (tracks one welcome email per member)
 -- 5. Add function secrets in Supabase Dashboard → Edge Functions → Secrets:
 --      RESEND_API_KEY = your Resend API key
---      RESEND_FROM_EMAIL = Coffee Connectr <onboarding@resend.dev>
+--      RESEND_FROM_EMAIL = Coffee Connectr <hello@coffeeconnectr.com>
 --      SITE_URL = https://www.coffeeconnectr.com
 --      ADMIN_EMAIL = your-email@example.com  (optional fallback if admin profile email lookup fails)
 --
