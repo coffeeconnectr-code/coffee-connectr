@@ -9,6 +9,7 @@ import CategoryLabel from './CategoryLabel'
 import ProfileContactStats from './ProfileContactStats'
 import ProfileListings from './ProfileListings'
 import VerifiedBadge from './VerifiedBadge'
+import VerificationRequestForm from './VerificationRequestForm'
 
 function formatMessageTime(value) {
   const date = new Date(value)
@@ -166,6 +167,10 @@ export default function MemberDashboard({ userId, userEmail }) {
                 Finish profile
               </Link>
             </div>
+          ) : null}
+
+          {!profile.is_verified ? (
+            <VerificationRequestForm compact id="verification" />
           ) : null}
         </div>
       )}

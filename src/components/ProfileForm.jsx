@@ -26,6 +26,7 @@ import RoastingEquipmentForm, {
   machinesFromDatabase,
   normalizeMachinesForSave,
 } from './RoastingEquipmentForm'
+import VerificationRequestForm from './VerificationRequestForm'
 
 const emptyForm = {
   profile_type: 'individual',
@@ -106,6 +107,7 @@ export default function ProfileForm({ userId, userEmail }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [isVerified, setIsVerified] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -118,6 +120,7 @@ export default function ProfileForm({ userId, userEmail }) {
         const profile = await fetchProfile(userId, userId)
         if (active) {
           setForm(profileToForm(profile))
+          setIsVerified(Boolean(profile?.is_verified))
           if (!profile?.contact_email && userEmail) {
             setForm((current) => ({
               ...current,
@@ -712,6 +715,8 @@ export default function ProfileForm({ userId, userEmail }) {
           ) : null}
         </p>
       ) : null}
+
+      {!isVerified ? <VerificationRequestForm id="verification" /> : null}
     </section>
   )
 }

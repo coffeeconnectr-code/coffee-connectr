@@ -928,6 +928,23 @@ button:disabled {
   margin-bottom: 0;
 }
 
+.verification-request {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 6%, var(--card));
+}
+
+.verification-request h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.verification-request-compact {
+  margin-top: 1rem;
+}
+
 .completion-copy {
   display: flex;
   flex-direction: column;

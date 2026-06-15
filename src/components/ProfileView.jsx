@@ -15,7 +15,7 @@ import ProfileMapPreview from './ProfileMapPreview'
 import ProfileSkeleton from './ProfileSkeleton'
 import ReportButton from './ReportButton'
 import VerifiedBadge from './VerifiedBadge'
-import { submitVerificationRequest } from '../lib/adminApi'
+import VerificationRequestForm from './VerificationRequestForm'
 import useMemberAccess from '../hooks/useMemberAccess'
 import { profileHasMapPin } from '../lib/mapPins'
 
@@ -76,9 +76,6 @@ export default function ProfileView({ userId, currentUserId }) {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
-  const [verificationMessage, setVerificationMessage] = useState('')
-  const [verificationStatus, setVerificationStatus] = useState('')
-  const [verificationLoading, setVerificationLoading] = useState(false)
 
   const isOwnProfile = userId === currentUserId
   const { hasAccess: memberHasAccess } = useMemberAccess(
@@ -152,22 +149,6 @@ export default function ProfileView({ userId, currentUserId }) {
       window.setTimeout(() => setCopied(false), 2000)
     } catch {
       setCopied(false)
-    }
-  }
-
-  async function handleVerificationRequest(event) {
-    event.preventDefault()
-    setVerificationLoading(true)
-    setVerificationStatus('')
-
-    try {
-      await submitVerificationRequest(verificationMessage)
-      setVerificationStatus('Verification request submitted.')
-      setVerificationMessage('')
-    } catch (requestError) {
-      setVerificationStatus(requestError.message)
-    } finally {
-      setVerificationLoading(false)
     }
   }
 
@@ -375,6 +356,8 @@ export default function ProfileView({ userId, currentUserId }) {
           </div>
         ) : null}
 
+        {isOwnProfile && !profile.is_verified ? <VerificationRequestForm /> : null}
+
         {showAboutSection ? (
           <ProfileSection title="About">{aboutSection}</ProfileSection>
         ) : isOwnProfile ? (
@@ -452,30 +435,6 @@ export default function ProfileView({ userId, currentUserId }) {
             targetId={userId}
             targetLabel="profile"
           />
-        ) : null}
-
-        {isOwnProfile && !profile.is_verified ? (
-          <section className="profile-section">
-            <h3>Request verification badge</h3>
-            <p className="field-hint">
-              Tell us why your profile should be verified. An admin will review your request.
-            </p>
-            <form className="report-form" onSubmit={handleVerificationRequest}>
-              <label>
-                Message (optional)
-                <textarea
-                  value={verificationMessage}
-                  onChange={(event) => setVerificationMessage(event.target.value)}
-                  rows={3}
-                  placeholder="e.g. I am a certified Q grader with 10 years experience"
-                />
-              </label>
-              <button type="submit" className="secondary-button" disabled={verificationLoading}>
-                {verificationLoading ? 'Submitting...' : 'Request verification'}
-              </button>
-            </form>
-            {verificationStatus ? <p className="status-message">{verificationStatus}</p> : null}
-          </section>
         ) : null}
       </div>
     </article>
