@@ -5,9 +5,8 @@
 }
 
 .landing-topbar {
-  width: min(1120px, calc(100% - 2rem));
-  margin: 0 auto;
-  padding: 1.25rem 0 0.5rem;
+  width: 100%;
+  padding: 0 0 0.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -52,14 +51,48 @@
   border-color: #b08d57;
 }
 
-.landing-hero {
+.landing-header {
+  position: relative;
+  overflow: hidden;
+  min-height: min(78vh, 760px);
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.landing-hero-map {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.landing-hero-map .maplibregl-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.landing-header-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(10 10 10 / 0.72) 0%, rgb(10 10 10 / 0.55) 42%, rgb(10 10 10 / 0.92) 100%),
+    linear-gradient(90deg, rgb(10 10 10 / 0.82) 0%, rgb(10 10 10 / 0.2) 55%, rgb(10 10 10 / 0.75) 100%);
+}
+
+.landing-header-content {
+  position: relative;
+  z-index: 1;
   width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: 4.5rem 0 5rem;
+  padding: 1.25rem 0 4.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: inherit;
 }
 
 .landing-hero-copy {
   max-width: 760px;
+  margin-top: auto;
+  padding-top: 2.5rem;
 }
 
 .landing-eyebrow {
@@ -285,7 +318,15 @@
     align-items: flex-start;
   }
 
-  .landing-hero {
-    padding-top: 2.5rem;
+  .landing-header {
+    min-height: min(70vh, 640px);
+  }
+
+  .landing-header-content {
+    padding-bottom: 3rem;
+  }
+
+  .landing-hero-copy {
+    padding-top: 1.5rem;
   }
 }

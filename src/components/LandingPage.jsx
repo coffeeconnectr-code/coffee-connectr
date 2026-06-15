@@ -3,6 +3,7 @@ import { CATEGORIES, getCategoryIcon } from '../lib/profileConstants'
 import { LANDING_STEPS } from '../lib/landingConstants'
 import SiteFooter from './SiteFooter'
 import SiteTopNav from './SiteTopNav'
+import LandingHeroMap from './LandingHeroMap'
 import './LandingPage.css'
 
 export default function LandingPage({ session }) {
@@ -10,25 +11,29 @@ export default function LandingPage({ session }) {
 
   return (
     <div className="landing-page">
-      <SiteTopNav session={session} />
+      <section className="landing-header">
+        <LandingHeroMap />
+        <div className="landing-header-overlay" aria-hidden="true" />
+        <div className="landing-header-content">
+          <SiteTopNav session={session} />
 
-      <section className="landing-hero">
-        <div className="landing-hero-copy">
-          <h1>The global network for the coffee industry.</h1>
-          <p className="landing-hero-subline">
-            Find roasters, technicians, trainers, suppliers, importers and more — wherever you are
-            in the world.
-          </p>
-          <div className="landing-hero-actions">
-            <Link to="/discover/map" className="primary-button profile-action-link">
-              Explore the map
-            </Link>
-            <Link to={profileCta} className="secondary-button profile-action-link">
-              Create your profile
-            </Link>
-            <Link to="/pricing" className="secondary-button profile-action-link">
-              View pricing
-            </Link>
+          <div className="landing-hero-copy">
+            <h1>The global network for the coffee industry.</h1>
+            <p className="landing-hero-subline">
+              Find roasters, technicians, trainers, suppliers, importers and more — wherever you are
+              in the world.
+            </p>
+            <div className="landing-hero-actions">
+              <Link to="/discover/map" className="primary-button profile-action-link">
+                Explore the map
+              </Link>
+              <Link to={profileCta} className="secondary-button profile-action-link">
+                Create your profile
+              </Link>
+              <Link to="/pricing" className="secondary-button profile-action-link">
+                View pricing
+              </Link>
+            </div>
           </div>
         </div>
       </section>
