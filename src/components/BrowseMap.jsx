@@ -1,17 +1,25 @@
 import { useEffect, useMemo, useRef } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { MAP_STYLE_URL, applyCoffeeMapTheme, createMapPinElement, updateMapPinIcon } from '../lib/mapTheme'
-import { profilesToMapPins } from '../lib/mapPins'
+import { MAP_STYLE_URL, applyCoffeeMapTheme, createMapPinCountElement, createMapPinElement } from '../lib/mapTheme'
+import { groupMapPins, profilesToMapPins } from '../lib/mapPins'
 import { getCategoryIcon } from '../lib/profileConstants'
 
-function createJoinPopup() {
+function navigateTo(path) {
+  window.history.pushState({}, '', path)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+}
+
+function createJoinPopup(memberCount = 1) {
   const popup = document.createElement('div')
   popup.className = 'browse-map-popup browse-map-popup-preview'
 
   const message = document.createElement('p')
   message.className = 'browse-map-popup-category'
-  message.textContent = 'Join Coffee Connectr to view member profiles and connect.'
+  message.textContent =
+    memberCount > 1
+      ? `${memberCount} members at this location. Join Coffee Connectr to view profiles and connect.`
+      : 'Join Coffee Connectr to view member profiles and connect.'
   popup.appendChild(message)
 
   const link = document.createElement('a')
@@ -20,12 +28,41 @@ function createJoinPopup() {
   link.textContent = 'Sign up free'
   link.addEventListener('click', (event) => {
     event.preventDefault()
-    window.history.pushState({}, '', link.href)
-    window.dispatchEvent(new PopStateEvent('popstate'))
+    navigateTo(link.href)
   })
   popup.appendChild(link)
 
   return popup
+}
+
+function formatPinLabel(pin) {
+  return pin.site_name ? `${pin.name} — ${pin.site_name}` : (pin.name ?? 'Member')
+}
+
+function appendProfileLink(listItem, pin) {
+  const link = document.createElement('a')
+  link.href = `/profile/${pin.user_id}`
+  link.className = 'browse-map-popup-profile-link'
+  link.textContent = formatPinLabel(pin)
+  link.addEventListener('click', (event) => {
+    event.preventDefault()
+    navigateTo(link.href)
+  })
+  listItem.appendChild(link)
+
+  if (pin.is_verified) {
+    const verified = document.createElement('span')
+    verified.className = 'browse-map-popup-verified'
+    verified.textContent = '✓ Verified'
+    listItem.appendChild(verified)
+  }
+
+  if (pin.primary_category) {
+    const category = document.createElement('span')
+    category.className = 'browse-map-popup-profile-category'
+    category.textContent = `${getCategoryIcon(pin.primary_category)} ${pin.primary_category}`
+    listItem.appendChild(category)
+  }
 }
 
 function createPopupContent(pin) {
@@ -34,7 +71,7 @@ function createPopupContent(pin) {
 
   const name = document.createElement('p')
   name.className = 'browse-map-popup-name'
-  name.textContent = pin.site_name ? `${pin.name} — ${pin.site_name}` : (pin.name ?? 'Member')
+  name.textContent = formatPinLabel(pin)
   popup.appendChild(name)
 
   if (pin.is_verified) {
@@ -64,11 +101,44 @@ function createPopupContent(pin) {
   link.textContent = 'View profile'
   link.addEventListener('click', (event) => {
     event.preventDefault()
-    window.history.pushState({}, '', link.href)
-    window.dispatchEvent(new PopStateEvent('popstate'))
+    navigateTo(link.href)
   })
   popup.appendChild(link)
 
+  return popup
+}
+
+function createGroupedPopupContent(group) {
+  if (group.count === 1) {
+    return createPopupContent(group.pins[0])
+  }
+
+  const popup = document.createElement('div')
+  popup.className = 'browse-map-popup browse-map-popup-group'
+
+  const heading = document.createElement('p')
+  heading.className = 'browse-map-popup-name'
+  heading.textContent = `${group.count} members at this location`
+  popup.appendChild(heading)
+
+  const sharedLocation = group.pins.find((pin) => pin.location)?.location
+  if (sharedLocation) {
+    const location = document.createElement('p')
+    location.className = 'browse-map-popup-location'
+    location.textContent = sharedLocation
+    popup.appendChild(location)
+  }
+
+  const list = document.createElement('ul')
+  list.className = 'browse-map-popup-profiles'
+
+  group.pins.forEach((pin) => {
+    const listItem = document.createElement('li')
+    appendProfileLink(listItem, pin)
+    list.appendChild(listItem)
+  })
+
+  popup.appendChild(list)
   return popup
 }
 
@@ -77,7 +147,7 @@ export default function BrowseMap({ profiles, previewMode = false }) {
   const mapRef = useRef(null)
   const markersRef = useRef([])
 
-  const mapPins = useMemo(() => profilesToMapPins(profiles), [profiles])
+  const pinGroups = useMemo(() => groupMapPins(profilesToMapPins(profiles)), [profiles])
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -118,20 +188,24 @@ export default function BrowseMap({ profiles, previewMode = false }) {
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
 
-      mapPins.forEach((pin) => {
+      pinGroups.forEach((group) => {
         const marker = new maplibregl.Marker({
-          element: createMapPinElement(pin.primary_category),
-        })
-          .setLngLat([pin.longitude, pin.latitude])
+          element:
+            group.count > 1
+              ? createMapPinCountElement(group.count)
+              : createMapPinElement(group.pins[0].primary_category),
+        }).setLngLat([group.longitude, group.latitude])
 
         if (previewMode) {
           marker.setPopup(
-            new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(createJoinPopup()),
+            new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
+              createJoinPopup(group.count),
+            ),
           )
         } else {
           marker.setPopup(
             new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
-              createPopupContent(pin),
+              createGroupedPopupContent(group),
             ),
           )
         }
@@ -141,20 +215,20 @@ export default function BrowseMap({ profiles, previewMode = false }) {
         markersRef.current.push(marker)
       })
 
-      if (mapPins.length === 1) {
-        const pin = mapPins[0]
+      if (pinGroups.length === 1) {
+        const group = pinGroups[0]
         map.easeTo({
-          center: [pin.longitude, pin.latitude],
+          center: [group.longitude, group.latitude],
           zoom: 10,
           duration: 500,
         })
         return
       }
 
-      if (mapPins.length > 1) {
+      if (pinGroups.length > 1) {
         const bounds = new maplibregl.LngLatBounds()
-        mapPins.forEach((pin) => {
-          bounds.extend([pin.longitude, pin.latitude])
+        pinGroups.forEach((group) => {
+          bounds.extend([group.longitude, group.latitude])
         })
 
         map.fitBounds(bounds, {
@@ -170,7 +244,7 @@ export default function BrowseMap({ profiles, previewMode = false }) {
     } else {
       map.once('load', updateMarkers)
     }
-  }, [mapPins, previewMode])
+  }, [pinGroups, previewMode])
 
   return (
     <div className="map-shell browse-map-shell">

@@ -89,3 +89,42 @@ export function profilesToMapPins(profiles) {
 
   return profiles.flatMap((profile) => profileToMapPins(profile))
 }
+
+const LOCATION_PRECISION = 5
+
+function locationKey(latitude, longitude) {
+  return `${Number(latitude).toFixed(LOCATION_PRECISION)},${Number(longitude).toFixed(LOCATION_PRECISION)}`
+}
+
+export function groupMapPins(pins) {
+  if (!Array.isArray(pins)) {
+    return []
+  }
+
+  const groups = new Map()
+
+  pins.forEach((pin) => {
+    if (pin.latitude == null || pin.longitude == null) {
+      return
+    }
+
+    const key = locationKey(pin.latitude, pin.longitude)
+    const existing = groups.get(key)
+
+    if (existing) {
+      existing.pins.push(pin)
+      existing.count = existing.pins.length
+      return
+    }
+
+    groups.set(key, {
+      latitude: pin.latitude,
+      longitude: pin.longitude,
+      primary_category: pin.primary_category,
+      pins: [pin],
+      count: 1,
+    })
+  })
+
+  return [...groups.values()]
+}

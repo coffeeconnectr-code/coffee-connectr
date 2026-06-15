@@ -119,6 +119,13 @@ export function createMapPinElement(category) {
   return element
 }
 
+export function createMapPinCountElement(count) {
+  const element = document.createElement('div')
+  element.className = 'coffee-map-pin coffee-map-pin-count'
+  element.innerHTML = `<span class="coffee-map-pin-count-label" aria-hidden="true">${count}</span>`
+  return element
+}
+
 export function createListingPinElement(section) {
   const element = document.createElement('div')
   element.className = 'coffee-map-pin noticeboard-map-pin'
