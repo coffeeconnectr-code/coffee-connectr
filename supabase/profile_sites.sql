@@ -148,8 +148,59 @@ as $$
     and (
       p_profile_type = ''
       or p.profile_type = p_profile_type
+    )
+
+  union all
+
+  select
+    p.latitude,
+    p.longitude,
+    p.primary_category
+  from public.profiles p
+  where
+    p.profile_type = 'business'
+    and p.latitude is not null
+    and p.longitude is not null
+    and not p.is_hidden
+    and not p.is_suspended
+    and public.has_active_member_access(p.user_id)
+    and not exists (
+      select 1
+      from public.profile_sites ps
+      where ps.profile_id = p.id
+        and ps.latitude is not null
+        and ps.longitude is not null
+    )
+    and (
+      p_category = ''
+      or p.primary_category = p_category
+      or p_category = any (p.secondary_categories)
+    )
+    and (
+      p_profile_type = ''
+      or p.profile_type = p_profile_type
     );
 $$;
+
+-- Copy any legacy business profile locations into profile_sites (safe to re-run).
+insert into public.profile_sites (profile_id, site_name, location, latitude, longitude, sort_order)
+select
+  p.id,
+  coalesce(nullif(trim(p.name), ''), 'Main site'),
+  p.location,
+  p.latitude,
+  p.longitude,
+  0
+from public.profiles p
+where
+  p.profile_type = 'business'
+  and p.latitude is not null
+  and p.longitude is not null
+  and not exists (
+    select 1
+    from public.profile_sites ps
+    where ps.profile_id = p.id
+  );
 
 revoke all on function public.get_public_map_pins(text, text) from public;
 grant execute on function public.get_public_map_pins(text, text) to anon;

@@ -88,7 +88,7 @@ export default function DiscoverMap({ session }) {
         </p>
       ) : null}
 
-      {!loading && !error && mapPins.length > 0 ? (
+      {!loading && !error ? (
         <BrowseMap profiles={results} previewMode={previewMode} />
       ) : null}
     </section>

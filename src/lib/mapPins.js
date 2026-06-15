@@ -4,9 +4,15 @@ export function profileHasMapPin(profile) {
   }
 
   if (profile.profile_type === 'business') {
-    return (profile.profile_sites ?? []).some(
+    const hasSitePin = (profile.profile_sites ?? []).some(
       (site) => site.latitude != null && site.longitude != null,
     )
+
+    if (hasSitePin) {
+      return true
+    }
+
+    return profile.latitude != null && profile.longitude != null
   }
 
   return profile.latitude != null && profile.longitude != null
@@ -18,7 +24,7 @@ export function profileToMapPins(profile) {
   }
 
   if (profile.profile_type === 'business') {
-    return (profile.profile_sites ?? [])
+    const sitePins = (profile.profile_sites ?? [])
       .filter((site) => site.latitude != null && site.longitude != null)
       .map((site) => ({
         latitude: site.latitude,
@@ -31,6 +37,28 @@ export function profileToMapPins(profile) {
         is_verified: profile.is_verified,
         profile_type: profile.profile_type,
       }))
+
+    if (sitePins.length > 0) {
+      return sitePins
+    }
+
+    if (profile.latitude == null || profile.longitude == null) {
+      return []
+    }
+
+    return [
+      {
+        latitude: profile.latitude,
+        longitude: profile.longitude,
+        primary_category: profile.primary_category,
+        user_id: profile.user_id,
+        name: profile.name,
+        location: profile.location,
+        site_name: null,
+        is_verified: profile.is_verified,
+        profile_type: profile.profile_type,
+      },
+    ]
   }
 
   if (profile.latitude == null || profile.longitude == null) {

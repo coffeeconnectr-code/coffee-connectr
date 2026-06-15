@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import {
@@ -31,8 +31,9 @@ export default function CoffeeMap({
   const onLocationPickRef = useRef(onLocationPick)
   const onMarkerDragEndRef = useRef(onMarkerDragEnd)
 
-  const locatedPins = mapPins.filter(
-    (pin) => pin.latitude != null && pin.longitude != null,
+  const locatedPins = useMemo(
+    () => mapPins.filter((pin) => pin.latitude != null && pin.longitude != null),
+    [mapPins],
   )
   const useMultiPins = locatedPins.length > 0
   const hasSinglePin = !useMultiPins && latitude != null && longitude != null
