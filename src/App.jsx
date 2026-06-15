@@ -37,6 +37,7 @@ import AdminModeration from './components/admin/AdminModeration'
 import AdminReports from './components/admin/AdminReports'
 import AdminVerification from './components/admin/AdminVerification'
 import AdminAudit from './components/admin/AdminAudit'
+import AdminWelcomeEmails from './components/admin/AdminWelcomeEmails'
 import useAdminAccess from './hooks/useAdminAccess'
 import useMemberAccess from './hooks/useMemberAccess'
 import { isUuid } from './lib/uuid'
@@ -342,6 +343,7 @@ export default function App() {
       <Route path="/admin" element={<AdminRoute session={session} />}>
         <Route index element={<AdminDashboard />} />
         <Route path="moderation" element={<AdminModeration />} />
+        <Route path="welcome-emails" element={<AdminWelcomeEmails />} />
         <Route path="reports" element={<AdminReports />} />
         <Route path="verification" element={<AdminVerification />} />
         <Route path="audit" element={<AdminAudit />} />

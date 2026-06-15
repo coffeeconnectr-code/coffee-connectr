@@ -162,6 +162,70 @@ export async function fetchAdminAuditLog(limit = 100) {
   return data ?? []
 }
 
+export async function fetchAdminWelcomeEmailMembers(search = '') {
+  const { data, error } = await supabase.rpc('admin_list_welcome_email_members', {
+    p_search: search,
+    p_limit: 50,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
+async function parseFunctionError(error) {
+  let details = error.message
+
+  try {
+    if (error.context) {
+      const body = await error.context.json()
+      details = body?.error ?? details
+    }
+  } catch {
+    // Keep the default invoke error message.
+  }
+
+  return details
+}
+
+export async function adminSendWelcomeEmail(userId) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session) {
+    throw new Error('Sign in required')
+  }
+
+  const { data, error } = await supabase.functions.invoke('send-welcome-email', {
+    body: { userId, adminSend: true },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  })
+
+  if (error) {
+    throw new Error(await parseFunctionError(error))
+  }
+
+  if (data?.error) {
+    throw new Error(data.error)
+  }
+
+  if (!data?.sent) {
+    throw new Error(data?.reason ?? 'Welcome email was not sent')
+  }
+
+  await supabase.rpc('log_admin_action', {
+    p_action: 'send_welcome_email',
+    p_target_type: 'user',
+    p_target_id: userId,
+    p_details: {},
+  })
+
+  return data
+}
+
 export async function submitContentReport({ targetType, targetId, reason, details = '' }) {
   const { data, error } = await supabase.rpc('submit_content_report', {
     p_target_type: targetType,

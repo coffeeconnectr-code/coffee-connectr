@@ -162,6 +162,23 @@ function isDuplicateWelcomeRow(error: { message?: string; code?: string } | null
   return error?.code === '23505'
 }
 
+async function isCallerAdmin(
+  adminClient: ReturnType<typeof createClient>,
+  callerId: string,
+) {
+  const { data, error } = await adminClient
+    .from('profiles')
+    .select('is_admin')
+    .eq('user_id', callerId)
+    .maybeSingle()
+
+  if (error) {
+    return false
+  }
+
+  return data?.is_admin === true
+}
+
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -208,20 +225,44 @@ Deno.serve(async (request) => {
       })
     }
 
-    const { userId } = await request.json().catch(() => ({}))
-    if (!userId || userId !== caller.id) {
+    const body = await request.json().catch(() => ({}))
+    const { userId, adminSend = false } = body
+
+    const adminClient = createClient(supabaseUrl, supabaseServiceRoleKey)
+
+    let targetUserId: string
+
+    if (adminSend) {
+      if (!userId) {
+        return new Response(JSON.stringify({ error: 'Missing user id.' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        })
+      }
+
+      const callerIsAdmin = await isCallerAdmin(adminClient, caller.id)
+
+      if (!callerIsAdmin) {
+        return new Response(JSON.stringify({ error: 'Forbidden.' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 403,
+        })
+      }
+
+      targetUserId = userId
+    } else if (!userId || userId !== caller.id) {
       return new Response(JSON.stringify({ error: 'Forbidden.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 403,
       })
+    } else {
+      targetUserId = userId
     }
-
-    const adminClient = createClient(supabaseUrl, supabaseServiceRoleKey)
 
     const { data: existing, error: existingError } = await adminClient
       .from('welcome_emails_sent')
       .select('user_id, status')
-      .eq('user_id', userId)
+      .eq('user_id', targetUserId)
       .maybeSingle()
 
     if (existingError) {
@@ -241,16 +282,27 @@ Deno.serve(async (request) => {
     }
 
     if (existing) {
-      return new Response(JSON.stringify({ skipped: true, reason: 'already_processed' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      })
+      if (adminSend) {
+        const { error: clearError } = await adminClient
+          .from('welcome_emails_sent')
+          .delete()
+          .eq('user_id', targetUserId)
+
+        if (clearError) {
+          throw clearError
+        }
+      } else {
+        return new Response(JSON.stringify({ skipped: true, reason: 'already_processed' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        })
+      }
     }
 
     const {
       data: { user },
       error: userError,
-    } = await adminClient.auth.admin.getUserById(userId)
+    } = await adminClient.auth.admin.getUserById(targetUserId)
 
     if (userError) {
       throw userError
@@ -265,9 +317,9 @@ Deno.serve(async (request) => {
 
     const createdAt = user.created_at ?? new Date().toISOString()
 
-    if (hoursSince(createdAt) > WELCOME_WINDOW_HOURS) {
+    if (!adminSend && hoursSince(createdAt) > WELCOME_WINDOW_HOURS) {
       const { error: skipError } = await adminClient.from('welcome_emails_sent').insert({
-        user_id: userId,
+        user_id: targetUserId,
         status: 'skipped_legacy',
       })
 
@@ -294,7 +346,7 @@ Deno.serve(async (request) => {
     }
 
     const { error: lockError } = await adminClient.from('welcome_emails_sent').insert({
-      user_id: userId,
+      user_id: targetUserId,
       status: 'sent',
     })
 
@@ -361,7 +413,7 @@ Deno.serve(async (request) => {
     })
 
     if (emailError) {
-      await adminClient.from('welcome_emails_sent').delete().eq('user_id', userId)
+      await adminClient.from('welcome_emails_sent').delete().eq('user_id', targetUserId)
 
       const resendMessage = getResendErrorMessage(emailError)
 

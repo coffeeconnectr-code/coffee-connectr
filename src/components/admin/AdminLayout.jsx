@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 const NAV_ITEMS = [
   { to: '/admin', label: 'Dashboard', exact: true },
   { to: '/admin/moderation', label: 'Moderation' },
+  { to: '/admin/welcome-emails', label: 'Welcome emails' },
   { to: '/admin/reports', label: 'Reports' },
   { to: '/admin/verification', label: 'Verification' },
   { to: '/admin/audit', label: 'Audit log' },
