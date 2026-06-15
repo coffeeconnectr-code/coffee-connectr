@@ -12,14 +12,20 @@ export default function Auth({ defaultIsSignUp = false }) {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState('')
+  const [showResendPanel, setShowResendPanel] = useState(false)
   const [resendMessage, setResendMessage] = useState('')
+
+  const canResendConfirmation = Boolean(pendingConfirmationEmail || showResendPanel)
 
   async function handleEmailAuth(event) {
     event.preventDefault()
     setLoading(true)
     setMessage('')
     setResendMessage('')
-    setPendingConfirmationEmail('')
+
+    if (isSignUp) {
+      setPendingConfirmationEmail('')
+    }
 
     const { data, error } = isSignUp
       ? await supabase.auth.signUp({
@@ -32,11 +38,23 @@ export default function Auth({ defaultIsSignUp = false }) {
       : await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setMessage(
-        isSignUp && error.message.toLowerCase().includes('already registered')
-          ? 'An account with this email already exists. Switch to Sign in below.'
-          : error.message,
-      )
+      const lowerError = error.message.toLowerCase()
+
+      if (
+        !isSignUp &&
+        (lowerError.includes('not confirmed') || lowerError.includes('email not confirmed'))
+      ) {
+        setShowResendPanel(true)
+        setMessage(
+          'Please confirm your email before signing in. You can resend the confirmation link below.',
+        )
+      } else {
+        setMessage(
+          isSignUp && lowerError.includes('already registered')
+            ? 'An account with this email already exists. Switch to Sign in below.'
+            : error.message,
+        )
+      }
     } else if (data.session) {
       if (isSignUp) {
         notifyWelcomeEmail(data.session.user.id, data.session.access_token)
@@ -53,7 +71,10 @@ export default function Auth({ defaultIsSignUp = false }) {
   }
 
   async function handleResendConfirmation() {
-    if (!pendingConfirmationEmail) {
+    const targetEmail = (pendingConfirmationEmail || email).trim()
+
+    if (!targetEmail) {
+      setResendMessage('Enter your email address above first.')
       return
     }
 
@@ -62,7 +83,7 @@ export default function Auth({ defaultIsSignUp = false }) {
 
     const { error } = await supabase.auth.resend({
       type: 'signup',
-      email: pendingConfirmationEmail,
+      email: targetEmail,
       options: {
         emailRedirectTo: getAuthRedirectUrl('/dashboard'),
       },
@@ -71,7 +92,9 @@ export default function Auth({ defaultIsSignUp = false }) {
     if (error) {
       setResendMessage(error.message)
     } else {
-      setResendMessage(`Another confirmation email was sent to ${pendingConfirmationEmail}.`)
+      setPendingConfirmationEmail(targetEmail)
+      setShowResendPanel(true)
+      setResendMessage(`Another confirmation email was sent to ${targetEmail}.`)
     }
 
     setLoading(false)
@@ -82,6 +105,7 @@ export default function Auth({ defaultIsSignUp = false }) {
     setMessage('')
     setResendMessage('')
     setPendingConfirmationEmail('')
+    setShowResendPanel(false)
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -146,6 +170,7 @@ export default function Auth({ defaultIsSignUp = false }) {
           setMessage('')
           setResendMessage('')
           setPendingConfirmationEmail('')
+          setShowResendPanel(false)
         }}
       >
         {isSignUp ? 'Already have an account? Sign in' : 'New here? Create an account'}
@@ -153,11 +178,26 @@ export default function Auth({ defaultIsSignUp = false }) {
 
       {message ? <p className="auth-message">{message}</p> : null}
 
-      {pendingConfirmationEmail ? (
+      {!isSignUp && !canResendConfirmation ? (
+        <button
+          type="button"
+          className="text-button"
+          onClick={() => {
+            setShowResendPanel(true)
+            setResendMessage('')
+            setMessage('')
+          }}
+        >
+          Resend confirmation email
+        </button>
+      ) : null}
+
+      {canResendConfirmation ? (
         <div className="auth-confirmation-panel">
           <p className="status-message">
-            No confirmation email? Ask your site admin to connect Resend SMTP in Supabase, or
-            try resending below.
+            {pendingConfirmationEmail
+              ? 'No confirmation email? Check spam, or resend below.'
+              : 'Enter the email you signed up with, then resend your confirmation link.'}
           </p>
           <button
             type="button"
@@ -167,6 +207,18 @@ export default function Auth({ defaultIsSignUp = false }) {
           >
             {loading ? 'Please wait...' : 'Resend confirmation email'}
           </button>
+          {showResendPanel && !pendingConfirmationEmail ? (
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => {
+                setShowResendPanel(false)
+                setResendMessage('')
+              }}
+            >
+              Cancel
+            </button>
+          ) : null}
           {resendMessage ? <p className="auth-message">{resendMessage}</p> : null}
         </div>
       ) : null}
