@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import useBrowseProfiles from '../hooks/useBrowseProfiles'
+import useMapProfiles from '../hooks/useMapProfiles'
 import BrowseFilters from './BrowseFilters'
 import BrowseMap from './BrowseMap'
 
@@ -7,7 +7,7 @@ function profilesWithLocation(profiles) {
   return profiles.filter((profile) => profile.latitude != null && profile.longitude != null)
 }
 
-export default function DiscoverMap() {
+export default function DiscoverMap({ session }) {
   const {
     search,
     setSearch,
@@ -18,7 +18,8 @@ export default function DiscoverMap() {
     results,
     loading,
     error,
-  } = useBrowseProfiles()
+    previewMode,
+  } = useMapProfiles(session)
 
   const onMap = profilesWithLocation(results)
   const missingLocation = results.length - onMap.length
@@ -29,18 +30,35 @@ export default function DiscoverMap() {
         <div>
           <h2>Discover on map</h2>
           <p className="status-message">
-            See where coffee professionals and businesses are located around the world.
+            {previewMode
+              ? 'Preview where coffee professionals and businesses are located around the world.'
+              : 'See where coffee professionals and businesses are located around the world.'}
           </p>
         </div>
-        <div className="discover-header-actions">
-          <Link to="/discover" className="secondary-button profile-action-link">
-            List view
-          </Link>
-          <Link to="/discover/roasters" className="secondary-button profile-action-link">
-            Find roasters
-          </Link>
-        </div>
+        {previewMode ? (
+          <div className="discover-header-actions">
+            <Link to="/sign-up" className="primary-button profile-action-link">
+              Join to explore
+            </Link>
+          </div>
+        ) : (
+          <div className="discover-header-actions">
+            <Link to="/discover" className="secondary-button profile-action-link">
+              List view
+            </Link>
+            <Link to="/discover/roasters" className="secondary-button profile-action-link">
+              Find roasters
+            </Link>
+          </div>
+        )}
       </div>
+
+      {previewMode ? (
+        <p className="status-message member-preview-banner">
+          Map preview only. Sign up for a free trial to view member profiles, message people, and
+          use the full platform.
+        </p>
+      ) : null}
 
       <BrowseFilters
         search={search}
@@ -49,6 +67,7 @@ export default function DiscoverMap() {
         onCategoryChange={setCategory}
         profileType={profileType}
         onProfileTypeChange={setProfileType}
+        hideSearch={previewMode}
       />
 
       {loading ? <p className="status-message">Loading members...</p> : null}
@@ -57,7 +76,7 @@ export default function DiscoverMap() {
       {!loading && !error ? (
         <p className="status-message">
           {onMap.length} member{onMap.length === 1 ? '' : 's'} on map
-          {missingLocation > 0
+          {!previewMode && missingLocation > 0
             ? ` (${missingLocation} without a map location hidden)`
             : ''}
         </p>
@@ -69,7 +88,9 @@ export default function DiscoverMap() {
         </p>
       ) : null}
 
-      {!loading && !error && onMap.length > 0 ? <BrowseMap profiles={results} /> : null}
+      {!loading && !error && onMap.length > 0 ? (
+        <BrowseMap profiles={results} previewMode={previewMode} />
+      ) : null}
     </section>
   )
 }

@@ -47,15 +47,21 @@ function ProfileViewRoute({ session }) {
   const { userId } = useParams()
 
   if (!isUuid(userId)) {
-    return <Navigate to="/discover" replace />
+    return <Navigate to="/discover/map" replace />
   }
 
   return (
-    <ProfileView
-      userId={userId}
-      currentUserId={session?.user?.id ?? null}
-    />
+    <MemberGate session={session}>
+      <ProfileView
+        userId={userId}
+        currentUserId={session?.user?.id ?? null}
+      />
+    </MemberGate>
   )
+}
+
+function MemberFeatureRoute({ session, children }) {
+  return <MemberGate session={session}>{children}</MemberGate>
 }
 
 function MessagesRoute({ session }) {
@@ -146,10 +152,12 @@ function NoticeboardPostRoute({ session }) {
   }
 
   return (
-    <NoticeboardPostView
-      postId={postId}
-      currentUserId={session?.user?.id ?? null}
-    />
+    <MemberFeatureRoute session={session}>
+      <NoticeboardPostView
+        postId={postId}
+        currentUserId={session?.user?.id ?? null}
+      />
+    </MemberFeatureRoute>
   )
 }
 
@@ -186,7 +194,11 @@ function ResourcePostRoute({ session }) {
     return <Navigate to="/resources" replace />
   }
 
-  return <ResourcePostView resourceId={resourceId} currentUserId={session?.user?.id ?? null} />
+  return (
+    <MemberFeatureRoute session={session}>
+      <ResourcePostView resourceId={resourceId} currentUserId={session?.user?.id ?? null} />
+    </MemberFeatureRoute>
+  )
 }
 
 function ResourcesEditRoute({ session }) {
@@ -221,7 +233,8 @@ function AdminRoute({ session }) {
 
 function AppShell({ session, onSignOut }) {
   const { isAdmin } = useAdminAccess(session)
-  const { access, loading: accessLoading } = useMemberAccess(session)
+  const { access, hasAccess, loading: accessLoading } = useMemberAccess(session)
+  const showMemberFeatures = Boolean(session && hasAccess)
 
   return (
     <main className="page">
@@ -233,15 +246,19 @@ function AppShell({ session, onSignOut }) {
           <Link to="/discover/map" className="secondary-button profile-action-link">
             Map
           </Link>
-          <Link to="/discover" className="secondary-button profile-action-link">
-            Discover
-          </Link>
-          <Link to="/noticeboard" className="secondary-button profile-action-link">
-            Noticeboard
-          </Link>
-          <Link to="/resources" className="secondary-button profile-action-link">
-            Resources
-          </Link>
+          {showMemberFeatures ? (
+            <>
+              <Link to="/discover" className="secondary-button profile-action-link">
+                Discover
+              </Link>
+              <Link to="/noticeboard" className="secondary-button profile-action-link">
+                Noticeboard
+              </Link>
+              <Link to="/resources" className="secondary-button profile-action-link">
+                Resources
+              </Link>
+            </>
+          ) : null}
           <Link to="/about" className="secondary-button profile-action-link">
             About
           </Link>
@@ -256,17 +273,26 @@ function AppShell({ session, onSignOut }) {
               <Link to="/dashboard" className="secondary-button profile-action-link dashboard-nav-link">
                 Dashboard
               </Link>
+              {!showMemberFeatures && !accessLoading ? (
+                <Link to="/subscribe" className="secondary-button profile-action-link">
+                  Subscribe
+                </Link>
+              ) : null}
               {isAdmin ? (
                 <Link to="/admin" className="secondary-button profile-action-link">
                   Admin
                 </Link>
               ) : null}
-              <Link to="/messages" className="secondary-button profile-action-link">
-                Messages
-              </Link>
-              <Link to="/saved" className="secondary-button profile-action-link">
-                Saved
-              </Link>
+              {showMemberFeatures ? (
+                <>
+                  <Link to="/messages" className="secondary-button profile-action-link">
+                    Messages
+                  </Link>
+                  <Link to="/saved" className="secondary-button profile-action-link">
+                    Saved
+                  </Link>
+                </>
+              ) : null}
               <button type="button" className="secondary-button" onClick={onSignOut}>
                 Sign out
               </button>
@@ -349,17 +375,52 @@ export default function App() {
         <Route path="audit" element={<AdminAudit />} />
       </Route>
       <Route element={<AppShell session={session} onSignOut={handleSignOut} />}>
-        <Route path="/discover" element={<DiscoverBrowse currentUserId={session?.user?.id ?? null} />} />
-        <Route path="/discover/map" element={<DiscoverMap />} />
-        <Route path="/discover/roasters" element={<DiscoverRoasters />} />
+        <Route
+          path="/discover"
+          element={
+            <MemberFeatureRoute session={session}>
+              <DiscoverBrowse currentUserId={session?.user?.id ?? null} />
+            </MemberFeatureRoute>
+          }
+        />
+        <Route path="/discover/map" element={<DiscoverMap session={session} />} />
+        <Route
+          path="/discover/roasters"
+          element={
+            <MemberFeatureRoute session={session}>
+              <DiscoverRoasters />
+            </MemberFeatureRoute>
+          }
+        />
         <Route path="/dashboard" element={<DashboardRoute session={session} />} />
         <Route path="/subscribe" element={<SubscribeRoute session={session} />} />
-        <Route path="/noticeboard" element={<NoticeboardBrowse currentUserId={session?.user?.id ?? null} />} />
-        <Route path="/noticeboard/map" element={<NoticeboardMap />} />
+        <Route
+          path="/noticeboard"
+          element={
+            <MemberFeatureRoute session={session}>
+              <NoticeboardBrowse currentUserId={session?.user?.id ?? null} />
+            </MemberFeatureRoute>
+          }
+        />
+        <Route
+          path="/noticeboard/map"
+          element={
+            <MemberFeatureRoute session={session}>
+              <NoticeboardMap />
+            </MemberFeatureRoute>
+          }
+        />
         <Route path="/noticeboard/new" element={<NoticeboardNewRoute session={session} />} />
         <Route path="/noticeboard/:postId/edit" element={<NoticeboardEditRoute session={session} />} />
         <Route path="/noticeboard/:postId" element={<NoticeboardPostRoute session={session} />} />
-        <Route path="/resources" element={<ResourcesBrowse currentUserId={session?.user?.id ?? null} />} />
+        <Route
+          path="/resources"
+          element={
+            <MemberFeatureRoute session={session}>
+              <ResourcesBrowse currentUserId={session?.user?.id ?? null} />
+            </MemberFeatureRoute>
+          }
+        />
         <Route path="/resources/new" element={<ResourcesNewRoute session={session} />} />
         <Route path="/resources/:resourceId/edit" element={<ResourcesEditRoute session={session} />} />
         <Route path="/resources/:resourceId" element={<ResourcePostRoute session={session} />} />

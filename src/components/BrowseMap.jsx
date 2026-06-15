@@ -4,6 +4,29 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { MAP_STYLE_URL, applyCoffeeMapTheme, createMapPinElement } from '../lib/mapTheme'
 import { getCategoryIcon } from '../lib/profileConstants'
 
+function createJoinPopup() {
+  const popup = document.createElement('div')
+  popup.className = 'browse-map-popup browse-map-popup-preview'
+
+  const message = document.createElement('p')
+  message.className = 'browse-map-popup-category'
+  message.textContent = 'Join Coffee Connectr to view member profiles and connect.'
+  popup.appendChild(message)
+
+  const link = document.createElement('a')
+  link.href = '/sign-up'
+  link.className = 'browse-map-popup-link'
+  link.textContent = 'Sign up free'
+  link.addEventListener('click', (event) => {
+    event.preventDefault()
+    window.history.pushState({}, '', link.href)
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  })
+  popup.appendChild(link)
+
+  return popup
+}
+
 function createPopupContent(profile) {
   const popup = document.createElement('div')
   popup.className = 'browse-map-popup'
@@ -48,7 +71,7 @@ function createPopupContent(profile) {
   return popup
 }
 
-export default function BrowseMap({ profiles }) {
+export default function BrowseMap({ profiles, previewMode = false }) {
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const markersRef = useRef([])
@@ -102,12 +125,20 @@ export default function BrowseMap({ profiles }) {
           element: createMapPinElement(profile.primary_category),
         })
           .setLngLat([profile.longitude, profile.latitude])
-          .setPopup(
+
+        if (previewMode) {
+          marker.setPopup(
+            new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(createJoinPopup()),
+          )
+        } else {
+          marker.setPopup(
             new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
               createPopupContent(profile),
             ),
           )
-          .addTo(map)
+        }
+
+        marker.addTo(map)
 
         markersRef.current.push(marker)
       })
@@ -141,7 +172,7 @@ export default function BrowseMap({ profiles }) {
     } else {
       map.once('load', updateMarkers)
     }
-  }, [locatedProfiles])
+  }, [locatedProfiles, previewMode])
 
   return (
     <div className="map-shell browse-map-shell">

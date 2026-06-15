@@ -553,6 +553,13 @@
   font-size: 0.95rem;
 }
 
+.member-preview-banner {
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, var(--card));
+}
+
 .auth-confirmation-panel {
   margin-top: 0.5rem;
   padding: 1rem;

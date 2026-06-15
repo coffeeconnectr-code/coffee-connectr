@@ -1,5 +1,18 @@
 import { supabase } from './supabase'
 
+export async function browsePublicMapPins({ category = '', profileType = '' } = {}) {
+  const { data, error } = await supabase.rpc('get_public_map_pins', {
+    p_category: category,
+    p_profile_type: profileType,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
 export async function browseProfiles({ search = '', category = '', profileType = '' } = {}) {
   let query = supabase
     .from('profiles')

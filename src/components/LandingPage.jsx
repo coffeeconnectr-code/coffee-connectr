@@ -71,7 +71,7 @@ export default function LandingPage({ session }) {
             {CATEGORIES.map((category) => (
               <Link
                 key={category}
-                to={`/discover?category=${encodeURIComponent(category)}`}
+                to={`/discover/map?category=${encodeURIComponent(category)}`}
                 className="landing-category-card"
               >
                 <span className="landing-category-icon" aria-hidden="true">

@@ -17,7 +17,7 @@ export default function AdminGate({ session, children }) {
   }
 
   if (!isAdmin) {
-    return <Navigate to="/discover" replace />
+    return <Navigate to="/discover/map" replace />
   }
 
   return children

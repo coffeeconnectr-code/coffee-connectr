@@ -7,18 +7,21 @@ export default function BrowseFilters({
   onCategoryChange,
   profileType,
   onProfileTypeChange,
+  hideSearch = false,
 }) {
   return (
     <div className="browse-filters">
-      <label>
-        Search
-        <input
-          type="search"
-          value={search}
-          onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Name, location, or bio"
-        />
-      </label>
+      {hideSearch ? null : (
+        <label>
+          Search
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Name, location, or bio"
+          />
+        </label>
+      )}
 
       <label>
         Category
