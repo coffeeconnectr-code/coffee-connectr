@@ -17,6 +17,7 @@ import ReportButton from './ReportButton'
 import VerifiedBadge from './VerifiedBadge'
 import { submitVerificationRequest } from '../lib/adminApi'
 import useMemberAccess from '../hooks/useMemberAccess'
+import { profileHasMapPin } from '../lib/mapPins'
 
 function formatOpenTo(values) {
   return values
@@ -210,7 +211,7 @@ export default function ProfileView({ userId, currentUserId }) {
   }
 
   const isIndividual = profile.profile_type === 'individual'
-  const hasMap = profile.latitude != null && profile.longitude != null
+  const hasMap = profileHasMapPin(profile)
   const completion = isOwnProfile ? getProfileCompletion(profile) : null
   const socialLinks = getSocialLinks(profile)
 
@@ -381,12 +382,13 @@ export default function ProfileView({ userId, currentUserId }) {
         ) : null}
 
         {hasMap ? (
-          <ProfileSection title="Location">
+          <ProfileSection title={profile.profile_type === 'business' ? 'Sites' : 'Location'}>
             <ProfileMapPreview
               latitude={profile.latitude}
               longitude={profile.longitude}
               location={profile.location}
               primaryCategory={profile.primary_category}
+              sites={profile.profile_sites ?? []}
             />
           </ProfileSection>
         ) : profile.location ? (

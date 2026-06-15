@@ -11,6 +11,7 @@ import {
 export default function CoffeeMap({
   latitude,
   longitude,
+  mapPins = [],
   zoom = 13,
   defaultCenter = [0, 20],
   defaultZoom = 2,
@@ -26,10 +27,15 @@ export default function CoffeeMap({
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const markerRef = useRef(null)
+  const markersRef = useRef([])
   const onLocationPickRef = useRef(onLocationPick)
   const onMarkerDragEndRef = useRef(onMarkerDragEnd)
 
-  const hasPin = latitude != null && longitude != null
+  const locatedPins = mapPins.filter(
+    (pin) => pin.latitude != null && pin.longitude != null,
+  )
+  const useMultiPins = locatedPins.length > 0
+  const hasSinglePin = !useMultiPins && latitude != null && longitude != null
 
   useEffect(() => {
     onLocationPickRef.current = onLocationPick
@@ -44,8 +50,8 @@ export default function CoffeeMap({
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: MAP_STYLE_URL,
-      center: hasPin ? [longitude, latitude] : defaultCenter,
-      zoom: hasPin ? zoom : defaultZoom,
+      center: hasSinglePin ? [longitude, latitude] : defaultCenter,
+      zoom: hasSinglePin ? zoom : defaultZoom,
       attributionControl: true,
       scrollZoom,
       dragPan: interactive,
@@ -70,6 +76,8 @@ export default function CoffeeMap({
     mapRef.current = map
 
     return () => {
+      markersRef.current.forEach((marker) => marker.remove())
+      markersRef.current = []
       markerRef.current?.remove()
       markerRef.current = null
       map.remove()
@@ -83,8 +91,32 @@ export default function CoffeeMap({
       return
     }
 
-    const moveToPin = () => {
-      if (hasPin) {
+    const moveToPins = () => {
+      if (useMultiPins) {
+        if (locatedPins.length === 1) {
+          const pin = locatedPins[0]
+          map.easeTo({
+            center: [pin.longitude, pin.latitude],
+            zoom,
+            duration: 500,
+          })
+          return
+        }
+
+        const bounds = new maplibregl.LngLatBounds()
+        locatedPins.forEach((pin) => {
+          bounds.extend([pin.longitude, pin.latitude])
+        })
+
+        map.fitBounds(bounds, {
+          padding: 48,
+          maxZoom: zoom,
+          duration: 500,
+        })
+        return
+      }
+
+      if (hasSinglePin) {
         map.easeTo({
           center: [longitude, latitude],
           zoom,
@@ -94,19 +126,50 @@ export default function CoffeeMap({
     }
 
     if (map.isStyleLoaded()) {
-      moveToPin()
+      moveToPins()
     } else {
-      map.once('load', moveToPin)
+      map.once('load', moveToPins)
     }
-  }, [hasPin, latitude, longitude, zoom])
+  }, [useMultiPins, hasSinglePin, locatedPins, latitude, longitude, zoom])
 
   useEffect(() => {
     const map = mapRef.current
-    if (!map) {
+    if (!map || !showMarker) {
       return
     }
 
-    if (!showMarker || !hasPin) {
+    if (useMultiPins) {
+      markerRef.current?.remove()
+      markerRef.current = null
+
+      const updateMarkers = () => {
+        markersRef.current.forEach((marker) => marker.remove())
+        markersRef.current = []
+
+        locatedPins.forEach((pin) => {
+          const marker = new maplibregl.Marker({
+            element: createMapPinElement(pin.category ?? category),
+          })
+            .setLngLat([pin.longitude, pin.latitude])
+            .addTo(map)
+
+          markersRef.current.push(marker)
+        })
+      }
+
+      if (map.isStyleLoaded()) {
+        updateMarkers()
+      } else {
+        map.once('load', updateMarkers)
+      }
+
+      return
+    }
+
+    markersRef.current.forEach((marker) => marker.remove())
+    markersRef.current = []
+
+    if (!hasSinglePin) {
       markerRef.current?.remove()
       markerRef.current = null
       return
@@ -134,7 +197,16 @@ export default function CoffeeMap({
     markerRef.current.setLngLat([longitude, latitude])
     markerRef.current.setDraggable(draggableMarker)
     updateMapPinIcon(markerRef.current.getElement(), category)
-  }, [showMarker, draggableMarker, hasPin, latitude, longitude, category])
+  }, [
+    showMarker,
+    draggableMarker,
+    useMultiPins,
+    hasSinglePin,
+    locatedPins,
+    latitude,
+    longitude,
+    category,
+  ])
 
   return <div ref={containerRef} className={`coffee-map ${className}`.trim()} />
 }

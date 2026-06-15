@@ -1,11 +1,8 @@
 import { Link } from 'react-router-dom'
+import { profilesToMapPins } from '../lib/mapPins'
 import useMapProfiles from '../hooks/useMapProfiles'
 import BrowseFilters from './BrowseFilters'
 import BrowseMap from './BrowseMap'
-
-function profilesWithLocation(profiles) {
-  return profiles.filter((profile) => profile.latitude != null && profile.longitude != null)
-}
 
 export default function DiscoverMap({ session }) {
   const {
@@ -21,8 +18,11 @@ export default function DiscoverMap({ session }) {
     previewMode,
   } = useMapProfiles(session)
 
-  const onMap = profilesWithLocation(results)
-  const missingLocation = results.length - onMap.length
+  const mapPins = profilesToMapPins(results)
+  const profilesWithPins = new Set(
+    results.filter((profile) => profilesToMapPins(profile).length > 0).map((profile) => profile.user_id),
+  ).size
+  const missingLocation = results.length - profilesWithPins
 
   return (
     <section className="card discover-card">
@@ -75,20 +75,20 @@ export default function DiscoverMap({ session }) {
 
       {!loading && !error ? (
         <p className="status-message">
-          {onMap.length} member{onMap.length === 1 ? '' : 's'} on map
+          {mapPins.length} pin{mapPins.length === 1 ? '' : 's'} on map
           {!previewMode && missingLocation > 0
-            ? ` (${missingLocation} without a map location hidden)`
+            ? ` (${missingLocation} member${missingLocation === 1 ? '' : 's'} without a map location hidden)`
             : ''}
         </p>
       ) : null}
 
-      {!loading && !error && onMap.length === 0 ? (
+      {!loading && !error && mapPins.length === 0 ? (
         <p className="status-message">
           No members with a map location match those filters yet.
         </p>
       ) : null}
 
-      {!loading && !error && onMap.length > 0 ? (
+      {!loading && !error && mapPins.length > 0 ? (
         <BrowseMap profiles={results} previewMode={previewMode} />
       ) : null}
     </section>

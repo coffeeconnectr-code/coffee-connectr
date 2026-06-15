@@ -1,8 +1,10 @@
+import { profileHasMapPin } from './mapPins'
+
 const SHARED_CHECKS = [
   { label: 'Name', test: (profile) => Boolean(profile.name?.trim()) },
   { label: 'Profile photo or logo', test: (profile) => Boolean(profile.profile_photo_url) },
   { label: 'Cover image', test: (profile) => Boolean(profile.cover_image_url) },
-  { label: 'Location pin', test: (profile) => profile.latitude != null && profile.longitude != null },
+  { label: 'Location pin', test: (profile) => profileHasMapPin(profile) },
   { label: 'Primary category', test: (profile) => Boolean(profile.primary_category) },
   {
     label: 'Secondary categories',
@@ -25,6 +27,7 @@ const INDIVIDUAL_CHECKS = [
 ]
 
 const BUSINESS_CHECKS = [
+  { label: 'Business site', test: (profile) => (profile.profile_sites?.length ?? 0) > 0 },
   { label: 'Business type', test: (profile) => Boolean(profile.business_type?.trim()) },
   { label: 'Year established', test: (profile) => profile.year_established != null },
   { label: 'Team size', test: (profile) => Boolean(profile.team_size?.trim()) },

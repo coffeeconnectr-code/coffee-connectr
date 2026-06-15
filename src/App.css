@@ -1234,6 +1234,30 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+.profile-site-list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profile-site-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.9rem;
+}
+
+.profile-site-list strong {
+  color: var(--text);
+}
+
+.profile-site-list span {
+  color: var(--text-muted);
+}
+
 .profile-error {
   color: #f3a6a6;
 }

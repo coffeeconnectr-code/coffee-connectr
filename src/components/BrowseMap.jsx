@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { MAP_STYLE_URL, applyCoffeeMapTheme, createMapPinElement } from '../lib/mapTheme'
+import { MAP_STYLE_URL, applyCoffeeMapTheme, createMapPinElement, updateMapPinIcon } from '../lib/mapTheme'
+import { profilesToMapPins } from '../lib/mapPins'
 import { getCategoryIcon } from '../lib/profileConstants'
 
 function createJoinPopup() {
@@ -27,38 +28,38 @@ function createJoinPopup() {
   return popup
 }
 
-function createPopupContent(profile) {
+function createPopupContent(pin) {
   const popup = document.createElement('div')
   popup.className = 'browse-map-popup'
 
   const name = document.createElement('p')
   name.className = 'browse-map-popup-name'
-  name.textContent = profile.name ?? 'Member'
+  name.textContent = pin.site_name ? `${pin.name} — ${pin.site_name}` : (pin.name ?? 'Member')
   popup.appendChild(name)
 
-  if (profile.is_verified) {
+  if (pin.is_verified) {
     const verified = document.createElement('p')
     verified.className = 'browse-map-popup-category'
     verified.textContent = '✓ Verified member'
     popup.appendChild(verified)
   }
 
-  if (profile.location) {
+  if (pin.location) {
     const location = document.createElement('p')
     location.className = 'browse-map-popup-location'
-    location.textContent = profile.location
+    location.textContent = pin.location
     popup.appendChild(location)
   }
 
-  if (profile.primary_category) {
+  if (pin.primary_category) {
     const category = document.createElement('p')
     category.className = 'browse-map-popup-category'
-    category.textContent = `${getCategoryIcon(profile.primary_category)} ${profile.primary_category}`
+    category.textContent = `${getCategoryIcon(pin.primary_category)} ${pin.primary_category}`
     popup.appendChild(category)
   }
 
   const link = document.createElement('a')
-  link.href = `/profile/${profile.user_id}`
+  link.href = `/profile/${pin.user_id}`
   link.className = 'browse-map-popup-link'
   link.textContent = 'View profile'
   link.addEventListener('click', (event) => {
@@ -76,10 +77,7 @@ export default function BrowseMap({ profiles, previewMode = false }) {
   const mapRef = useRef(null)
   const markersRef = useRef([])
 
-  const locatedProfiles = useMemo(
-    () => profiles.filter((profile) => profile.latitude != null && profile.longitude != null),
-    [profiles],
-  )
+  const mapPins = useMemo(() => profilesToMapPins(profiles), [profiles])
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -120,11 +118,11 @@ export default function BrowseMap({ profiles, previewMode = false }) {
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
 
-      locatedProfiles.forEach((profile) => {
+      mapPins.forEach((pin) => {
         const marker = new maplibregl.Marker({
-          element: createMapPinElement(profile.primary_category),
+          element: createMapPinElement(pin.primary_category),
         })
-          .setLngLat([profile.longitude, profile.latitude])
+          .setLngLat([pin.longitude, pin.latitude])
 
         if (previewMode) {
           marker.setPopup(
@@ -133,7 +131,7 @@ export default function BrowseMap({ profiles, previewMode = false }) {
         } else {
           marker.setPopup(
             new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
-              createPopupContent(profile),
+              createPopupContent(pin),
             ),
           )
         }
@@ -143,20 +141,20 @@ export default function BrowseMap({ profiles, previewMode = false }) {
         markersRef.current.push(marker)
       })
 
-      if (locatedProfiles.length === 1) {
-        const profile = locatedProfiles[0]
+      if (mapPins.length === 1) {
+        const pin = mapPins[0]
         map.easeTo({
-          center: [profile.longitude, profile.latitude],
+          center: [pin.longitude, pin.latitude],
           zoom: 10,
           duration: 500,
         })
         return
       }
 
-      if (locatedProfiles.length > 1) {
+      if (mapPins.length > 1) {
         const bounds = new maplibregl.LngLatBounds()
-        locatedProfiles.forEach((profile) => {
-          bounds.extend([profile.longitude, profile.latitude])
+        mapPins.forEach((pin) => {
+          bounds.extend([pin.longitude, pin.latitude])
         })
 
         map.fitBounds(bounds, {
@@ -172,7 +170,7 @@ export default function BrowseMap({ profiles, previewMode = false }) {
     } else {
       map.once('load', updateMarkers)
     }
-  }, [locatedProfiles, previewMode])
+  }, [mapPins, previewMode])
 
   return (
     <div className="map-shell browse-map-shell">

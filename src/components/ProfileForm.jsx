@@ -12,7 +12,15 @@ import { fetchProfile, saveProfile, uploadProfileImage } from '../lib/profileApi
 import { getProfileCompletion } from '../lib/profileCompletion'
 import { isRoastingProfile } from '../lib/roasterConstants'
 import { saveProfileRoasters } from '../lib/roasterApi'
+import {
+  emptySite,
+  normalizeSitesForSave,
+  saveProfileSites,
+  sitesFromDatabase,
+  summarizeBusinessLocations,
+} from '../lib/profileSitesApi'
 import LocationPicker from './LocationPicker'
+import ProfileSitesForm from './ProfileSitesForm'
 import RoastingEquipmentForm, {
   emptyMachine,
   machinesFromDatabase,
@@ -92,6 +100,7 @@ function profileToForm(profile) {
 export default function ProfileForm({ userId, userEmail }) {
   const [form, setForm] = useState(emptyForm)
   const [machines, setMachines] = useState([{ ...emptyMachine }])
+  const [sites, setSites] = useState([{ ...emptySite }])
   const [totalCapacity, setTotalCapacity] = useState('')
   const [contractCapacity, setContractCapacity] = useState('')
   const [loading, setLoading] = useState(true)
@@ -116,6 +125,7 @@ export default function ProfileForm({ userId, userEmail }) {
             }))
           }
           setMachines(machinesFromDatabase(profile?.profile_roasters))
+          setSites(sitesFromDatabase(profile?.profile_sites))
           setTotalCapacity(profile?.total_roasting_capacity_kg?.toString() ?? '')
           setContractCapacity(profile?.contract_roasting_capacity_kg?.toString() ?? '')
         }
@@ -173,10 +183,54 @@ export default function ProfileForm({ userId, userEmail }) {
     }
   }
 
+  function setProfileType(nextType) {
+    if (nextType === form.profile_type) {
+      return
+    }
+
+    if (nextType === 'business') {
+      if (form.latitude != null || form.location.trim()) {
+        setSites([
+          {
+            site_name: form.name.trim() || 'Main site',
+            location: form.location,
+            latitude: form.latitude,
+            longitude: form.longitude,
+          },
+        ])
+      }
+
+      setForm((current) => ({
+        ...current,
+        profile_type: 'business',
+        location: '',
+        latitude: null,
+        longitude: null,
+      }))
+      return
+    }
+
+    const firstLocatedSite = sites.find(
+      (site) => site.latitude != null && site.longitude != null,
+    )
+
+    setForm((current) => ({
+      ...current,
+      profile_type: 'individual',
+      location: firstLocatedSite?.location ?? current.location,
+      latitude: firstLocatedSite?.latitude ?? current.latitude,
+      longitude: firstLocatedSite?.longitude ?? current.longitude,
+    }))
+    setSites([{ ...emptySite }])
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
     setSaving(true)
     setMessage('')
+
+    const isBusiness = form.profile_type === 'business'
+    const normalizedSites = isBusiness ? normalizeSitesForSave(sites) : []
 
     const payload = {
       user_id: userId,
@@ -184,9 +238,11 @@ export default function ProfileForm({ userId, userEmail }) {
       name: form.name.trim(),
       profile_photo_url: form.profile_photo_url || null,
       cover_image_url: form.cover_image_url || null,
-      location: form.location.trim() || null,
-      latitude: form.latitude,
-      longitude: form.longitude,
+      location: isBusiness
+        ? summarizeBusinessLocations(normalizedSites)
+        : form.location.trim() || null,
+      latitude: isBusiness ? null : form.latitude,
+      longitude: isBusiness ? null : form.longitude,
       primary_category: form.primary_category || null,
       secondary_categories: form.secondary_categories,
       about_bio: form.about_bio.trim() || null,
@@ -235,6 +291,12 @@ export default function ProfileForm({ userId, userEmail }) {
         await saveProfileRoasters(savedProfile.id, [])
       }
 
+      if (isBusiness) {
+        await saveProfileSites(savedProfile.id, normalizedSites)
+      } else {
+        await saveProfileSites(savedProfile.id, [])
+      }
+
       setMessage('Profile saved.')
     } catch (error) {
       setMessage(error.message)
@@ -258,6 +320,7 @@ export default function ProfileForm({ userId, userEmail }) {
     total_roasting_capacity_kg: totalCapacity ? Number(totalCapacity) : null,
     contract_roasting_capacity_kg: contractCapacity ? Number(contractCapacity) : null,
     profile_roasters: normalizeMachinesForSave(machines).filter((machine) => machine.batch_size_kg),
+    profile_sites: normalizeSitesForSave(sites),
   })
 
   return (
@@ -290,14 +353,14 @@ export default function ProfileForm({ userId, userEmail }) {
             <button
               type="button"
               className={isIndividual ? 'segment active' : 'segment'}
-              onClick={() => updateField('profile_type', 'individual')}
+              onClick={() => setProfileType('individual')}
             >
               Individual
             </button>
             <button
               type="button"
               className={!isIndividual ? 'segment active' : 'segment'}
-              onClick={() => updateField('profile_type', 'business')}
+              onClick={() => setProfileType('business')}
             >
               Business
             </button>
@@ -342,20 +405,28 @@ export default function ProfileForm({ userId, userEmail }) {
             ) : null}
           </label>
 
-          <LocationPicker
-            location={form.location}
-            latitude={form.latitude}
-            longitude={form.longitude}
-            primaryCategory={form.primary_category}
-            onChange={({ location, latitude, longitude }) => {
-              setForm((current) => ({
-                ...current,
-                location,
-                latitude,
-                longitude,
-              }))
-            }}
-          />
+          {isIndividual ? (
+            <LocationPicker
+              location={form.location}
+              latitude={form.latitude}
+              longitude={form.longitude}
+              primaryCategory={form.primary_category}
+              onChange={({ location, latitude, longitude }) => {
+                setForm((current) => ({
+                  ...current,
+                  location,
+                  latitude,
+                  longitude,
+                }))
+              }}
+            />
+          ) : (
+            <ProfileSitesForm
+              sites={sites}
+              primaryCategory={form.primary_category}
+              onSitesChange={setSites}
+            />
+          )}
 
           <label>
             Primary category

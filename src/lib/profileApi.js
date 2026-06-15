@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import { isUuid } from './uuid'
 
-const OWN_PROFILE_SELECT = '*, profile_roasters(*)'
+const OWN_PROFILE_SELECT = '*, profile_roasters(*), profile_sites(*)'
 
 const PUBLIC_PROFILE_SELECT = `
   id, user_id, profile_type, name, profile_photo_url, cover_image_url,
@@ -13,7 +13,8 @@ const PUBLIC_PROFILE_SELECT = `
   contract_roasting_capacity_kg, email_on_message,
   show_contact_email, show_contact_phone, is_verified,
   created_at, updated_at,
-  profile_roasters(*)
+  profile_roasters(*),
+  profile_sites(*)
 `
 
 export async function uploadProfileImage(file, bucket, userId) {
@@ -52,6 +53,10 @@ export async function fetchProfile(userId, currentUserId = null) {
 
   if (data?.profile_roasters) {
     data.profile_roasters.sort((a, b) => a.sort_order - b.sort_order)
+  }
+
+  if (data?.profile_sites) {
+    data.profile_sites.sort((a, b) => a.sort_order - b.sort_order)
   }
 
   return data
