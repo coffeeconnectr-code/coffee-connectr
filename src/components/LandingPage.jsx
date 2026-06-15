@@ -3,7 +3,6 @@ import { CATEGORIES, getCategoryIcon } from '../lib/profileConstants'
 import { LANDING_STEPS } from '../lib/landingConstants'
 import SiteFooter from './SiteFooter'
 import SiteTopNav from './SiteTopNav'
-import BrandMark from './BrandMark'
 import './LandingPage.css'
 
 export default function LandingPage({ session }) {
@@ -15,11 +14,6 @@ export default function LandingPage({ session }) {
 
       <section className="landing-hero">
         <div className="landing-hero-copy">
-          <BrandMark
-            className="landing-hero-brand"
-            titleClassName="landing-eyebrow"
-            logoClassName="landing-hero-logo"
-          />
           <h1>The global network for the coffee industry.</h1>
           <p className="landing-hero-subline">
             Find roasters, technicians, trainers, suppliers, importers and more — wherever you are
