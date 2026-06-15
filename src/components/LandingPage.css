@@ -17,10 +17,26 @@
 .landing-wordmark {
   color: #f5f2ec;
   text-decoration: none;
+}
+
+.landing-wordmark-title {
+  color: #f5f2ec;
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.34em;
   text-transform: uppercase;
+}
+
+.landing-wordmark .brand-mark-logo {
+  width: 2rem;
+}
+
+.landing-hero-brand {
+  margin-bottom: 1rem;
+}
+
+.landing-hero-logo {
+  width: clamp(3.5rem, 8vw, 5rem);
 }
 
 .landing-topnav {

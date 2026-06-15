@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom'
+import BrandMark from './components/BrandMark'
 import { supabase } from './lib/supabase'
 import { fetchMemberAccess } from './lib/subscriptionApi'
 import { notifyWelcomeEmail } from './lib/notificationsApi'
@@ -240,7 +241,7 @@ function AppShell({ session, onSignOut }) {
     <main className="page">
       <header className="page-header">
         <Link to="/" className="brand-link">
-          <h1>Coffee Connectr</h1>
+          <BrandMark titleAs="h1" />
         </Link>
         <div className="header-actions">
           <Link to="/discover/map" className="secondary-button profile-action-link">

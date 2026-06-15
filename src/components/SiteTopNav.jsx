@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
+import BrandMark from './BrandMark'
 
 export default function SiteTopNav({ session }) {
   return (
     <header className="landing-topbar">
       <Link to="/" className="landing-wordmark">
-        Coffee Connectr
+        <BrandMark titleClassName="landing-wordmark-title" />
       </Link>
       <nav className="landing-topnav" aria-label="Main">
         <Link to="/discover/map" className="landing-topnav-link">

@@ -771,6 +771,31 @@ button:disabled {
   text-decoration: none;
 }
 
+.brand-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.brand-mark-title {
+  margin: 0;
+}
+
+.brand-mark-logo {
+  width: 2.25rem;
+  height: auto;
+  display: block;
+}
+
+.page-header .brand-mark-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
 .home-card,
 .profile-view-empty {
   display: flex;
