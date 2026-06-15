@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { profilesToMapPins } from '../lib/mapPins'
+import { profileToMapPins, profilesToMapPins } from '../lib/mapPins'
 import useMapProfiles from '../hooks/useMapProfiles'
 import BrowseFilters from './BrowseFilters'
 import BrowseMap from './BrowseMap'
@@ -18,11 +18,14 @@ export default function DiscoverMap({ session }) {
     previewMode,
   } = useMapProfiles(session)
 
-  const mapPins = profilesToMapPins(results)
+  const locatedProfiles = Array.isArray(results) ? results : []
+  const mapPins = profilesToMapPins(locatedProfiles)
   const profilesWithPins = new Set(
-    results.filter((profile) => profilesToMapPins(profile).length > 0).map((profile) => profile.user_id),
+    locatedProfiles
+      .filter((profile) => profileToMapPins(profile).length > 0)
+      .map((profile) => profile.user_id),
   ).size
-  const missingLocation = results.length - profilesWithPins
+  const missingLocation = locatedProfiles.length - profilesWithPins
 
   return (
     <section className="card discover-card">
@@ -89,7 +92,7 @@ export default function DiscoverMap({ session }) {
       ) : null}
 
       {!loading && !error ? (
-        <BrowseMap profiles={results} previewMode={previewMode} />
+        <BrowseMap profiles={locatedProfiles} previewMode={previewMode} />
       ) : null}
     </section>
   )

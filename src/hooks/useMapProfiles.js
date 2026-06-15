@@ -36,7 +36,7 @@ export default function useMapProfiles(session) {
           : await browseProfiles({ search, category, profileType })
 
         if (active) {
-          setResults(profiles)
+          setResults(Array.isArray(profiles) ? profiles : [])
         }
       } catch (loadError) {
         if (active) {

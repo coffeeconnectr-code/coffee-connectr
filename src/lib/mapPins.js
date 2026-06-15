@@ -4,7 +4,8 @@ export function profileHasMapPin(profile) {
   }
 
   if (profile.profile_type === 'business') {
-    const hasSitePin = (profile.profile_sites ?? []).some(
+    const profileSites = Array.isArray(profile.profile_sites) ? profile.profile_sites : []
+    const hasSitePin = profileSites.some(
       (site) => site.latitude != null && site.longitude != null,
     )
 
@@ -24,7 +25,8 @@ export function profileToMapPins(profile) {
   }
 
   if (profile.profile_type === 'business') {
-    const sitePins = (profile.profile_sites ?? [])
+    const profileSites = Array.isArray(profile.profile_sites) ? profile.profile_sites : []
+    const sitePins = profileSites
       .filter((site) => site.latitude != null && site.longitude != null)
       .map((site) => ({
         latitude: site.latitude,
@@ -81,5 +83,9 @@ export function profileToMapPins(profile) {
 }
 
 export function profilesToMapPins(profiles) {
+  if (!Array.isArray(profiles)) {
+    return []
+  }
+
   return profiles.flatMap((profile) => profileToMapPins(profile))
 }
