@@ -1,164 +1,120 @@
-import { useEffect, useMemo, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { MAP_STYLE_URL, applyCoffeeMapTheme, createBrowseMapPinElement, createMapPinCountElement } from '../lib/mapTheme'
 import { groupMapPins, profilesToMapPins } from '../lib/mapPins'
-import { getCategoryIcon } from '../lib/profileConstants'
+import CategoryLabel from './CategoryLabel'
+import FeaturedBadge from './FeaturedBadge'
+import VerifiedBadge from './VerifiedBadge'
 
-function createJoinPopup(memberCount = 1, onNavigate) {
-  const popup = document.createElement('div')
-  popup.className = 'browse-map-popup browse-map-popup-preview'
+const LOCATION_PRECISION = 5
 
-  const message = document.createElement('p')
-  message.className = 'browse-map-popup-category'
-  message.textContent =
-    memberCount > 1
-      ? `${memberCount} members at this location. Join Coffee Connectr to view profiles and connect.`
-      : 'Join Coffee Connectr to view member profiles and connect.'
-  popup.appendChild(message)
-
-  const link = document.createElement('a')
-  link.href = '/sign-up'
-  link.className = 'browse-map-popup-link'
-  link.textContent = 'Sign up free'
-  link.addEventListener('click', (event) => {
-    event.preventDefault()
-    onNavigate(link.href)
-  })
-  popup.appendChild(link)
-
-  return popup
+function groupKey(group) {
+  return `${Number(group.latitude).toFixed(LOCATION_PRECISION)},${Number(group.longitude).toFixed(LOCATION_PRECISION)}`
 }
 
 function formatPinLabel(pin) {
   return pin.site_name ? `${pin.name} — ${pin.site_name}` : (pin.name ?? 'Member')
 }
 
-function appendProfileLink(listItem, pin, onNavigate) {
-  const link = document.createElement('a')
-  link.href = `/profile/${pin.user_id}`
-  link.className = 'browse-map-popup-profile-link'
-  link.textContent = formatPinLabel(pin)
-  link.addEventListener('click', (event) => {
-    event.preventDefault()
-    onNavigate(link.href)
-  })
-  listItem.appendChild(link)
-
-  if (pin.is_verified) {
-    const verified = document.createElement('span')
-    verified.className = 'browse-map-popup-verified'
-    verified.textContent = '✓ Verified'
-    listItem.appendChild(verified)
-  }
-
-  if (pin.is_featured) {
-    const featured = document.createElement('span')
-    featured.className = 'browse-map-popup-featured'
-    featured.textContent = '★ Featured'
-    listItem.appendChild(featured)
-  }
-
-  if (pin.primary_category) {
-    const category = document.createElement('span')
-    category.className = 'browse-map-popup-profile-category'
-    category.textContent = `${getCategoryIcon(pin.primary_category)} ${pin.primary_category}`
-    listItem.appendChild(category)
-  }
+function pinListKey(pin) {
+  return `${pin.user_id ?? 'preview'}-${pin.site_name ?? 'main'}-${pin.latitude}-${pin.longitude}`
 }
 
-function createPopupContent(pin, onNavigate) {
-  const popup = document.createElement('div')
-  popup.className = 'browse-map-popup'
-
-  const name = document.createElement('p')
-  name.className = 'browse-map-popup-name'
-  name.textContent = formatPinLabel(pin)
-  popup.appendChild(name)
-
-  if (pin.is_verified) {
-    const verified = document.createElement('p')
-    verified.className = 'browse-map-popup-category'
-    verified.textContent = '✓ Verified member'
-    popup.appendChild(verified)
+function BrowseMapSidebar({ group, previewMode, onClear }) {
+  if (!group) {
+    return (
+      <aside className="browse-map-sidebar browse-map-sidebar-empty">
+        <p className="browse-map-sidebar-title">Map selection</p>
+        <p className="status-message">Click a pin to see members at that location.</p>
+      </aside>
+    )
   }
-
-  if (pin.is_featured) {
-    const featured = document.createElement('p')
-    featured.className = 'browse-map-popup-category'
-    featured.textContent = '★ Featured member'
-    popup.appendChild(featured)
-  }
-
-  if (pin.location) {
-    const location = document.createElement('p')
-    location.className = 'browse-map-popup-location'
-    location.textContent = pin.location
-    popup.appendChild(location)
-  }
-
-  if (pin.primary_category) {
-    const category = document.createElement('p')
-    category.className = 'browse-map-popup-category'
-    category.textContent = `${getCategoryIcon(pin.primary_category)} ${pin.primary_category}`
-    popup.appendChild(category)
-  }
-
-  const link = document.createElement('a')
-  link.href = `/profile/${pin.user_id}`
-  link.className = 'browse-map-popup-link'
-  link.textContent = 'View profile'
-  link.addEventListener('click', (event) => {
-    event.preventDefault()
-    onNavigate(link.href)
-  })
-  popup.appendChild(link)
-
-  return popup
-}
-
-function createGroupedPopupContent(group, onNavigate) {
-  if (group.count === 1) {
-    return createPopupContent(group.pins[0], onNavigate)
-  }
-
-  const popup = document.createElement('div')
-  popup.className = 'browse-map-popup browse-map-popup-group'
-
-  const heading = document.createElement('p')
-  heading.className = 'browse-map-popup-name'
-  heading.textContent = `${group.count} members at this location`
-  popup.appendChild(heading)
 
   const sharedLocation = group.pins.find((pin) => pin.location)?.location
-  if (sharedLocation) {
-    const location = document.createElement('p')
-    location.className = 'browse-map-popup-location'
-    location.textContent = sharedLocation
-    popup.appendChild(location)
+
+  if (previewMode) {
+    return (
+      <aside className="browse-map-sidebar">
+        <div className="browse-map-sidebar-header">
+          <div>
+            <p className="browse-map-sidebar-title">Location preview</p>
+            <h3 className="browse-map-sidebar-heading">
+              {group.count} member{group.count === 1 ? '' : 's'} here
+            </h3>
+            {sharedLocation ? <p className="browse-meta">{sharedLocation}</p> : null}
+          </div>
+          <button type="button" className="text-button" onClick={onClear}>
+            Clear
+          </button>
+        </div>
+        <p className="status-message">
+          Join Coffee Connectr to view member profiles and connect with the community.
+        </p>
+        <Link to="/sign-up" className="primary-button profile-action-link">
+          Sign up free
+        </Link>
+      </aside>
+    )
   }
 
-  const list = document.createElement('ul')
-  list.className = 'browse-map-popup-profiles'
+  return (
+    <aside className="browse-map-sidebar">
+      <div className="browse-map-sidebar-header">
+        <div>
+          <p className="browse-map-sidebar-title">
+            {group.count > 1 ? `${group.count} members at this location` : 'Member at this location'}
+          </p>
+          {sharedLocation ? <p className="browse-meta">{sharedLocation}</p> : null}
+        </div>
+        <button type="button" className="text-button" onClick={onClear}>
+          Clear
+        </button>
+      </div>
 
-  group.pins.forEach((pin) => {
-    const listItem = document.createElement('li')
-    appendProfileLink(listItem, pin, onNavigate)
-    list.appendChild(listItem)
-  })
-
-  popup.appendChild(list)
-  return popup
+      <ul className="browse-map-profile-list">
+        {group.pins.map((pin) => (
+          <li key={pinListKey(pin)}>
+            <Link to={`/profile/${pin.user_id}`} className="browse-map-profile-item">
+              <div className="browse-map-profile-item-copy">
+                <strong>{formatPinLabel(pin)}</strong>
+                {pin.location && pin.site_name ? (
+                  <p className="browse-meta">{pin.location}</p>
+                ) : null}
+                {pin.primary_category ? (
+                  <span className="tag tag-primary">
+                    <CategoryLabel category={pin.primary_category} />
+                  </span>
+                ) : null}
+                <span className="browse-map-profile-badges">
+                  {pin.is_featured ? <FeaturedBadge compact /> : null}
+                  {pin.is_verified ? <VerifiedBadge compact /> : null}
+                </span>
+              </div>
+              <span className="browse-map-profile-item-action">View profile</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )
 }
 
 export default function BrowseMap({ profiles, previewMode = false }) {
-  const navigate = useNavigate()
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const markersRef = useRef([])
+  const [selectedGroupKey, setSelectedGroupKey] = useState(null)
 
   const pinGroups = useMemo(() => groupMapPins(profilesToMapPins(profiles)), [profiles])
+
+  const selectedGroup = useMemo(
+    () => pinGroups.find((group) => groupKey(group) === selectedGroupKey) ?? null,
+    [pinGroups, selectedGroupKey],
+  )
+
+  const activeGroupKey = selectedGroup ? groupKey(selectedGroup) : null
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -195,42 +151,41 @@ export default function BrowseMap({ profiles, previewMode = false }) {
       return
     }
 
-    const onNavigate = (path) => {
-      navigate(path)
-    }
-
     const updateMarkers = () => {
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
 
       pinGroups.forEach((group) => {
-        const marker = new maplibregl.Marker({
-          element:
-            group.count > 1
-              ? createMapPinCountElement(group.count)
-              : createBrowseMapPinElement(group.pins[0]),
-        }).setLngLat([group.longitude, group.latitude])
+        const key = groupKey(group)
+        const pinElement =
+          group.count > 1
+            ? createMapPinCountElement(group.count)
+            : createBrowseMapPinElement(group.pins[0])
 
-        if (previewMode) {
-          marker.setPopup(
-            new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
-              createJoinPopup(group.count, onNavigate),
-            ),
-          )
-        } else {
-          marker.setPopup(
-            new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(
-              createGroupedPopupContent(group, onNavigate),
-            ),
-          )
+        if (key === activeGroupKey) {
+          pinElement.classList.add('coffee-map-pin-selected')
         }
 
-        marker.addTo(map)
+        const marker = new maplibregl.Marker({ element: pinElement }).setLngLat([
+          group.longitude,
+          group.latitude,
+        ])
 
+        pinElement.addEventListener('click', (event) => {
+          event.stopPropagation()
+          setSelectedGroupKey(key)
+          map.easeTo({
+            center: [group.longitude, group.latitude],
+            zoom: Math.max(map.getZoom(), 10),
+            duration: 500,
+          })
+        })
+
+        marker.addTo(map)
         markersRef.current.push(marker)
       })
 
-      if (pinGroups.length === 1) {
+      if (pinGroups.length === 1 && !activeGroupKey) {
         const group = pinGroups[0]
         map.easeTo({
           center: [group.longitude, group.latitude],
@@ -240,7 +195,7 @@ export default function BrowseMap({ profiles, previewMode = false }) {
         return
       }
 
-      if (pinGroups.length > 1) {
+      if (pinGroups.length > 1 && !activeGroupKey) {
         const bounds = new maplibregl.LngLatBounds()
         pinGroups.forEach((group) => {
           bounds.extend([group.longitude, group.latitude])
@@ -259,11 +214,18 @@ export default function BrowseMap({ profiles, previewMode = false }) {
     } else {
       map.once('load', updateMarkers)
     }
-  }, [pinGroups, previewMode, navigate])
+  }, [pinGroups, previewMode, activeGroupKey])
 
   return (
-    <div className="map-shell browse-map-shell">
-      <div ref={containerRef} className="coffee-map browse-map" />
+    <div className="browse-map-layout">
+      <div className="map-shell browse-map-shell">
+        <div ref={containerRef} className="coffee-map browse-map" />
+      </div>
+      <BrowseMapSidebar
+        group={selectedGroup}
+        previewMode={previewMode}
+        onClear={() => setSelectedGroupKey(null)}
+      />
     </div>
   )
 }
