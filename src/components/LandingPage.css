@@ -47,18 +47,20 @@
 }
 
 .landing-topnav-link {
-  color: #c8c2b8;
+  color: #f5f2ec;
   text-decoration: none;
   font-size: 0.9rem;
   padding: 0.45rem 0.7rem;
   border-radius: 999px;
-  border: 1px solid #2a2a2a;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, #2a2a2a);
+  background: var(--tab-bronze);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .landing-topnav-link:hover {
-  color: #f5f2ec;
-  border-color: #b08d57;
+  color: #0a0a0a;
+  border-color: #0a0a0a;
+  background: var(--tab-bronze-active);
 }
 
 .landing-header {

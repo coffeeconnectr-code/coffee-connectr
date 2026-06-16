@@ -664,6 +664,11 @@
   color: var(--text);
 }
 
+.page-header .header-actions .secondary-button {
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--tab-bronze) 75%, var(--card));
+}
+
 .google-button {
   width: 100%;
 }
@@ -1666,17 +1671,18 @@ button:disabled {
 .noticeboard-pill {
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--tab-bronze) 75%, var(--card));
   color: var(--text-muted);
   font-size: 0.85rem;
   cursor: pointer;
 }
 
 .noticeboard-pill-active {
-  border-color: var(--accent);
-  color: var(--text);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: #0a0a0a;
+  color: #0a0a0a;
+  background: var(--tab-bronze-active);
+  font-weight: 600;
 }
 
 .noticeboard-card {
@@ -2015,16 +2021,18 @@ button:disabled {
 .admin-nav-link {
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--tab-bronze) 75%, var(--card));
   color: var(--text-muted);
   text-decoration: none;
   font-size: 0.85rem;
 }
 
 .admin-nav-link-active {
-  border-color: var(--accent);
-  color: var(--text);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: #0a0a0a;
+  color: #0a0a0a;
+  background: var(--tab-bronze-active);
+  font-weight: 600;
 }
 
 .admin-panel h3 {
