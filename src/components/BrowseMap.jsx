@@ -26,7 +26,7 @@ function BrowseMapSidebar({ group, previewMode, onClear }) {
   if (!group) {
     return (
       <aside className="browse-map-sidebar browse-map-sidebar-empty">
-        <p className="browse-map-sidebar-title">Map selection</p>
+        <p className="browse-map-sidebar-title">Selected location</p>
         <p className="status-message">Click a pin to see members at that location.</p>
       </aside>
     )
