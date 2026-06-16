@@ -12,6 +12,7 @@ import VerifiedBadge from './VerifiedBadge'
 import FeaturedBadge from './FeaturedBadge'
 import VerificationRequestForm from './VerificationRequestForm'
 import FeaturedRequestForm from './FeaturedRequestForm'
+import FeedbackForm from './FeedbackForm'
 import useMemberAccess from '../hooks/useMemberAccess'
 
 function formatMessageTime(value) {
@@ -36,6 +37,7 @@ function truncatePreview(text, maxLength = 72) {
 
 export default function MemberDashboard({ userId, userEmail, session }) {
   const { hasAccess, loading: accessLoading } = useMemberAccess(session)
+  const [tab, setTab] = useState('overview')
   const [profile, setProfile] = useState(null)
   const [conversations, setConversations] = useState([])
   const [savedProfiles, setSavedProfiles] = useState([])
@@ -130,6 +132,27 @@ export default function MemberDashboard({ userId, userEmail, session }) {
         </div>
       </div>
 
+      <div className="admin-tab-row dashboard-tab-row">
+        <button
+          type="button"
+          className={`noticeboard-pill${tab === 'overview' ? ' noticeboard-pill-active' : ''}`}
+          onClick={() => setTab('overview')}
+        >
+          Overview
+        </button>
+        <button
+          type="button"
+          className={`noticeboard-pill${tab === 'feedback' ? ' noticeboard-pill-active' : ''}`}
+          onClick={() => setTab('feedback')}
+        >
+          Feedback
+        </button>
+      </div>
+
+      {tab === 'feedback' ? (
+        <FeedbackForm userId={userId} userEmail={userEmail} />
+      ) : (
+        <>
       {!hasAccess ? (
         <section className="member-access-banner member-access-banner-warning">
           <div>
@@ -377,6 +400,8 @@ export default function MemberDashboard({ userId, userEmail, session }) {
       {profile ? <ProfileListings userId={userId} isOwnProfile /> : null}
         </>
       ) : null}
+        </>
+      )}
     </section>
   )
 }

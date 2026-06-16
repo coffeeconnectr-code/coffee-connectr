@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/admin/reports', label: 'Reports' },
   { to: '/admin/verification', label: 'Verification' },
   { to: '/admin/featured', label: 'Featured' },
+  { to: '/admin/feedback', label: 'Feedback' },
   { to: '/admin/audit', label: 'Audit log' },
 ]
 

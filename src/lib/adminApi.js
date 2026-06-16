@@ -290,3 +290,26 @@ export async function adminReviewFeatured(requestId, approved, reason = '') {
     throw error
   }
 }
+
+export async function fetchAdminMemberFeedback(status = 'open') {
+  const { data, error } = await supabase.rpc('admin_list_member_feedback', {
+    p_status: status,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
+export async function adminResolveMemberFeedback(feedbackId, adminNotes = '') {
+  const { error } = await supabase.rpc('admin_resolve_member_feedback', {
+    p_feedback_id: feedbackId,
+    p_admin_notes: adminNotes,
+  })
+
+  if (error) {
+    throw error
+  }
+}

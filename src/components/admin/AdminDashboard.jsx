@@ -78,6 +78,11 @@ export default function AdminDashboard() {
           value={stats.pending_featured ?? 0}
           to="/admin/featured"
         />
+        <StatCard
+          label="Open feedback"
+          value={stats.open_feedback ?? 0}
+          to="/admin/feedback"
+        />
       </div>
     </div>
   )
