@@ -1,5 +1,8 @@
--- Sign-up confirmation emails are sent by SUPABASE AUTH (not the welcome edge function).
--- Run this checklist in the Supabase Dashboard if new members do not receive confirm emails.
+-- Email sign-up confirmation for Coffee Connectr
+-- Run this checklist in the Supabase Dashboard (production must have confirm email ON).
+--
+-- Project dashboard:
+--   https://supabase.com/dashboard/project/xfrgctnrafhhcfkcoplp
 --
 -- ---------------------------------------------------------------------------
 -- A. Two different emails (do not mix them up)
@@ -12,9 +15,30 @@
 --    Subject: "Welcome to Coffee Connectr - here's how to get started"
 --
 -- ---------------------------------------------------------------------------
--- B. URL configuration (required)
+-- B. REQUIRED: turn on email confirmation (production)
+-- ---------------------------------------------------------------------------
+-- Dashboard → Authentication → Providers → Email
+--   https://supabase.com/dashboard/project/xfrgctnrafhhcfkcoplp/auth/providers
+--
+--   Confirm email = ON   ← required for production
+--   Secure email change = ON (recommended)
+--
+-- After turning this on:
+--   - New email/password sign-ups receive a confirmation link
+--   - They cannot sign in until they click it
+--   - Google sign-in is unchanged (Google already verifies the address)
+--
+-- Quick test:
+--   1. Sign up with a new test email on /sign-up
+--   2. You should see "We sent a confirmation link..." and stay signed out
+--   3. In Dashboard → Authentication → Users, the user shows "Waiting for verification"
+--   4. Click the email link, then sign in — user should show "Confirmed"
+--
+-- ---------------------------------------------------------------------------
+-- C. URL configuration (required)
 -- ---------------------------------------------------------------------------
 -- Dashboard → Authentication → URL Configuration
+--   https://supabase.com/dashboard/project/xfrgctnrafhhcfkcoplp/auth/url-configuration
 --
 -- Site URL:
 --   https://www.coffeeconnectr.com
@@ -25,12 +49,13 @@
 --   http://localhost:5173/**
 --
 -- ---------------------------------------------------------------------------
--- C. Enable custom SMTP with Resend (recommended for production)
+-- D. Enable custom SMTP with Resend (recommended for production)
 -- ---------------------------------------------------------------------------
 -- Without custom SMTP, Supabase's default mailer is unreliable and often lands in spam.
 -- You already use Resend for message/contact/welcome emails — connect the same account here.
 --
 -- Dashboard → Authentication → Emails → SMTP Settings → Enable Custom SMTP
+--   https://supabase.com/dashboard/project/xfrgctnrafhhcfkcoplp/auth/smtp
 --
 --   Host:         smtp.resend.com
 --   Port:         587   (try this first — STARTTLS)
@@ -50,19 +75,22 @@
 -- DEBUG: Supabase → Logs → filter Auth / signup to see the real SMTP error
 -- DEBUG: Resend → Emails — check if a send attempt appears after sign-up
 --
--- Then Authentication → Providers → Email:
---   Confirm email = ON
---   Secure email change = ON (optional)
+-- ---------------------------------------------------------------------------
+-- E. Client-side guard (already in the app)
+-- ---------------------------------------------------------------------------
+-- src/lib/authEmailConfirmation.js signs out email/password users who have no
+-- email_confirmed_at, even if Supabase settings drift. OAuth users are exempt.
 --
 -- ---------------------------------------------------------------------------
--- D. Quick test option (for beta testing only)
+-- F. Beta testing only — do NOT use in production
 -- ---------------------------------------------------------------------------
--- To skip confirmation emails entirely while testing:
+-- To skip confirmation emails while testing locally:
 --   Authentication → Providers → Email → turn OFF "Confirm email"
--- Members can sign in immediately after sign-up; welcome email still sends on sign-in.
+-- Members can sign in immediately after sign-up; the app guard will still block
+-- unconfirmed users once you turn confirm email back ON.
 --
 -- ---------------------------------------------------------------------------
--- E. Verify in Supabase after a test sign-up
+-- G. Verify in Supabase after a test sign-up
 -- ---------------------------------------------------------------------------
 -- Dashboard → Authentication → Users → find the test user
 --   "Waiting for verification" = confirm email was never clicked OR email never arrived

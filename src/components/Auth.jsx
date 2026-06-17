@@ -2,20 +2,40 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { getAuthRedirectUrl } from '../lib/authRedirect'
+import {
+  EMAIL_CONFIRMATION_MESSAGE,
+  getInitialConfirmationPrompt,
+  markPendingEmailConfirmation,
+  userNeedsEmailConfirmation,
+} from '../lib/authEmailConfirmation'
 import { notifyWelcomeEmail } from '../lib/notificationsApi'
 
 export default function Auth({ defaultIsSignUp = false }) {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const initialConfirmationPrompt = getInitialConfirmationPrompt()
+  const [email, setEmail] = useState(initialConfirmationPrompt.email)
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(defaultIsSignUp)
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState(initialConfirmationPrompt.message)
   const [loading, setLoading] = useState(false)
-  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState('')
-  const [showResendPanel, setShowResendPanel] = useState(false)
+  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState(
+    initialConfirmationPrompt.pendingConfirmationEmail,
+  )
+  const [showResendPanel, setShowResendPanel] = useState(initialConfirmationPrompt.showResendPanel)
   const [resendMessage, setResendMessage] = useState('')
 
   const canResendConfirmation = Boolean(pendingConfirmationEmail || showResendPanel)
+
+  async function blockUnconfirmedSession(session, fallbackEmail = '') {
+    const targetEmail = (session?.user?.email ?? fallbackEmail).trim()
+
+    markPendingEmailConfirmation(targetEmail)
+    await supabase.auth.signOut()
+    setPendingConfirmationEmail(targetEmail)
+    setShowResendPanel(true)
+    setMessage(EMAIL_CONFIRMATION_MESSAGE)
+    setLoading(false)
+  }
 
   async function handleEmailAuth(event) {
     event.preventDefault()
@@ -45,9 +65,7 @@ export default function Auth({ defaultIsSignUp = false }) {
         (lowerError.includes('not confirmed') || lowerError.includes('email not confirmed'))
       ) {
         setShowResendPanel(true)
-        setMessage(
-          'Please confirm your email before signing in. You can resend the confirmation link below.',
-        )
+        setMessage(EMAIL_CONFIRMATION_MESSAGE)
       } else {
         setMessage(
           isSignUp && lowerError.includes('already registered')
@@ -56,6 +74,11 @@ export default function Auth({ defaultIsSignUp = false }) {
         )
       }
     } else if (data.session) {
+      if (userNeedsEmailConfirmation(data.session.user)) {
+        await blockUnconfirmedSession(data.session, email)
+        return
+      }
+
       if (isSignUp) {
         notifyWelcomeEmail(data.session.user.id, data.session.access_token)
       }

@@ -45,6 +45,10 @@ import AdminWelcomeEmails from './components/admin/AdminWelcomeEmails'
 import useAdminAccess from './hooks/useAdminAccess'
 import useMemberAccess from './hooks/useMemberAccess'
 import { isUuid } from './lib/uuid'
+import {
+  enforceEmailConfirmation,
+  userNeedsEmailConfirmation,
+} from './lib/authEmailConfirmation'
 import './App.css'
 
 function ProfileViewRoute({ session }) {
@@ -326,29 +330,51 @@ export default function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setLoading(false)
-    })
+    let active = true
+
+    async function initializeSession() {
+      const { data } = await supabase.auth.getSession()
+      const nextSession = await enforceEmailConfirmation(data.session)
+
+      if (active) {
+        setSession(nextSession)
+        setLoading(false)
+      }
+    }
+
+    initializeSession()
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, nextSession) => {
-      setSession(nextSession)
+    } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
+      const session = await enforceEmailConfirmation(nextSession)
+
+      if (!active) {
+        return
+      }
+
+      setSession(session)
 
       if (
-        nextSession?.user?.id &&
+        session?.user?.id &&
         (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED')
       ) {
         fetchMemberAccess().catch(() => {})
       }
 
-      if (nextSession?.user?.id && event === 'SIGNED_IN') {
-        notifyWelcomeEmail(nextSession.user.id, nextSession.access_token)
+      if (
+        session?.user?.id &&
+        event === 'SIGNED_IN' &&
+        !userNeedsEmailConfirmation(session.user)
+      ) {
+        notifyWelcomeEmail(session.user.id, session.access_token)
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      active = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   async function handleSignOut() {
