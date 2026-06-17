@@ -9,7 +9,9 @@
 --      npx supabase functions deploy send-report-notification
 --      npx supabase functions deploy send-contact-form
 --      npx supabase functions deploy send-welcome-email
+--      npx supabase functions deploy send-profile-reminder-email
 -- 4. Run welcome_email.sql in the SQL Editor (tracks one welcome email per member)
+--    Run profile_reminder_emails.sql for admin finish-your-profile reminders
 -- 5. Add function secrets in Supabase Dashboard → Edge Functions → Secrets:
 --      RESEND_API_KEY = your Resend API key
 --      RESEND_FROM_EMAIL = Coffee Connectr <hello@coffeeconnectr.com>

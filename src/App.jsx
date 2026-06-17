@@ -42,6 +42,7 @@ import AdminFeatured from './components/admin/AdminFeatured'
 import AdminFeedback from './components/admin/AdminFeedback'
 import AdminAudit from './components/admin/AdminAudit'
 import AdminWelcomeEmails from './components/admin/AdminWelcomeEmails'
+import AdminProfileReminders from './components/admin/AdminProfileReminders'
 import useAdminAccess from './hooks/useAdminAccess'
 import useMemberAccess from './hooks/useMemberAccess'
 import { isUuid } from './lib/uuid'
@@ -404,6 +405,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="moderation" element={<AdminModeration />} />
           <Route path="welcome-emails" element={<AdminWelcomeEmails />} />
+          <Route path="profile-reminders" element={<AdminProfileReminders />} />
           <Route path="reports" element={<AdminReports />} />
           <Route path="verification" element={<AdminVerification />} />
           <Route path="featured" element={<AdminFeatured />} />

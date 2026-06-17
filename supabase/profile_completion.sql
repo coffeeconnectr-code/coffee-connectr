@@ -141,7 +141,8 @@ grant execute on function public.get_public_map_pins(text, text) to anon;
 grant execute on function public.get_public_map_pins(text, text) to authenticated;
 
 -- ---------------------------------------------------------------------------
--- 3. After running this script
+-- 4. IMPORTANT: backfill existing members (run if map pins disappeared)
 -- ---------------------------------------------------------------------------
--- Ask members to open Edit profile and save once so is_profile_complete updates.
--- Or run a one-off backfill in SQL Editor if you add a server-side checker later.
+-- profile_completion.sql sets is_profile_complete default false, so existing
+-- profiles are hidden until they save again. To restore members who were
+-- already on the map, run supabase/profile_completion_backfill.sql next.

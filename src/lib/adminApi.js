@@ -226,6 +226,67 @@ export async function adminSendWelcomeEmail(userId) {
   return data
 }
 
+export async function fetchAdminIncompleteProfileMembers(search = '') {
+  const { data, error } = await supabase.rpc('admin_list_incomplete_profile_members', {
+    p_search: search,
+    p_limit: 50,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
+export async function adminSendProfileReminderEmail(userId) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session) {
+    throw new Error('Sign in required')
+  }
+
+  const { data, error } = await supabase.functions.invoke('send-profile-reminder-email', {
+    body: { userId },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  })
+
+  if (error) {
+    throw new Error(await parseFunctionError(error))
+  }
+
+  if (data?.error) {
+    throw new Error(data.error)
+  }
+
+  if (data?.skipped) {
+    const reasonMessages = {
+      profile_already_complete: 'This profile is already complete.',
+      no_profile: 'This member has not created a profile yet.',
+      profile_unavailable: 'This profile is hidden or suspended.',
+      missing_user_email: 'This member has no email address.',
+      missing_resend_api_key: 'Resend is not configured for edge functions.',
+    }
+
+    throw new Error(reasonMessages[data.reason] ?? data.reason ?? 'Reminder email was not sent')
+  }
+
+  if (!data?.sent) {
+    throw new Error('Reminder email was not sent')
+  }
+
+  await supabase.rpc('log_admin_action', {
+    p_action: 'send_profile_reminder_email',
+    p_target_type: 'user',
+    p_target_id: userId,
+    p_details: {},
+  })
+
+  return data
+}
+
 export async function submitContentReport({ targetType, targetId, reason, details = '' }) {
   const { data, error } = await supabase.rpc('submit_content_report', {
     p_target_type: targetType,
