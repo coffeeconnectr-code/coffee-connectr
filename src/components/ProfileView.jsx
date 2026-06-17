@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { buildShareUrl } from '../lib/siteConfig'
 import { fetchProfile } from '../lib/profileApi'
 import { isFavourite } from '../lib/favouritesApi'
-import { getProfileCompletion, getSocialLinks } from '../lib/profileCompletion'
+import { getProfileCompletion, getSocialLinks, isProfileComplete } from '../lib/profileCompletion'
 import { formatBatchSize, formatCapacity, isRoastingProfile } from '../lib/roasterConstants'
 import { OPEN_TO_OPTIONS } from '../lib/profileConstants'
 import CategoryLabel from './CategoryLabel'
@@ -197,6 +197,21 @@ export default function ProfileView({ userId, currentUserId }) {
     )
   }
 
+  if (!isOwnProfile && !isProfileComplete(profile)) {
+    return (
+      <section className="card profile-view-empty">
+        <div className="empty-icon">☕</div>
+        <h2>Profile not available</h2>
+        <p className="status-message">
+          This member has not finished their profile yet, so it is not shown publicly.
+        </p>
+        <Link to="/discover" className="secondary-button profile-action-link">
+          Back to Discover
+        </Link>
+      </section>
+    )
+  }
+
   const isIndividual = profile.profile_type === 'individual'
   const hasMap = profileHasMapPin(profile)
   const completion = isOwnProfile ? getProfileCompletion(profile) : null
@@ -355,7 +370,7 @@ export default function ProfileView({ userId, currentUserId }) {
           <div className="completion-banner below-header">
             <div className="completion-copy">
               <strong>Profile {completion.percent}% complete</strong>
-              <p>Add: {completion.missing.slice(0, 3).join(', ')}</p>
+              <p>Complete all required fields to appear in Discover: {completion.missing.slice(0, 3).join(', ')}</p>
             </div>
             <Link to="/profile/edit" className="secondary-button profile-action-link">
               Finish profile

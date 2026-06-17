@@ -220,7 +220,7 @@ export default function MemberDashboard({ userId, userEmail, session }) {
             <div className="completion-banner below-header">
               <div className="completion-copy">
                 <strong>Profile {completion.percent}% complete</strong>
-                <p>Add: {completion.missing.slice(0, 3).join(', ')}</p>
+                <p>Complete all required fields to appear in Discover: {completion.missing.slice(0, 3).join(', ')}</p>
               </div>
               <Link to="/profile/edit" className="secondary-button profile-action-link">
                 Finish profile

@@ -72,9 +72,10 @@ export async function fetchSavedProfiles(userId) {
   const { data: profiles, error: profileError } = await supabase
     .from('profiles')
     .select(
-      'id, user_id, name, profile_type, profile_photo_url, location, primary_category, secondary_categories, about_bio, latitude, longitude, is_verified, is_featured, profile_sites(id, site_name, location, latitude, longitude, sort_order)',
+      'id, user_id, name, profile_type, profile_photo_url, location, primary_category, secondary_categories, about_bio, latitude, longitude, is_verified, is_featured, is_profile_complete, profile_sites(id, site_name, location, latitude, longitude, sort_order)',
     )
     .in('user_id', favouriteUserIds)
+    .eq('is_profile_complete', true)
 
   if (profileError) {
     throw profileError

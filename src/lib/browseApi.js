@@ -17,8 +17,9 @@ export async function browseProfiles({ search = '', category = '', profileType =
   let query = supabase
     .from('profiles')
     .select(
-      'id, user_id, name, profile_type, profile_photo_url, location, primary_category, secondary_categories, about_bio, latitude, longitude, is_verified, is_featured, profile_sites(id, site_name, location, latitude, longitude, sort_order)',
+      'id, user_id, name, profile_type, profile_photo_url, location, primary_category, secondary_categories, about_bio, latitude, longitude, is_verified, is_featured, is_profile_complete, profile_sites(id, site_name, location, latitude, longitude, sort_order)',
     )
+    .eq('is_profile_complete', true)
     .order('is_featured', { ascending: false })
     .order('name', { ascending: true })
 

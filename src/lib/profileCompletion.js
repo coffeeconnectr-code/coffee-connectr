@@ -4,17 +4,21 @@ const SHARED_CHECKS = [
   { label: 'Name', test: (profile) => Boolean(profile.name?.trim()) },
   { label: 'Profile photo or logo', test: (profile) => Boolean(profile.profile_photo_url) },
   { label: 'Cover image', test: (profile) => Boolean(profile.cover_image_url) },
-  { label: 'Location pin', test: (profile) => profileHasMapPin(profile) },
   { label: 'Primary category', test: (profile) => Boolean(profile.primary_category) },
   {
     label: 'Secondary categories',
     test: (profile) => (profile.secondary_categories?.length ?? 0) > 0,
   },
   { label: 'About / bio', test: (profile) => Boolean(profile.about_bio?.trim()) },
-  { label: 'Website or social link', test: (profile) => hasSocialLink(profile) },
+  { label: 'Website', test: (profile) => Boolean(profile.website?.trim()) },
+  { label: 'LinkedIn', test: (profile) => Boolean(profile.linkedin_url?.trim()) },
+  { label: 'Instagram', test: (profile) => Boolean(profile.instagram_url?.trim()) },
+  { label: 'Contact email', test: (profile) => Boolean(profile.contact_email?.trim()) },
+  { label: 'Contact phone', test: (profile) => Boolean(profile.contact_phone?.trim()) },
 ]
 
 const INDIVIDUAL_CHECKS = [
+  { label: 'Location pin', test: (profile) => profileHasMapPin(profile) },
   { label: 'Job title / role', test: (profile) => Boolean(profile.job_title_role?.trim()) },
   { label: 'Years of experience', test: (profile) => profile.years_of_experience != null },
   {
@@ -27,7 +31,10 @@ const INDIVIDUAL_CHECKS = [
 ]
 
 const BUSINESS_CHECKS = [
-  { label: 'Business site', test: (profile) => (profile.profile_sites?.length ?? 0) > 0 },
+  {
+    label: 'Business site with map pin',
+    test: (profile) => hasCompleteBusinessSite(profile),
+  },
   { label: 'Business type', test: (profile) => Boolean(profile.business_type?.trim()) },
   { label: 'Year established', test: (profile) => profile.year_established != null },
   { label: 'Team size', test: (profile) => Boolean(profile.team_size?.trim()) },
@@ -35,48 +42,47 @@ const BUSINESS_CHECKS = [
   { label: 'Opening hours', test: (profile) => Boolean(profile.opening_hours?.trim()) },
 ]
 
-const ROASTING_CHECKS = [
-  {
-    label: 'At least one roaster listed',
-    test: (profile) => (profile.profile_roasters?.length ?? 0) > 0,
-  },
-  {
-    label: 'Total roasting capacity',
-    test: (profile) => profile.total_roasting_capacity_kg != null,
-  },
-  {
-    label: 'Contract roasting capacity',
-    test: (profile) => profile.contract_roasting_capacity_kg != null,
-  },
-]
+function hasCompleteBusinessSite(profile) {
+  const sites = profile.profile_sites ?? []
 
-function hasSocialLink(profile) {
-  return Boolean(
-    profile.website?.trim() || profile.linkedin_url?.trim() || profile.instagram_url?.trim(),
+  return sites.some(
+    (site) =>
+      site.site_name?.trim() &&
+      site.location?.trim() &&
+      site.latitude != null &&
+      site.longitude != null,
   )
 }
 
-import { isRoastingProfile } from './roasterConstants'
+function getPublishChecks(profile) {
+  if (!profile) {
+    return []
+  }
+
+  return profile.profile_type === 'business'
+    ? [...SHARED_CHECKS, ...BUSINESS_CHECKS]
+    : [...SHARED_CHECKS, ...INDIVIDUAL_CHECKS]
+}
+
+export function isProfileComplete(profile) {
+  if (!profile) {
+    return false
+  }
+
+  return getPublishChecks(profile).every((check) => check.test(profile))
+}
 
 export function getProfileCompletion(profile) {
   if (!profile) {
-    return { percent: 0, missing: ['Create your profile'] }
+    return { percent: 0, missing: ['Create your profile'], isComplete: false }
   }
 
-  let checks =
-    profile.profile_type === 'business'
-      ? [...SHARED_CHECKS, ...BUSINESS_CHECKS]
-      : [...SHARED_CHECKS, ...INDIVIDUAL_CHECKS]
-
-  if (isRoastingProfile(profile)) {
-    checks = [...checks, ...ROASTING_CHECKS]
-  }
-
+  const checks = getPublishChecks(profile)
   const completed = checks.filter((check) => check.test(profile))
   const missing = checks.filter((check) => !check.test(profile)).map((check) => check.label)
   const percent = Math.round((completed.length / checks.length) * 100)
 
-  return { percent, missing }
+  return { percent, missing, isComplete: missing.length === 0 }
 }
 
 export function getSocialLinks(profile) {

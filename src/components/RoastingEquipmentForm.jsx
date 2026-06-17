@@ -28,8 +28,9 @@ export default function RoastingEquipmentForm({
     <fieldset className="form-section">
       <legend>Roasting equipment</legend>
       <p className="field-hint">
-        List each roaster you operate, plus your weekly capacity. Other members can find you by
-        roaster type when looking for contract roasting.
+        Optional — not required for your profile to appear in Discover. List each roaster you
+        operate, plus your weekly capacity. Other members can find you by roaster type when looking
+        for contract roasting.
       </p>
 
       {machines.map((machine, index) => {
