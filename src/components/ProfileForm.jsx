@@ -9,7 +9,7 @@ import {
 } from '../lib/profileConstants'
 import CategoryLabel from './CategoryLabel'
 import { fetchProfile, saveProfile, uploadProfileImage } from '../lib/profileApi'
-import { getProfileCompletion, isProfileComplete } from '../lib/profileCompletion'
+import { getProfileCompletion, isProfileListed, PROFILE_LISTING_THRESHOLD } from '../lib/profileCompletion'
 import { isRoastingProfile } from '../lib/roasterConstants'
 import { saveProfileRoasters } from '../lib/roasterApi'
 import {
@@ -287,7 +287,7 @@ export default function ProfileForm({ userId, userEmail }) {
         ? Number(contractCapacity)
         : null,
       email_on_message: form.email_on_message,
-      is_profile_complete: isProfileComplete({
+      is_profile_complete: isProfileListed({
         ...form,
         profile_type: form.profile_type,
         name: form.name.trim(),
@@ -342,10 +342,51 @@ export default function ProfileForm({ userId, userEmail }) {
         await saveProfileSites(savedProfile.id, [])
       }
 
+      const listingStatus = getProfileCompletion({
+        ...form,
+        profile_type: form.profile_type,
+        name: form.name.trim(),
+        profile_photo_url: form.profile_photo_url || null,
+        cover_image_url: form.cover_image_url || null,
+        primary_category: form.primary_category || null,
+        secondary_categories: form.secondary_categories,
+        about_bio: form.about_bio.trim() || null,
+        website: form.website.trim() || null,
+        linkedin_url: form.linkedin_url.trim() || null,
+        instagram_url: form.instagram_url.trim() || null,
+        contact_email: form.contact_email.trim() || null,
+        contact_phone: form.contact_phone.trim() || null,
+        job_title_role: form.profile_type === 'individual' ? form.job_title_role.trim() || null : null,
+        years_of_experience:
+          form.profile_type === 'individual' && form.years_of_experience
+            ? Number(form.years_of_experience)
+            : null,
+        skills_specialties:
+          form.profile_type === 'individual' ? splitList(form.skills_specialties) : [],
+        certifications:
+          form.profile_type === 'individual' ? form.certifications.trim() || null : null,
+        open_to_status: form.profile_type === 'individual' ? form.open_to_status : [],
+        languages: form.profile_type === 'individual' ? splitList(form.languages) : [],
+        business_type: form.profile_type === 'business' ? form.business_type.trim() || null : null,
+        year_established:
+          form.profile_type === 'business' && form.year_established
+            ? Number(form.year_established)
+            : null,
+        team_size: form.profile_type === 'business' ? form.team_size.trim() || null : null,
+        services_offered:
+          form.profile_type === 'business' ? form.services_offered.trim() || null : null,
+        opening_hours: form.profile_type === 'business' ? form.opening_hours.trim() || null : null,
+        latitude: isBusiness ? null : form.latitude,
+        longitude: isBusiness ? null : form.longitude,
+        profile_sites: normalizedSites,
+      })
+
       setMessage(
-        payload.is_profile_complete
-          ? 'Profile saved. It is now visible in Discover and on the map.'
-          : 'Profile saved as a draft. Complete all required fields below to appear in Discover.',
+        listingStatus.isListed
+          ? listingStatus.isComplete
+            ? 'Profile saved. It is now fully complete and visible in Discover and on the map.'
+            : 'Profile saved. It is now visible in Discover and on the map. Complete the remaining fields to reach 100%.'
+          : `Profile saved as a draft. Reach ${PROFILE_LISTING_THRESHOLD}% completion to appear in Discover.`,
       )
     } catch (error) {
       setMessage(error.message)
@@ -388,7 +429,11 @@ export default function ProfileForm({ userId, userEmail }) {
         <div className="completion-banner compact">
           <div className="completion-copy">
             <strong>{completion.percent}% complete</strong>
-            <p>Complete all required fields to appear in Discover and on the map.</p>
+            <p>
+              {completion.isListed
+                ? 'Your profile is visible in Discover. Complete the remaining fields to reach 100%.'
+                : `Reach ${PROFILE_LISTING_THRESHOLD}% completion to appear in Discover and on the map.`}
+            </p>
             <div className="completion-bar">
               <span style={{ width: `${completion.percent}%` }} />
             </div>
@@ -555,7 +600,7 @@ export default function ProfileForm({ userId, userEmail }) {
           <legend>Contact details</legend>
           <p className="field-hint">
             Members can message you in the app, or reveal your email and phone if you choose to share
-            them. Contact email and phone are required to publish your profile.
+            them. Contact email and phone count toward your profile completion.
           </p>
 
           <label>

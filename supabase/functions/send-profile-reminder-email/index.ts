@@ -171,7 +171,7 @@ Deno.serve(async (request) => {
     }
 
     if (profile?.is_profile_complete) {
-      return new Response(JSON.stringify({ skipped: true, reason: 'profile_already_complete' }), {
+      return new Response(JSON.stringify({ skipped: true, reason: 'profile_already_listed' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       })

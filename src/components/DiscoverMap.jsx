@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { profileToMapPins, profilesToMapPins } from '../lib/mapPins'
+import { profileToMapPins, profilesToMapPins, groupMapPins } from '../lib/mapPins'
 import useMapProfiles from '../hooks/useMapProfiles'
 import BrowseFilters from './BrowseFilters'
 import BrowseMap from './BrowseMap'
@@ -20,12 +20,14 @@ export default function DiscoverMap({ session }) {
 
   const locatedProfiles = Array.isArray(results) ? results : []
   const mapPins = profilesToMapPins(locatedProfiles)
+  const pinGroups = groupMapPins(mapPins)
   const profilesWithPins = new Set(
     locatedProfiles
       .filter((profile) => profileToMapPins(profile).length > 0)
       .map((profile) => profile.user_id),
   ).size
   const missingLocation = locatedProfiles.length - profilesWithPins
+  const sharedLocations = mapPins.length - pinGroups.length
 
   return (
     <section className="card discover-card">
@@ -78,9 +80,14 @@ export default function DiscoverMap({ session }) {
 
       {!loading && !error ? (
         <p className="status-message">
-          {mapPins.length} pin{mapPins.length === 1 ? '' : 's'} on map
+          {locatedProfiles.length} member{locatedProfiles.length === 1 ? '' : 's'}
+          {' · '}
+          {pinGroups.length} map location{pinGroups.length === 1 ? '' : 's'}
+          {sharedLocations > 0
+            ? ` (${sharedLocations} member${sharedLocations === 1 ? '' : 's'} share${sharedLocations === 1 ? 's' : ''} a location)`
+            : ''}
           {!previewMode && missingLocation > 0
-            ? ` (${missingLocation} member${missingLocation === 1 ? '' : 's'} without a map location hidden)`
+            ? ` · ${missingLocation} without a map pin hidden`
             : ''}
         </p>
       ) : null}

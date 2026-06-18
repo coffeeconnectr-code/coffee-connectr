@@ -1,5 +1,7 @@
 import { profileHasMapPin } from './mapPins'
 
+export const PROFILE_LISTING_THRESHOLD = 70
+
 const SHARED_CHECKS = [
   { label: 'Name', test: (profile) => Boolean(profile.name?.trim()) },
   { label: 'Profile photo or logo', test: (profile) => Boolean(profile.profile_photo_url) },
@@ -64,17 +66,14 @@ function getPublishChecks(profile) {
     : [...SHARED_CHECKS, ...INDIVIDUAL_CHECKS]
 }
 
-export function isProfileComplete(profile) {
-  if (!profile) {
-    return false
-  }
-
-  return getPublishChecks(profile).every((check) => check.test(profile))
-}
-
 export function getProfileCompletion(profile) {
   if (!profile) {
-    return { percent: 0, missing: ['Create your profile'], isComplete: false }
+    return {
+      percent: 0,
+      missing: ['Create your profile'],
+      isComplete: false,
+      isListed: false,
+    }
   }
 
   const checks = getPublishChecks(profile)
@@ -82,7 +81,20 @@ export function getProfileCompletion(profile) {
   const missing = checks.filter((check) => !check.test(profile)).map((check) => check.label)
   const percent = Math.round((completed.length / checks.length) * 100)
 
-  return { percent, missing, isComplete: missing.length === 0 }
+  return {
+    percent,
+    missing,
+    isComplete: missing.length === 0,
+    isListed: percent >= PROFILE_LISTING_THRESHOLD,
+  }
+}
+
+export function isProfileListed(profile) {
+  return getProfileCompletion(profile).isListed
+}
+
+export function isProfileComplete(profile) {
+  return getProfileCompletion(profile).isComplete
 }
 
 export function getSocialLinks(profile) {
