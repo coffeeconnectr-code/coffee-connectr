@@ -163,21 +163,14 @@ Deno.serve(async (request) => {
       throw profileError
     }
 
-    if (!profile) {
-      return new Response(JSON.stringify({ skipped: true, reason: 'no_profile' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      })
-    }
-
-    if (profile.is_hidden || profile.is_suspended) {
+    if (profile?.is_hidden || profile?.is_suspended) {
       return new Response(JSON.stringify({ skipped: true, reason: 'profile_unavailable' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       })
     }
 
-    if (profile.is_profile_complete) {
+    if (profile?.is_profile_complete) {
       return new Response(JSON.stringify({ skipped: true, reason: 'profile_already_complete' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -187,7 +180,10 @@ Deno.serve(async (request) => {
     const siteUrl = Deno.env.get('SITE_URL') ?? 'https://www.coffeeconnectr.com'
     const fromEmail = resolveFromEmail()
     const profileUrl = `${siteUrl}/profile/edit`
-    const displayName = profile.name?.trim() || 'there'
+    const displayName = profile?.name?.trim() || 'there'
+    const introLine = profile
+      ? 'Your Coffee Connectr profile is not complete yet, so it is not visible in Discover or on the map.'
+      : 'You have joined Coffee Connectr, but you have not created your profile yet, so you are not visible in Discover or on the map.'
 
     const resend = new Resend(resendApiKey)
     const { error: emailError } = await resend.emails.send({
@@ -198,16 +194,15 @@ Deno.serve(async (request) => {
         <div style="font-family: Arial, sans-serif; line-height: 1.55; color: #0a0a0a; max-width: 640px;">
           <p style="margin-top: 0;">Hi ${escapeHtml(displayName)},</p>
           <p>
-            Your Coffee Connectr profile is not complete yet, so it is not visible in Discover or on
-            the map.
+            ${introLine}
           </p>
           <p>
-            Please finish the required fields in your profile — photo, bio, categories, location,
+            Please ${profile ? 'finish the required fields in your profile' : 'create your profile and fill in the required fields'} — photo, bio, categories, location,
             contact details, and the rest of your member information. Roasting equipment is optional.
           </p>
           <p style="margin: 1.5rem 0 1rem;">
             <a href="${profileUrl}" style="display: inline-block; padding: 0.75rem 1.25rem; border-radius: 999px; background: #8b6a3e; color: #ffffff; font-weight: 600; text-decoration: none;">
-              Finish your profile
+              ${profile ? 'Finish your profile' : 'Create your profile'}
             </a>
           </p>
           <p style="color: #5c5c5c; font-size: 0.95rem;">
