@@ -25,11 +25,13 @@ export default function AdminWelcomeEmails() {
   const [sendingUserId, setSendingUserId] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
-  async function loadMembers() {
+  async function loadMembers({ keepFeedback = false } = {}) {
     setLoading(true)
-    setError('')
-    setActionError('')
-    setSuccessMessage('')
+    if (!keepFeedback) {
+      setError('')
+      setActionError('')
+      setSuccessMessage('')
+    }
 
     try {
       setMembers(await fetchAdminWelcomeEmailMembers(search))
@@ -70,8 +72,8 @@ export default function AdminWelcomeEmails() {
 
     try {
       await adminSendWelcomeEmail(member.user_id)
+      await loadMembers({ keepFeedback: true })
       setSuccessMessage(`Welcome email sent to ${member.email}.`)
-      await loadMembers()
     } catch (sendError) {
       setActionError(sendError.message)
     } finally {

@@ -13,11 +13,13 @@ export default function AdminProfileReminders() {
   const [sendingUserId, setSendingUserId] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
-  async function loadMembers(searchTerm = search) {
+  async function loadMembers(searchTerm = search, { keepFeedback = false } = {}) {
     setLoading(true)
-    setError('')
-    setActionError('')
-    setSuccessMessage('')
+    if (!keepFeedback) {
+      setError('')
+      setActionError('')
+      setSuccessMessage('')
+    }
 
     try {
       setMembers(await fetchAdminIncompleteProfileMembers(searchTerm))
@@ -57,11 +59,15 @@ export default function AdminProfileReminders() {
     setSuccessMessage('')
 
     try {
-      await adminSendProfileReminderEmail(member.user_id)
-      setSuccessMessage(`Finish-your-profile email sent to ${member.email}.`)
-      await loadMembers()
+      const result = await adminSendProfileReminderEmail(member.user_id)
+      await loadMembers(search, { keepFeedback: true })
+      setSuccessMessage(
+        result.warning
+          ? `Finish-your-profile email sent to ${member.email}. (${result.warning})`
+          : `Finish-your-profile email sent to ${member.email}.`,
+      )
     } catch (sendError) {
-      setActionError(sendError.message)
+      setActionError(sendError?.message || 'Reminder email failed. Check Edge Function logs.')
     } finally {
       setSendingUserId('')
     }

@@ -2,6 +2,8 @@
 -- Do NOT re-run admin.sql — that causes admin_list_reports conflicts if admin_phase2.sql was already applied.
 --
 -- Prerequisites: profile_completion.sql and admin.sql (already run once).
+-- Deploy edge function (required for Send reminder to work):
+--   npx supabase functions deploy send-profile-reminder-email --project-ref xfrgctnrafhhcfkcoplp
 -- Tracks admin "finish your profile" reminder emails.
 
 create table if not exists public.profile_reminder_emails_sent (

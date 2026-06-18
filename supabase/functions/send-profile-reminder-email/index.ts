@@ -239,12 +239,13 @@ Deno.serve(async (request) => {
       if (isMissingReminderTable(logError)) {
         return new Response(
           JSON.stringify({
-            error:
-              'Database setup missing. Run supabase/profile_reminder_emails.sql in the SQL Editor.',
+            sent: true,
+            warning:
+              'Email sent, but tracking failed. Run supabase/profile_reminder_emails.sql in the SQL Editor.',
           }),
           {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 500,
+            status: 200,
           },
         )
       }

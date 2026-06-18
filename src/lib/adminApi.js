@@ -178,6 +178,10 @@ export async function fetchAdminWelcomeEmailMembers(search = '') {
 async function parseFunctionError(error) {
   let details = error.message
 
+  if (/edge function|function not found|failed to send a request/i.test(details)) {
+    return `${details} Deploy send-profile-reminder-email in Supabase Edge Functions.`
+  }
+
   try {
     if (error.context) {
       const body = await error.context.json()
@@ -277,11 +281,19 @@ export async function adminSendProfileReminderEmail(userId) {
     throw new Error('Reminder email was not sent')
   }
 
+  if (data?.warning) {
+    console.warn(data.warning)
+  }
+
   await supabase.rpc('log_admin_action', {
     p_action: 'send_profile_reminder_email',
     p_target_type: 'user',
     p_target_id: userId,
     p_details: {},
+  }).then(({ error }) => {
+    if (error) {
+      console.warn('Failed to log admin action:', error.message)
+    }
   })
 
   return data
