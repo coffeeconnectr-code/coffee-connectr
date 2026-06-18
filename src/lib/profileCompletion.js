@@ -1,6 +1,6 @@
 import { profileHasMapPin } from './mapPins'
 
-export const PROFILE_LISTING_THRESHOLD = 70
+export const PROFILE_LISTING_THRESHOLD = 0
 
 const SHARED_CHECKS = [
   { label: 'Name', test: (profile) => Boolean(profile.name?.trim()) },
@@ -90,7 +90,7 @@ export function getProfileCompletion(profile) {
 }
 
 export function isProfileListed(profile) {
-  return getProfileCompletion(profile).isListed
+  return Boolean(profile)
 }
 
 export function isProfileComplete(profile) {

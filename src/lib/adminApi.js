@@ -267,8 +267,8 @@ export async function adminSendProfileReminderEmail(userId) {
 
   if (data?.skipped) {
     const reasonMessages = {
-      profile_already_listed: 'This profile is already listed in Discover (70%+ complete).',
-      profile_already_complete: 'This profile is already listed in Discover (70%+ complete).',
+      profile_already_listed: 'This profile is already listed in Discover.',
+      profile_already_complete: 'This profile is already listed in Discover.',
       profile_unavailable: 'This profile is hidden or suspended.',
       missing_user_email: 'This member has no email address.',
       missing_resend_api_key: 'Resend is not configured for edge functions.',

@@ -1,6 +1,6 @@
 -- Run in Supabase SQL Editor after profile_completion.sql
--- Lists profiles in Discover/map at 70% completion instead of 100%.
--- The is_profile_complete column now means "listed publicly" (>= 70%).
+-- Lists profiles in Discover/map at 0% completion (all members with a profile).
+-- The is_profile_complete column now means "listed publicly".
 
 create or replace function public.profile_meets_listing_threshold(p public.profiles)
 returns boolean
@@ -150,7 +150,7 @@ begin
     end if;
   end if;
 
-  return (completed_checks::numeric / total_checks::numeric) >= 0.7;
+  return (completed_checks::numeric / total_checks::numeric) >= 0;
 end;
 $$;
 

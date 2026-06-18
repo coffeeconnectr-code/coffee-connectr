@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { buildShareUrl } from '../lib/siteConfig'
 import { fetchProfile } from '../lib/profileApi'
 import { isFavourite } from '../lib/favouritesApi'
-import { getProfileCompletion, getSocialLinks, isProfileListed, PROFILE_LISTING_THRESHOLD } from '../lib/profileCompletion'
+import { getProfileCompletion, getSocialLinks } from '../lib/profileCompletion'
 import { formatBatchSize, formatCapacity, isRoastingProfile } from '../lib/roasterConstants'
 import { OPEN_TO_OPTIONS } from '../lib/profileConstants'
 import CategoryLabel from './CategoryLabel'
@@ -197,21 +197,6 @@ export default function ProfileView({ userId, currentUserId }) {
     )
   }
 
-  if (!isOwnProfile && !isProfileListed(profile)) {
-    return (
-      <section className="card profile-view-empty">
-        <div className="empty-icon">☕</div>
-        <h2>Profile not available</h2>
-        <p className="status-message">
-          This member has not finished their profile yet, so it is not shown publicly.
-        </p>
-        <Link to="/discover" className="secondary-button profile-action-link">
-          Back to Discover
-        </Link>
-      </section>
-    )
-  }
-
   const isIndividual = profile.profile_type === 'individual'
   const hasMap = profileHasMapPin(profile)
   const completion = isOwnProfile ? getProfileCompletion(profile) : null
@@ -370,11 +355,7 @@ export default function ProfileView({ userId, currentUserId }) {
           <div className="completion-banner below-header">
             <div className="completion-copy">
               <strong>Profile {completion.percent}% complete</strong>
-              <p>
-                {completion.isListed
-                  ? `Complete all fields to reach 100%: ${completion.missing.slice(0, 3).join(', ')}`
-                  : `Reach ${PROFILE_LISTING_THRESHOLD}% to appear in Discover: ${completion.missing.slice(0, 3).join(', ')}`}
-              </p>
+              <p>Complete all fields to reach 100%: {completion.missing.slice(0, 3).join(', ')}</p>
             </div>
             <Link to="/profile/edit" className="secondary-button profile-action-link">
               Finish profile

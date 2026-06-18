@@ -1,5 +1,4 @@
 import { supabase } from './supabase'
-import { isProfileListed } from './profileCompletion'
 
 const BROWSE_PROFILE_SELECT = `
   id, user_id, name, profile_type, profile_photo_url, cover_image_url,
@@ -41,7 +40,7 @@ export async function browseProfiles({ search = '', category = '', profileType =
     throw error
   }
 
-  let results = (data ?? []).filter(isProfileListed)
+  let results = data ?? []
 
   if (category) {
     results = results.filter(

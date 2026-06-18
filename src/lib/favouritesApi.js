@@ -1,6 +1,5 @@
 import { supabase } from './supabase'
 import { sortBrowseProfiles } from './browseApi'
-import { isProfileListed } from './profileCompletion'
 
 export async function fetchFavouriteIds(userId) {
   const { data, error } = await supabase
@@ -86,7 +85,6 @@ export async function fetchSavedProfiles(userId) {
   return sortBrowseProfiles(
     favourites
       .map((favourite) => profileByUserId.get(favourite.favourite_user_id))
-      .filter(Boolean)
-      .filter(isProfileListed),
+      .filter(Boolean),
   )
 }

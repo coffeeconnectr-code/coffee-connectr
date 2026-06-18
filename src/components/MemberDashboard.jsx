@@ -4,7 +4,7 @@ import { fetchSavedProfiles } from '../lib/favouritesApi'
 import { fetchInbox } from '../lib/messagesApi'
 import { fetchUserNoticeboardPosts, isPostLive } from '../lib/noticeboardApi'
 import { fetchProfile } from '../lib/profileApi'
-import { getProfileCompletion, PROFILE_LISTING_THRESHOLD } from '../lib/profileCompletion'
+import { getProfileCompletion } from '../lib/profileCompletion'
 import CategoryLabel from './CategoryLabel'
 import ProfileContactStats from './ProfileContactStats'
 import ProfileListings from './ProfileListings'
@@ -220,11 +220,7 @@ export default function MemberDashboard({ userId, userEmail, session }) {
             <div className="completion-banner below-header">
               <div className="completion-copy">
                 <strong>Profile {completion.percent}% complete</strong>
-                <p>
-                  {completion.isListed
-                    ? `Complete all fields to reach 100%: ${completion.missing.slice(0, 3).join(', ')}`
-                    : `Reach ${PROFILE_LISTING_THRESHOLD}% to appear in Discover: ${completion.missing.slice(0, 3).join(', ')}`}
-                </p>
+                <p>Complete all fields to reach 100%: {completion.missing.slice(0, 3).join(', ')}</p>
               </div>
               <Link to="/profile/edit" className="secondary-button profile-action-link">
                 Finish profile
