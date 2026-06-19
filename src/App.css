@@ -933,6 +933,31 @@ button:disabled {
   margin-bottom: 0;
 }
 
+.recommendation-stats-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, var(--card));
+}
+
+.recommendation-stats-panel.compact {
+  margin-bottom: 1rem;
+}
+
+.recommendation-stats-copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.recommendation-stats-copy p {
+  margin: 0;
+}
+
 .verification-request {
   margin-top: 1.25rem;
   padding: 1rem;

@@ -3,6 +3,8 @@
 --
 -- Deploy edge function (required for Send recommendation to work):
 --   npx supabase functions deploy send-business-recommendation --project-ref xfrgctnrafhhcfkcoplp
+--
+-- Then run recommendation_rewards.sql to track sign-ups and grant bonus free months.
 
 create table if not exists public.business_recommendations (
   id uuid primary key default gen_random_uuid(),

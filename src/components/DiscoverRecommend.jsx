@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { submitBusinessRecommendation } from '../lib/recommendationsApi'
+import { useEffect, useState } from 'react'
+import { fetchRecommendationStats, submitBusinessRecommendation } from '../lib/recommendationsApi'
 import DiscoverNavLinks from './DiscoverNavLinks'
 import LocationPicker from './LocationPicker'
+import RecommendationStatsPanel from './RecommendationStatsPanel'
 
 const EMPTY_FORM = {
   contactName: '',
@@ -17,9 +18,33 @@ const EMPTY_FORM = {
 
 export default function DiscoverRecommend({ session }) {
   const [form, setForm] = useState(EMPTY_FORM)
+  const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    let active = true
+
+    async function loadStats() {
+      try {
+        const nextStats = await fetchRecommendationStats()
+        if (active) {
+          setStats(nextStats)
+        }
+      } catch {
+        if (active) {
+          setStats(null)
+        }
+      }
+    }
+
+    loadStats()
+
+    return () => {
+      active = false
+    }
+  }, [submitted])
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }))
@@ -73,11 +98,14 @@ export default function DiscoverRecommend({ session }) {
           <h2>Recommend Someone</h2>
           <p className="status-message">
             Know a coffee business that should be on Coffee Connectr? Send them a recommendation
-            email with a link to join for a free month.
+            email with a link to join for a free month. Every 5 recommendations that sign up earns
+            you an extra free month.
           </p>
         </div>
         <DiscoverNavLinks exclude="recommend" />
       </div>
+
+      {stats ? <RecommendationStatsPanel stats={stats} compact /> : null}
 
       {submitted ? (
         <div className="contact-success-card">

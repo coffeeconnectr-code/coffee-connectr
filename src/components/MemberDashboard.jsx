@@ -4,6 +4,7 @@ import { fetchSavedProfiles } from '../lib/favouritesApi'
 import { fetchInbox } from '../lib/messagesApi'
 import { fetchUserNoticeboardPosts, isPostLive } from '../lib/noticeboardApi'
 import { fetchProfile } from '../lib/profileApi'
+import { fetchRecommendationStats } from '../lib/recommendationsApi'
 import { getProfileCompletion } from '../lib/profileCompletion'
 import CategoryLabel from './CategoryLabel'
 import ProfileContactStats from './ProfileContactStats'
@@ -13,6 +14,7 @@ import FeaturedBadge from './FeaturedBadge'
 import VerificationRequestForm from './VerificationRequestForm'
 import FeaturedRequestForm from './FeaturedRequestForm'
 import FeedbackForm from './FeedbackForm'
+import RecommendationStatsPanel from './RecommendationStatsPanel'
 import useMemberAccess from '../hooks/useMemberAccess'
 
 function formatMessageTime(value) {
@@ -42,6 +44,7 @@ export default function MemberDashboard({ userId, userEmail, session }) {
   const [conversations, setConversations] = useState([])
   const [savedProfiles, setSavedProfiles] = useState([])
   const [listings, setListings] = useState([])
+  const [recommendationStats, setRecommendationStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -67,11 +70,21 @@ export default function MemberDashboard({ userId, userEmail, session }) {
           ])
         }
 
+        let stats = null
+        if (hasAccess) {
+          try {
+            stats = await fetchRecommendationStats()
+          } catch {
+            stats = null
+          }
+        }
+
         if (active) {
           setProfile(profileData)
           setConversations(inbox)
           setSavedProfiles(saved)
           setListings(posts)
+          setRecommendationStats(stats)
         }
       } catch (loadError) {
         if (active) {
@@ -163,6 +176,10 @@ export default function MemberDashboard({ userId, userEmail, session }) {
             Subscribe
           </Link>
         </section>
+      ) : null}
+
+      {hasAccess && recommendationStats ? (
+        <RecommendationStatsPanel stats={recommendationStats} />
       ) : null}
 
       {!profile ? (
