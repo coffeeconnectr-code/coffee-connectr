@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { fetchFavouriteIds } from '../lib/favouritesApi'
 import useBrowseProfiles from '../hooks/useBrowseProfiles'
 import BrowseFilters from './BrowseFilters'
+import DiscoverNavLinks from './DiscoverNavLinks'
 import ProfileBrowseCard from './ProfileBrowseCard'
 
 export default function DiscoverBrowse({ currentUserId = null }) {
@@ -59,14 +59,7 @@ export default function DiscoverBrowse({ currentUserId = null }) {
             Browse coffee professionals and businesses across the community.
           </p>
         </div>
-        <div className="discover-header-actions">
-          <Link to="/discover/map" className="secondary-button profile-action-link">
-            Map view
-          </Link>
-          <Link to="/discover/roasters" className="secondary-button profile-action-link">
-            Find roasters
-          </Link>
-        </div>
+        <DiscoverNavLinks exclude="browse" />
       </div>
 
       <BrowseFilters

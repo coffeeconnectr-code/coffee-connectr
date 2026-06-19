@@ -3,6 +3,7 @@ import { profileToMapPins, profilesToMapPins, groupMapPins } from '../lib/mapPin
 import useMapProfiles from '../hooks/useMapProfiles'
 import BrowseFilters from './BrowseFilters'
 import BrowseMap from './BrowseMap'
+import DiscoverNavLinks from './DiscoverNavLinks'
 
 export default function DiscoverMap({ session }) {
   const {
@@ -47,14 +48,7 @@ export default function DiscoverMap({ session }) {
             </Link>
           </div>
         ) : (
-          <div className="discover-header-actions">
-            <Link to="/discover" className="secondary-button profile-action-link">
-              List view
-            </Link>
-            <Link to="/discover/roasters" className="secondary-button profile-action-link">
-              Find roasters
-            </Link>
-          </div>
+          <DiscoverNavLinks exclude="map" />
         )}
       </div>
 

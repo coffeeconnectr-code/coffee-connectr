@@ -6,6 +6,7 @@ import { fetchMemberAccess } from './lib/subscriptionApi'
 import { notifyWelcomeEmail } from './lib/notificationsApi'
 import DiscoverBrowse from './components/DiscoverBrowse'
 import DiscoverMap from './components/DiscoverMap'
+import DiscoverRecommend from './components/DiscoverRecommend'
 import DiscoverRoasters from './components/DiscoverRoasters'
 import LandingPage from './components/LandingPage'
 import AboutPage from './components/AboutPage'
@@ -427,6 +428,14 @@ export default function App() {
             element={
               <MemberFeatureRoute session={session}>
                 <DiscoverRoasters />
+              </MemberFeatureRoute>
+            }
+          />
+          <Route
+            path="/discover/recommend"
+            element={
+              <MemberFeatureRoute session={session}>
+                <DiscoverRecommend session={session} />
               </MemberFeatureRoute>
             }
           />

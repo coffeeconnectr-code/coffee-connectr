@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ROASTER_BRANDS, formatBatchSize, formatCapacity } from '../lib/roasterConstants'
 import { searchProfilesByRoaster } from '../lib/roasterApi'
 import CategoryLabel from './CategoryLabel'
+import DiscoverNavLinks from './DiscoverNavLinks'
 import VerifiedBadge from './VerifiedBadge'
 
 export default function DiscoverRoasters() {
@@ -51,9 +52,7 @@ export default function DiscoverRoasters() {
             machine type.
           </p>
         </div>
-        <Link to="/discover" className="secondary-button profile-action-link">
-          All members
-        </Link>
+        <DiscoverNavLinks exclude="roasters" />
       </div>
 
       <label>
