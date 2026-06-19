@@ -7,11 +7,23 @@ const DISCOVER_LINKS = [
   { to: '/discover/recommend', label: 'Recommend Someone', key: 'recommend' },
 ]
 
-export default function DiscoverNavLinks({ exclude = null }) {
+export default function DiscoverNavLinks({ current = null }) {
   return (
     <div className="discover-header-actions">
-      {DISCOVER_LINKS.filter((link) => link.key !== exclude).map((link) => (
-        <Link key={link.to} to={link.to} className="secondary-button profile-action-link">
+      {DISCOVER_LINKS.map((link) => (
+        <Link
+          key={link.to}
+          to={link.to}
+          className={[
+            'secondary-button',
+            'profile-action-link',
+            link.key === 'recommend' ? 'discover-nav-recommend' : '',
+            link.key === current ? 'discover-nav-current' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          aria-current={link.key === current ? 'page' : undefined}
+        >
           {link.label}
         </Link>
       ))}

@@ -52,7 +52,7 @@ export default function DiscoverRoasters() {
             machine type.
           </p>
         </div>
-        <DiscoverNavLinks exclude="roasters" />
+        <DiscoverNavLinks current="roasters" />
       </div>
 
       <label>

@@ -102,7 +102,7 @@ export default function DiscoverRecommend({ session }) {
             you an extra free month.
           </p>
         </div>
-        <DiscoverNavLinks exclude="recommend" />
+        <DiscoverNavLinks current="recommend" />
       </div>
 
       {stats ? <RecommendationStatsPanel stats={stats} compact /> : null}

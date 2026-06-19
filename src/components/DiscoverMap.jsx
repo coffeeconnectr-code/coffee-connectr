@@ -48,7 +48,7 @@ export default function DiscoverMap({ session }) {
             </Link>
           </div>
         ) : (
-          <DiscoverNavLinks exclude="map" />
+          <DiscoverNavLinks current="map" />
         )}
       </div>
 

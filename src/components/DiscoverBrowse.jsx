@@ -59,7 +59,7 @@ export default function DiscoverBrowse({ currentUserId = null }) {
             Browse coffee professionals and businesses across the community.
           </p>
         </div>
-        <DiscoverNavLinks exclude="browse" />
+        <DiscoverNavLinks current="browse" />
       </div>
 
       <BrowseFilters
