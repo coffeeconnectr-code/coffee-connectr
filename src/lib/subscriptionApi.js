@@ -3,6 +3,7 @@ import { supabase } from './supabase'
 const DEFAULT_ACCESS = {
   hasAccess: false,
   isAdmin: false,
+  isLifetimeFree: false,
   status: 'unknown',
   planType: null,
   trialEndsAt: null,
@@ -20,6 +21,7 @@ export async function fetchMemberAccess() {
   return {
     hasAccess: Boolean(data?.hasAccess ?? data?.has_access),
     isAdmin: Boolean(data?.isAdmin ?? data?.is_admin),
+    isLifetimeFree: Boolean(data?.isLifetimeFree ?? data?.is_lifetime_free),
     status: data?.status ?? DEFAULT_ACCESS.status,
     planType: data?.planType ?? data?.plan_type ?? null,
     trialEndsAt: data?.trialEndsAt ?? data?.trial_ends_at ?? null,

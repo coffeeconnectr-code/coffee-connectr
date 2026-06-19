@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { getAuthRedirectUrl } from '../lib/authRedirect'
@@ -9,8 +9,9 @@ import {
   userNeedsEmailConfirmation,
 } from '../lib/authEmailConfirmation'
 import { notifyWelcomeEmail } from '../lib/notificationsApi'
+import { redeemStoredFreeProfileInvite, storeFreeProfileInviteToken } from '../lib/freeProfileInvite'
 
-export default function Auth({ defaultIsSignUp = false }) {
+export default function Auth({ defaultIsSignUp = false, inviteToken = null }) {
   const navigate = useNavigate()
   const initialConfirmationPrompt = getInitialConfirmationPrompt()
   const [email, setEmail] = useState(initialConfirmationPrompt.email)
@@ -23,6 +24,10 @@ export default function Auth({ defaultIsSignUp = false }) {
   )
   const [showResendPanel, setShowResendPanel] = useState(initialConfirmationPrompt.showResendPanel)
   const [resendMessage, setResendMessage] = useState('')
+
+  useEffect(() => {
+    storeFreeProfileInviteToken(inviteToken)
+  }, [inviteToken])
 
   const canResendConfirmation = Boolean(pendingConfirmationEmail || showResendPanel)
 
@@ -82,7 +87,12 @@ export default function Auth({ defaultIsSignUp = false }) {
       if (isSignUp) {
         notifyWelcomeEmail(data.session.user.id, data.session.access_token)
       }
-      navigate(isSignUp ? '/profile/edit' : '/dashboard', { replace: true })
+
+      const redeemResult = await redeemStoredFreeProfileInvite()
+      navigate(isSignUp ? '/profile/edit' : '/dashboard', {
+        replace: true,
+        state: redeemResult?.redeemed ? { lifetimeProfileActivated: true } : undefined,
+      })
     } else if (isSignUp) {
       setPendingConfirmationEmail(email.trim())
       setMessage(

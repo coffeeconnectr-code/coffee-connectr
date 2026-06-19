@@ -67,6 +67,12 @@ export default function ContactPage({ session }) {
           Questions about your account, billing, or using Coffee Connectr? Send us a message and
           we&apos;ll get back to you.
         </p>
+        {topic === 'free_profile' ? (
+          <p className="status-message">
+            Tell us a little about your coffee business or professional work. We review free profile
+            requests and will email you an invite link if approved.
+          </p>
+        ) : null}
       </section>
 
       <section className="info-section">

@@ -243,6 +243,69 @@ export async function fetchAdminIncompleteProfileMembers(search = '') {
   return data ?? []
 }
 
+export async function fetchAdminFreeProfileInvites(search = '', status = '') {
+  const { data, error } = await supabase.rpc('admin_list_free_profile_invites', {
+    p_search: search,
+    p_status: status,
+    p_limit: 50,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
+export async function adminSendFreeProfileInvite({ inviteId, contactName, email }) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session) {
+    throw new Error('Sign in required')
+  }
+
+  const { data, error } = await supabase.functions.invoke('send-free-profile-invite', {
+    body: { inviteId, contactName, email },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  })
+
+  if (error) {
+    throw new Error(await parseFunctionError(error))
+  }
+
+  if (data?.error) {
+    throw new Error(data.error)
+  }
+
+  if (data?.skipped) {
+    const reasonMessages = {
+      already_redeemed: 'This invite has already been used.',
+      missing_resend_api_key: 'Resend is not configured for edge functions.',
+    }
+
+    throw new Error(reasonMessages[data.reason] ?? data.reason ?? 'Invite email was not sent')
+  }
+
+  if (!data?.sent) {
+    throw new Error('Invite email was not sent')
+  }
+
+  await supabase.rpc('log_admin_action', {
+    p_action: 'send_free_profile_invite',
+    p_target_type: 'free_profile_invite',
+    p_target_id: data.inviteId ?? inviteId ?? null,
+    p_details: { email: email ?? null },
+  }).then(({ error: logError }) => {
+    if (logError) {
+      console.warn('Failed to log admin action:', logError.message)
+    }
+  })
+
+  return data
+}
+
 export async function adminSendProfileReminderEmail(userId) {
   const {
     data: { session },

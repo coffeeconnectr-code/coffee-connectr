@@ -1,5 +1,6 @@
 export const CONTACT_TOPICS = [
   { value: 'general', label: 'General enquiry' },
+  { value: 'free_profile', label: 'Free profile for life' },
   { value: 'account', label: 'Account help' },
   { value: 'billing', label: 'Billing & subscriptions' },
   { value: 'technical', label: 'Technical issue' },

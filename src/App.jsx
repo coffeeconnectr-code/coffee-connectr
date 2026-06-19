@@ -44,9 +44,11 @@ import AdminFeedback from './components/admin/AdminFeedback'
 import AdminAudit from './components/admin/AdminAudit'
 import AdminWelcomeEmails from './components/admin/AdminWelcomeEmails'
 import AdminProfileReminders from './components/admin/AdminProfileReminders'
+import AdminFreeProfiles from './components/admin/AdminFreeProfiles'
 import useAdminAccess from './hooks/useAdminAccess'
 import useMemberAccess from './hooks/useMemberAccess'
 import { isUuid } from './lib/uuid'
+import { redeemStoredFreeProfileInvite } from './lib/freeProfileInvite'
 import {
   enforceEmailConfirmation,
   userNeedsEmailConfirmation,
@@ -366,6 +368,20 @@ export default function App() {
 
       if (
         session?.user?.id &&
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') &&
+        !userNeedsEmailConfirmation(session.user)
+      ) {
+        redeemStoredFreeProfileInvite()
+          .then((result) => {
+            if (result?.redeemed) {
+              fetchMemberAccess().catch(() => {})
+            }
+          })
+          .catch(() => {})
+      }
+
+      if (
+        session?.user?.id &&
         event === 'SIGNED_IN' &&
         !userNeedsEmailConfirmation(session.user)
       ) {
@@ -407,6 +423,7 @@ export default function App() {
           <Route path="moderation" element={<AdminModeration />} />
           <Route path="welcome-emails" element={<AdminWelcomeEmails />} />
           <Route path="profile-reminders" element={<AdminProfileReminders />} />
+          <Route path="free-profiles" element={<AdminFreeProfiles />} />
           <Route path="reports" element={<AdminReports />} />
           <Route path="verification" element={<AdminVerification />} />
           <Route path="featured" element={<AdminFeatured />} />

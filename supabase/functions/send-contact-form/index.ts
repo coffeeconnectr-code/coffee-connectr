@@ -8,6 +8,7 @@ const corsHeaders = {
 
 const TOPIC_LABELS: Record<string, string> = {
   general: 'General enquiry',
+  free_profile: 'Free profile for life',
   account: 'Account help',
   billing: 'Billing & subscriptions',
   technical: 'Technical issue',
@@ -117,6 +118,20 @@ Deno.serve(async (request) => {
 
     if (adminEmails.length === 0) {
       adminEmails.push(fallbackEmail)
+    }
+
+    if (topicValue === 'free_profile') {
+      const { error: inviteError } = await adminClient.from('free_profile_invites').insert({
+        contact_name: trimmedName,
+        email: trimmedEmail,
+        source: 'contact',
+        status: 'contact',
+        contact_message: trimmedMessage,
+      })
+
+      if (inviteError && inviteError.code !== '42P01' && inviteError.code !== 'PGRST205') {
+        console.error('Failed to store free profile request:', inviteError.message)
+      }
     }
 
     const siteUrl = Deno.env.get('SITE_URL') ?? 'https://www.coffeeconnectr.com'

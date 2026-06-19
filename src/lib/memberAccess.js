@@ -33,6 +33,10 @@ export function getAccessSummary(access, now = Date.now()) {
     return 'Admin access'
   }
 
+  if (access.isLifetimeFree || access.status === 'lifetime') {
+    return 'Lifetime free profile'
+  }
+
   if (access.hasAccess && access.status === 'trialing') {
     const days = getTrialDaysRemaining(access.trialEndsAt, now) ?? access.daysRemaining ?? 0
 
