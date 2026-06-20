@@ -362,6 +362,44 @@ export async function adminSendProfileReminderEmail(userId) {
   return data
 }
 
+export async function fetchAdminMembersForMembershipGrant(search = '') {
+  const { data, error } = await supabase.rpc('admin_list_members_for_membership_grant', {
+    p_search: search,
+    p_limit: 50,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
+export async function adminGrantOneYearFreeMembership(userId, planType = null) {
+  const { data, error } = await supabase.rpc('admin_grant_one_year_free_membership', {
+    p_user_id: userId,
+    p_plan_type: planType,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  if (data?.granted === false && data?.reason === 'already_lifetime') {
+    return { granted: false, reason: 'already_lifetime' }
+  }
+
+  if (data?.granted !== true) {
+    throw new Error('Membership grant failed')
+  }
+
+  return {
+    granted: true,
+    currentPeriodEnd: data.currentPeriodEnd ?? data.current_period_end ?? null,
+    planType: data.planType ?? data.plan_type ?? planType,
+  }
+}
+
 export async function submitContentReport({ targetType, targetId, reason, details = '' }) {
   const { data, error } = await supabase.rpc('submit_content_report', {
     p_target_type: targetType,

@@ -52,6 +52,16 @@ export function getAccessSummary(access, now = Date.now()) {
   }
 
   if (access.hasAccess && access.status === 'active') {
+    const days = getTrialDaysRemaining(access.currentPeriodEnd, now)
+
+    if (days != null && days > 0) {
+      if (days === 1) {
+        return 'Free membership — 1 day left'
+      }
+
+      return `Free membership — ${days} days left`
+    }
+
     return `${access.planType === 'business' ? 'Business' : 'Individual'} plan active`
   }
 
