@@ -59,6 +59,12 @@ export default function DiscoverRecommend({ session }) {
     }))
   }
 
+  function resetRecommendForm() {
+    setSubmitted(false)
+    setMessage('')
+    setForm(EMPTY_FORM)
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
     setLoading(true)
@@ -102,7 +108,14 @@ export default function DiscoverRecommend({ session }) {
             you an extra free month.
           </p>
         </div>
-        <DiscoverNavLinks current="recommend" />
+        <DiscoverNavLinks
+          current="recommend"
+          onRepeatCurrent={(key) => {
+            if (key === 'recommend') {
+              resetRecommendForm()
+            }
+          }}
+        />
       </div>
 
       {stats ? <RecommendationStatsPanel stats={stats} compact /> : null}
@@ -117,10 +130,7 @@ export default function DiscoverRecommend({ session }) {
           <button
             type="button"
             className="secondary-button"
-            onClick={() => {
-              setSubmitted(false)
-              setMessage('')
-            }}
+            onClick={resetRecommendForm}
           >
             Recommend another business
           </button>

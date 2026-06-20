@@ -7,7 +7,7 @@ const DISCOVER_LINKS = [
   { to: '/discover/recommend', label: 'Recommend Someone', key: 'recommend' },
 ]
 
-export default function DiscoverNavLinks({ current = null }) {
+export default function DiscoverNavLinks({ current = null, onRepeatCurrent = null }) {
   return (
     <div className="discover-header-actions">
       {DISCOVER_LINKS.map((link) => (
@@ -23,6 +23,12 @@ export default function DiscoverNavLinks({ current = null }) {
             .filter(Boolean)
             .join(' ')}
           aria-current={link.key === current ? 'page' : undefined}
+          onClick={(event) => {
+            if (link.key === current && onRepeatCurrent) {
+              event.preventDefault()
+              onRepeatCurrent(link.key)
+            }
+          }}
         >
           {link.label}
         </Link>
