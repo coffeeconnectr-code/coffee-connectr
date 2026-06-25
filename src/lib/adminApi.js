@@ -375,6 +375,43 @@ export async function fetchAdminMembersForMembershipGrant(search = '') {
   return data ?? []
 }
 
+export async function fetchAdminUsersForAdminAccess(search = '') {
+  const { data, error } = await supabase.rpc('admin_list_users_for_admin_access', {
+    p_search: search,
+    p_limit: 50,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
+export async function adminSetUserAdmin(userId, isAdmin) {
+  const { data, error } = await supabase.rpc('admin_set_user_admin', {
+    p_user_id: userId,
+    p_is_admin: isAdmin,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  if (data?.updated === false && data?.reason === 'last_admin') {
+    return { updated: false, reason: 'last_admin' }
+  }
+
+  if (data?.updated !== true) {
+    throw new Error('Admin access update failed')
+  }
+
+  return {
+    updated: true,
+    isAdmin: Boolean(data.isAdmin ?? data.is_admin ?? isAdmin),
+  }
+}
+
 export async function adminGrantOneYearFreeMembership(userId, planType = null) {
   const { data, error } = await supabase.rpc('admin_grant_one_year_free_membership', {
     p_user_id: userId,

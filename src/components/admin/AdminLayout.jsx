@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/admin/profile-reminders', label: 'Profile reminders' },
   { to: '/admin/free-profiles', label: 'Free profile' },
   { to: '/admin/free-year', label: '1 year free' },
+  { to: '/admin/admins', label: 'Manage admins' },
   { to: '/admin/reports', label: 'Reports' },
   { to: '/admin/verification', label: 'Verification' },
   { to: '/admin/featured', label: 'Featured' },
