@@ -975,6 +975,16 @@ button:disabled {
   margin: 0;
 }
 
+.verification-reference-form .verification-reference-group {
+  margin-top: 1rem;
+}
+
+.verification-reference-review {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
 .verification-request {
   margin-top: 1.25rem;
   padding: 1rem;

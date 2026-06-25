@@ -454,18 +454,6 @@ export async function submitContentReport({ targetType, targetId, reason, detail
   return data
 }
 
-export async function submitVerificationRequest(message = '') {
-  const { data, error } = await supabase.rpc('submit_verification_request', {
-    p_message: message,
-  })
-
-  if (error) {
-    throw error
-  }
-
-  return data
-}
-
 export async function submitFeaturedRequest(message = '') {
   const { data, error } = await supabase.rpc('submit_featured_request', {
     p_message: message,

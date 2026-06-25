@@ -2,6 +2,16 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { adminReviewVerification, fetchAdminVerificationRequests } from '../../lib/adminApi'
 
+function formatReferenceList(references) {
+  const list = references ?? []
+
+  if (!Array.isArray(list) || list.length === 0) {
+    return null
+  }
+
+  return list
+}
+
 export default function AdminVerification() {
   const [status, setStatus] = useState('pending')
   const [requests, setRequests] = useState([])
@@ -79,6 +89,25 @@ export default function AdminVerification() {
               <strong>{request.profile_name || 'Unknown member'}</strong>
               <p className="browse-meta">Status: {request.status}</p>
               {request.message ? <p className="browse-bio">{request.message}</p> : null}
+              {formatReferenceList(request.industry_references ?? request.references)?.map((reference) => (
+                <div key={reference.id ?? reference.sort_order} className="verification-reference-review">
+                  <p className="browse-meta">
+                    <strong>Reference {reference.sort_order}:</strong> {reference.business_name}
+                  </p>
+                  <p className="browse-meta">
+                    {reference.contact_name} · {reference.email} · {reference.phone}
+                  </p>
+                  <p className="browse-meta">{reference.address}</p>
+                  {reference.reference_email_sent_at ? (
+                    <p className="browse-meta">
+                      Reference emailed{' '}
+                      {new Date(reference.reference_email_sent_at).toLocaleDateString()}
+                    </p>
+                  ) : (
+                    <p className="browse-meta">Reference email not sent yet</p>
+                  )}
+                </div>
+              ))}
               {request.admin_reason ? (
                 <p className="browse-meta">Admin reason: {request.admin_reason}</p>
               ) : null}
