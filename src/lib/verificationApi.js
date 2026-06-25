@@ -1,5 +1,17 @@
 import { supabase } from './supabase'
 
+const REFERENCE_FIELDS = [
+  { key: 'businessName', label: 'Business name' },
+  { key: 'contactName', label: 'Main contact name' },
+  { key: 'email', label: 'Email' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'address', label: 'Address' },
+]
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
 function normalizeReference(reference) {
   return {
     business_name: reference.businessName.trim(),
@@ -10,7 +22,37 @@ function normalizeReference(reference) {
   }
 }
 
+export function validateVerificationReferences(references) {
+  if (!Array.isArray(references) || references.length !== 3) {
+    return 'Exactly 3 industry references are required.'
+  }
+
+  for (let index = 0; index < references.length; index += 1) {
+    const reference = references[index]
+
+    for (const field of REFERENCE_FIELDS) {
+      const value = reference[field.key]?.trim() ?? ''
+
+      if (!value) {
+        return `Reference ${index + 1}: ${field.label} is required.`
+      }
+    }
+
+    if (!isValidEmail(reference.email.trim().toLowerCase())) {
+      return `Reference ${index + 1}: a valid email is required.`
+    }
+  }
+
+  return null
+}
+
 export async function submitVerificationRequest(message = '', references = []) {
+  const validationError = validateVerificationReferences(references)
+
+  if (validationError) {
+    throw new Error(validationError)
+  }
+
   const normalizedReferences = references.map(normalizeReference)
 
   const { data: requestId, error } = await supabase.rpc('submit_verification_request', {
