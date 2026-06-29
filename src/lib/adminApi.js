@@ -512,3 +512,118 @@ export async function adminResolveMemberFeedback(feedbackId, adminNotes = '') {
     throw error
   }
 }
+
+export async function fetchAdminMemberBroadcastCount(excludeSuspended = true) {
+  const { data, error } = await supabase.rpc('admin_count_member_broadcast_recipients', {
+    p_exclude_suspended: excludeSuspended,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? 0
+}
+
+export async function fetchAdminMemberBroadcasts() {
+  const { data, error } = await supabase.rpc('admin_list_member_broadcasts', {
+    p_limit: 20,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
+export async function adminCreateMemberBroadcast({
+  subject,
+  message,
+  excludeSuspended = true,
+}) {
+  const { data, error } = await supabase.rpc('admin_create_member_broadcast', {
+    p_subject: subject,
+    p_message: message,
+    p_exclude_suspended: excludeSuspended,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  const row = Array.isArray(data) ? data[0] : data
+
+  return {
+    broadcastId: row.broadcast_id,
+    recipientCount: row.recipient_count,
+  }
+}
+
+export async function adminSendMemberBroadcast(broadcastId, onProgress) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session) {
+    throw new Error('Sign in required')
+  }
+
+  let offset = 0
+  let hasMore = true
+  let sentCount = 0
+  let failedCount = 0
+  let totalRecipients = 0
+  let finalStatus = 'sent'
+
+  while (hasMore) {
+    const { data, error } = await supabase.functions.invoke('send-member-broadcast', {
+      body: { broadcastId, offset, batchSize: 25 },
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+
+    if (error) {
+      throw new Error(await parseFunctionError(error))
+    }
+
+    if (data?.skipped) {
+      throw new Error('Resend is not configured for edge functions.')
+    }
+
+    if (data?.error) {
+      throw new Error(data.error)
+    }
+
+    sentCount += data.batchSentCount ?? 0
+    failedCount += data.batchFailedCount ?? 0
+    totalRecipients = data.totalRecipients ?? totalRecipients
+    hasMore = Boolean(data.hasMore)
+    offset = data.nextOffset ?? offset + 25
+    finalStatus = data.status ?? finalStatus
+
+    onProgress?.({
+      processedCount: data.processedCount ?? sentCount + failedCount,
+      totalRecipients,
+      sentCount,
+      failedCount,
+    })
+  }
+
+  await supabase.rpc('log_admin_action', {
+    p_action: 'send_member_broadcast',
+    p_target_type: 'member_broadcast',
+    p_target_id: broadcastId,
+    p_details: {
+      sentCount,
+      failedCount,
+      totalRecipients,
+      status: finalStatus,
+    },
+  }).then(({ error: logError }) => {
+    if (logError) {
+      console.warn('Failed to log admin action:', logError.message)
+    }
+  })
+
+  return { sentCount, failedCount, totalRecipients, status: finalStatus }
+}

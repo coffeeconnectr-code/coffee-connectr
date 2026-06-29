@@ -2091,6 +2091,19 @@ button:disabled {
   margin: 0 0 0.75rem;
 }
 
+.admin-subheading {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1rem;
+}
+
+.admin-broadcast-form {
+  margin-top: 1rem;
+}
+
+.admin-broadcast-form textarea {
+  min-height: 12rem;
+}
+
 .admin-stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));

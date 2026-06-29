@@ -47,6 +47,7 @@ import AdminProfileReminders from './components/admin/AdminProfileReminders'
 import AdminFreeProfiles from './components/admin/AdminFreeProfiles'
 import AdminFreeYearMembership from './components/admin/AdminFreeYearMembership'
 import AdminManageAdmins from './components/admin/AdminManageAdmins'
+import AdminMemberBroadcasts from './components/admin/AdminMemberBroadcasts'
 import useAdminAccess from './hooks/useAdminAccess'
 import useMemberAccess from './hooks/useMemberAccess'
 import { isUuid } from './lib/uuid'
@@ -424,6 +425,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="moderation" element={<AdminModeration />} />
           <Route path="welcome-emails" element={<AdminWelcomeEmails />} />
+          <Route path="member-broadcasts" element={<AdminMemberBroadcasts />} />
           <Route path="profile-reminders" element={<AdminProfileReminders />} />
           <Route path="free-profiles" element={<AdminFreeProfiles />} />
           <Route path="free-year" element={<AdminFreeYearMembership />} />
