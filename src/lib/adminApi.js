@@ -375,6 +375,54 @@ export async function fetchAdminMembersForMembershipGrant(search = '') {
   return data ?? []
 }
 
+function parseGrantResult(data) {
+  if (data?.granted === false && data?.reason) {
+    return { granted: false, reason: data.reason }
+  }
+
+  if (data?.granted !== true) {
+    throw new Error('Grant failed')
+  }
+
+  return { granted: true }
+}
+
+export async function adminGrantLifetimeFreeMembership(userId) {
+  const { data, error } = await supabase.rpc('admin_grant_lifetime_free_membership', {
+    p_user_id: userId,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return parseGrantResult(data)
+}
+
+export async function adminGrantProfileFeatured(userId) {
+  const { data, error } = await supabase.rpc('admin_grant_profile_featured', {
+    p_user_id: userId,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return parseGrantResult(data)
+}
+
+export async function adminGrantProfileVerified(userId) {
+  const { data, error } = await supabase.rpc('admin_grant_profile_verified', {
+    p_user_id: userId,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return parseGrantResult(data)
+}
+
 export async function fetchAdminUsersForAdminAccess(search = '') {
   const { data, error } = await supabase.rpc('admin_list_users_for_admin_access', {
     p_search: search,

@@ -4,6 +4,7 @@ import {
   adminSendFreeProfileInvite,
   fetchAdminFreeProfileInvites,
 } from '../../lib/adminApi'
+import AdminMemberBenefitGrant from './AdminMemberBenefitGrant'
 
 const STATUS_FILTERS = [
   { value: '', label: 'All' },
@@ -151,6 +152,10 @@ export default function AdminFreeProfiles() {
           {sendingDirect ? 'Sending...' : 'Send invite email'}
         </button>
       </form>
+
+      <AdminMemberBenefitGrant benefitType="lifetime_free" />
+
+      <h4 className="admin-subheading">Invites and contact requests</h4>
 
       <div className="admin-tab-row">
         {STATUS_FILTERS.map((filter) => (

@@ -2104,6 +2104,12 @@ button:disabled {
   min-height: 12rem;
 }
 
+.admin-benefit-grant {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
 .admin-stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));

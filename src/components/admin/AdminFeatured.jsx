@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { adminReviewFeatured, fetchAdminFeaturedRequests } from '../../lib/adminApi'
+import AdminMemberBenefitGrant from './AdminMemberBenefitGrant'
 
 export default function AdminFeatured() {
   const [status, setStatus] = useState('pending')
@@ -51,6 +52,13 @@ export default function AdminFeatured() {
   return (
     <div className="admin-panel">
       <h3>Featured queue</h3>
+      <p className="status-message">
+        Review member requests below, or grant featured status directly to an existing member.
+      </p>
+
+      <AdminMemberBenefitGrant benefitType="featured" />
+
+      <h4 className="admin-subheading">Featured requests</h4>
 
       <div className="admin-tab-row">
         {['pending', 'approved', 'rejected', ''].map((item) => (

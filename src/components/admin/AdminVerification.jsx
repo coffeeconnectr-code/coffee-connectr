@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { adminReviewVerification, fetchAdminVerificationRequests } from '../../lib/adminApi'
+import AdminMemberBenefitGrant from './AdminMemberBenefitGrant'
 
 function formatReferenceList(references) {
   const list = references ?? []
@@ -61,6 +62,13 @@ export default function AdminVerification() {
   return (
     <div className="admin-panel">
       <h3>Verification queue</h3>
+      <p className="status-message">
+        Review verification requests below, or grant verified status directly to an existing member.
+      </p>
+
+      <AdminMemberBenefitGrant benefitType="verified" />
+
+      <h4 className="admin-subheading">Verification requests</h4>
 
       <div className="admin-tab-row">
         {['pending', 'approved', 'rejected', ''].map((item) => (
