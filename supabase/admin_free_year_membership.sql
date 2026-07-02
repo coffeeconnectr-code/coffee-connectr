@@ -75,7 +75,7 @@ begin
   set
     plan_type = v_plan_type,
     status = 'active',
-    trial_ends_at = null,
+    trial_ends_at = coalesce(v_subscription.trial_ends_at, now()),
     current_period_end = v_new_period_end,
     canceled_at = null,
     updated_at = now()

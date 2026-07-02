@@ -46,7 +46,7 @@ begin
   set
     is_lifetime_free = true,
     status = 'active',
-    trial_ends_at = null,
+    trial_ends_at = coalesce(trial_ends_at, now()),
     current_period_end = null,
     canceled_at = null,
     updated_at = now()
