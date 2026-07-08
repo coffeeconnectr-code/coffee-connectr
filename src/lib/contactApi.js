@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { isUuid } from './uuid'
+import { trackActivity } from './analytics'
 
 export async function fetchProfileContact(profileUserId) {
   if (!isUuid(profileUserId)) {
@@ -15,6 +16,15 @@ export async function fetchProfileContact(profileUserId) {
   }
 
   const contact = Array.isArray(data) ? data[0] : data
+
+  trackActivity('contact_reveal', {
+    targetType: 'profile',
+    targetId: profileUserId,
+    properties: {
+      hasEmail: Boolean(contact?.contact_email),
+      hasPhone: Boolean(contact?.contact_phone),
+    },
+  })
 
   return {
     email: contact?.contact_email ?? null,

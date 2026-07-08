@@ -37,7 +37,7 @@ export default function PricingPage({ session }) {
                 className={`pricing-plan-card${plan.highlighted ? ' pricing-plan-highlighted' : ''}`}
               >
                 {plan.highlighted ? (
-                  <p className="pricing-plan-badge">First month free</p>
+                  <p className="pricing-plan-badge">90 days free</p>
                 ) : null}
 
                 <p className="pricing-plan-audience">{plan.audience}</p>
@@ -150,7 +150,7 @@ export default function PricingPage({ session }) {
       <section className="info-section">
         <h2>Ready to join?</h2>
         <p>
-          Start with one month free. Put yourself on the map and connect with roasters,
+          Start with 90 days free. Put yourself on the map and connect with roasters,
           technicians, suppliers and more across the coffee world.
         </p>
         <div className="info-actions">

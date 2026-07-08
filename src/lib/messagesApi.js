@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { notifyNewMessage } from './notificationsApi'
+import { trackActivity } from './analytics'
 
 function getOtherUserId(message, currentUserId) {
   return message.sender_id === currentUserId ? message.recipient_id : message.sender_id
@@ -113,6 +114,10 @@ export async function sendMessage({ senderId, recipientId, body }) {
   }
 
   notifyNewMessage(data.id)
+  trackActivity('message_send', {
+    targetType: 'profile',
+    targetId: recipientId,
+  })
 
   return data
 }
@@ -128,6 +133,11 @@ export async function markConversationRead({ currentUserId, otherUserId }) {
   if (error) {
     throw error
   }
+
+  trackActivity('conversation_read', {
+    targetType: 'profile',
+    targetId: otherUserId,
+  })
 }
 
 export function subscribeToConversation({ currentUserId, otherUserId, onMessage }) {

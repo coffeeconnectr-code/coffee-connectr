@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { trackActivity } from './analytics'
 
 const REFERENCE_FIELDS = [
   { key: 'businessName', label: 'Business name' },
@@ -106,6 +107,11 @@ export async function submitVerificationRequest(message = '', references = []) {
       'Your verification request was saved, but reference emails are not configured yet.',
     )
   }
+
+  trackActivity('verification_submit', {
+    targetType: 'verification_request',
+    targetId: requestId,
+  })
 
   return requestId
 }

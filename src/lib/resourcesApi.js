@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { isUuid } from './uuid'
+import { trackActivity } from './analytics'
 
 const RESOURCE_SELECT = `
   id, user_id, post_type, title, description, topic,
@@ -146,6 +147,12 @@ export async function createResourcePost(userId, payload) {
     throw error
   }
 
+  trackActivity('resource_create', {
+    targetType: 'resource',
+    targetId: data.id,
+    properties: { postType: data.post_type },
+  })
+
   return data
 }
 
@@ -174,6 +181,11 @@ export async function updateResourcePost(resourceId, payload) {
     throw error
   }
 
+  trackActivity('resource_update', {
+    targetType: 'resource',
+    targetId: data.id,
+  })
+
   return data
 }
 
@@ -193,6 +205,12 @@ export async function updateResourcePostStatus(resourceId, status) {
     throw error
   }
 
+  trackActivity('resource_status_change', {
+    targetType: 'resource',
+    targetId: data.id,
+    properties: { status },
+  })
+
   return data
 }
 
@@ -206,6 +224,11 @@ export async function deleteResourcePost(resourceId) {
   if (error) {
     throw error
   }
+
+  trackActivity('resource_delete', {
+    targetType: 'resource',
+    targetId: resourceId,
+  })
 }
 
 export async function uploadResourceDocument(file, userId) {

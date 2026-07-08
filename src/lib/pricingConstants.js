@@ -1,8 +1,8 @@
 export const PRICING_LAUNCH_NOTE =
-  'Your first month on Coffee Connectr is free. After that, Individual members pay US$5 per month and Business members pay US$10 per month — billed monthly until you cancel.'
+  'Your first 90 days on Coffee Connectr are free. After that, Individual members pay US$5 per month and Business members pay US$10 per month — billed monthly until you cancel.'
 
 export const PRICING_TRIAL_NOTE =
-  'Every new member gets one free month with full access. When your trial ends, your chosen plan is charged monthly until you cancel.'
+  'Every new member gets 90 days with full access. When your trial ends, your chosen plan is charged monthly until you cancel.'
 
 export const PRICING_PLANS = [
   {
@@ -10,17 +10,17 @@ export const PRICING_PLANS = [
     name: 'Free trial',
     audience: 'New members',
     price: 'Free',
-    period: 'for your first month',
+    period: 'for your first 90 days',
     description:
-      'Try Coffee Connectr with full access for 30 days. Pick Individual or Business billing before your trial ends, or cancel anytime.',
+      'Try Coffee Connectr with full access for 90 days. Pick Individual or Business billing before your trial ends, or cancel anytime.',
     status: 'available',
     highlighted: true,
     features: [
-      'Full platform access for 30 days',
+      'Full platform access for 90 days',
       'Profile on the global map',
       'Discover, message, and connect',
       'Noticeboard browsing and posting',
-      'No charge during your first month',
+      'No charge during your first 90 days',
     ],
   },
   {
@@ -30,11 +30,11 @@ export const PRICING_PLANS = [
     price: 'US$5',
     period: 'per month',
     description:
-      'For solo professionals after your free month. Billed monthly until you cancel.',
+      'For solo professionals after your free trial. Billed monthly until you cancel.',
     status: 'available',
     highlighted: false,
     features: [
-      '1-month free trial included',
+      '90-day free trial included',
       'Profile on the global map',
       'Discover and search members',
       'Direct messaging',
@@ -49,11 +49,11 @@ export const PRICING_PLANS = [
     price: 'US$10',
     period: 'per month',
     description:
-      'For roasteries, suppliers, cafés and coffee businesses after your free month. Billed monthly until you cancel.',
+      'For roasteries, suppliers, cafés and coffee businesses after your free trial. Billed monthly until you cancel.',
     status: 'available',
     highlighted: false,
     features: [
-      '1-month free trial included',
+      '90-day free trial included',
       'Business profile fields',
       'Roaster equipment listings',
       'Enhanced business visibility',
@@ -66,14 +66,14 @@ export const PRICING_PLANS = [
 
 export const PRICING_FAQ = [
   {
-    question: 'Is the first month really free?',
+    question: 'Is the trial really free?',
     answer:
-      'Yes. Every new member gets one full month of access at no cost. You can explore the platform, build your profile, and connect with the industry before any monthly charge begins.',
+      'Yes. Every new member gets 90 days of access at no cost. You can explore the platform, build your profile, and connect with the industry before any monthly charge begins.',
   },
   {
     question: 'When does billing start?',
     answer:
-      'After your first free month. Individual members are then billed US$5 per month. Business members are billed US$10 per month.',
+      'After your 90-day free trial. Individual members are then billed US$5 per month. Business members are billed US$10 per month.',
   },
   {
     question: 'Can I cancel?',
@@ -88,7 +88,7 @@ export const PRICING_FAQ = [
   {
     question: 'Can I browse the map without an account?',
     answer:
-      'Yes. Anyone can explore the map and discover members. Creating your own profile requires signing up and starts your one-month free trial.',
+      'Yes. Anyone can explore the map and discover members. Creating your own profile requires signing up and starts your 90-day free trial.',
   },
   {
     question: 'How do I get started?',

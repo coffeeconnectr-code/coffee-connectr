@@ -55,7 +55,7 @@ export const TERMS_SECTIONS = [
   {
     title: '7. Subscriptions and billing',
     paragraphs: [
-      'New members receive one month of free access. After the free month, Individual memberships are billed at US$5 per month and Business memberships at US$10 per month unless canceled.',
+      'New members receive 90 days of free access. After the free trial, Individual memberships are billed at US$5 per month and Business memberships at US$10 per month unless canceled.',
       'Subscriptions renew monthly until canceled. Pricing and plan features may change, but we will give reasonable notice before changes apply to existing paying members.',
       'When payment processing is enabled, billing will be handled through our payment provider. You are responsible for any applicable taxes.',
       'Refunds, if any, are handled according to the payment provider\'s policies and applicable law.',

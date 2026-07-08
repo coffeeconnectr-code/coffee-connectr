@@ -1,12 +1,16 @@
--- Run in Supabase SQL Editor if new members are not getting their 90-day free trial.
--- Safe to re-run. Does not remove active paid subscriptions.
+-- Run in Supabase SQL Editor → New query → paste → Run
+-- Extends free membership to all users for 90 days and sets 90-day trials for new signups.
+-- Safe to re-run. Does not change lifetime-free or active paid subscriptions.
 --
--- If you have never run subscriptions.sql, run that file first, then run this file.
---
--- After running, check the results table at the bottom — each user should show
--- status = trialing and trial_active = true.
+-- After running, check the verify query at the bottom.
 
--- Recreate provision helper (idempotent)
+-- ---------------------------------------------------------------------------
+-- 1. New signups get a 90-day trial
+-- ---------------------------------------------------------------------------
+
+alter table public.member_subscriptions
+alter column trial_ends_at set default (now() + interval '90 days');
+
 create or replace function public.provision_member_subscription(p_user_id uuid)
 returns void
 language plpgsql
@@ -56,7 +60,10 @@ begin
 end;
 $$;
 
--- Insert missing trials for accounts that never got a subscription row
+-- ---------------------------------------------------------------------------
+-- 2. Extend all non-lifetime, non-paid users to 90 days from now
+-- ---------------------------------------------------------------------------
+
 insert into public.member_subscriptions (
   user_id,
   plan_type,
@@ -79,7 +86,6 @@ where not exists (
 )
 on conflict (user_id) do nothing;
 
--- Reset lapsed trials (keeps active paid and current trials untouched)
 update public.member_subscriptions ms
 set
   plan_type = coalesce(
@@ -87,24 +93,25 @@ set
     ms.plan_type
   ),
   status = 'trialing',
-  trial_started_at = now(),
   trial_ends_at = now() + interval '90 days',
   updated_at = now()
-where not (
+where not coalesce(ms.is_lifetime_free, false)
+and not (
   ms.status = 'active'
-  and (ms.current_period_end is null or ms.current_period_end > now())
-)
-and not (ms.status = 'past_due')
-and not (ms.status = 'trialing' and ms.trial_ends_at > now());
+  and ms.current_period_end is not null
+  and ms.current_period_end > now()
+);
 
+-- ---------------------------------------------------------------------------
 -- Verify
-select
-  u.email,
-  ms.status,
-  ms.trial_ends_at,
-  ms.trial_ends_at > now() as trial_active,
-  public.has_active_member_access(u.id) as has_access
-from auth.users u
-left join public.member_subscriptions ms on ms.user_id = u.id
-order by u.created_at desc
-limit 25;
+-- ---------------------------------------------------------------------------
+-- select
+--   u.email,
+--   ms.status,
+--   ms.trial_ends_at,
+--   ms.trial_ends_at > now() as trial_active,
+--   public.has_active_member_access(u.id) as has_access
+-- from auth.users u
+-- left join public.member_subscriptions ms on ms.user_id = u.id
+-- order by u.created_at desc
+-- limit 25;

@@ -2104,6 +2104,13 @@ button:disabled {
   min-height: 12rem;
 }
 
+.admin-analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
 .admin-benefit-grant {
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
