@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { trackActivity } from './analytics'
 
 const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024
 
@@ -35,6 +36,12 @@ export async function submitMemberFeedback({ message, screenshotUrl = null }) {
   if (error) {
     throw error
   }
+
+  trackActivity('feedback_submit', {
+    targetType: 'feedback',
+    targetId: data,
+    properties: { hasScreenshot: Boolean(screenshotUrl) },
+  })
 
   return data
 }

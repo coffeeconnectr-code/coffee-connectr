@@ -10,6 +10,7 @@ import {
 } from '../lib/authEmailConfirmation'
 import { notifyWelcomeEmail } from '../lib/notificationsApi'
 import { redeemStoredFreeProfileInvite, storeFreeProfileInviteToken } from '../lib/freeProfileInvite'
+import { setAnalyticsUser, trackActivity } from '../lib/analytics'
 
 export default function Auth({ defaultIsSignUp = false, inviteToken = null }) {
   const navigate = useNavigate()
@@ -86,6 +87,8 @@ export default function Auth({ defaultIsSignUp = false, inviteToken = null }) {
 
       if (isSignUp) {
         notifyWelcomeEmail(data.session.user.id, data.session.access_token)
+        setAnalyticsUser(data.session.user.id)
+        trackActivity('sign_up')
       }
 
       const redeemResult = await redeemStoredFreeProfileInvite()

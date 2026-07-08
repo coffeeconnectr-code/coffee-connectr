@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 import { DEFAULT_LISTING_DAYS } from './noticeboardConstants'
 import { isUuid } from './uuid'
+import { trackActivity } from './analytics'
 
 const POST_SELECT = `
   id, user_id, section, title, body, primary_category, secondary_categories,
@@ -178,6 +179,12 @@ export async function createNoticeboardPost(userId, payload) {
     throw error
   }
 
+  trackActivity('listing_create', {
+    targetType: 'listing',
+    targetId: data.id,
+    properties: { section: data.section },
+  })
+
   return data
 }
 
@@ -211,6 +218,11 @@ export async function updateNoticeboardPost(postId, payload) {
     throw error
   }
 
+  trackActivity('listing_update', {
+    targetType: 'listing',
+    targetId: data.id,
+  })
+
   return data
 }
 
@@ -230,6 +242,12 @@ export async function updateNoticeboardPostStatus(postId, status) {
     throw error
   }
 
+  trackActivity('listing_status_change', {
+    targetType: 'listing',
+    targetId: data.id,
+    properties: { status },
+  })
+
   return data
 }
 
@@ -243,6 +261,11 @@ export async function deleteNoticeboardPost(postId) {
   if (error) {
     throw error
   }
+
+  trackActivity('listing_delete', {
+    targetType: 'listing',
+    targetId: postId,
+  })
 }
 
 export async function uploadNoticeboardPhoto(file, userId) {

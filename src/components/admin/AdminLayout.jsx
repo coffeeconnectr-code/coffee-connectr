@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { to: '/admin/moderation', label: 'Moderation' },
   { to: '/admin/welcome-emails', label: 'Welcome emails' },
   { to: '/admin/member-broadcasts', label: 'Member updates' },
+  { to: '/admin/analytics', label: 'Analytics' },
   { to: '/admin/profile-reminders', label: 'Profile reminders' },
   { to: '/admin/free-profiles', label: 'Free profile' },
   { to: '/admin/free-year', label: '1 year free' },

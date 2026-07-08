@@ -48,10 +48,13 @@ import AdminFreeProfiles from './components/admin/AdminFreeProfiles'
 import AdminFreeYearMembership from './components/admin/AdminFreeYearMembership'
 import AdminManageAdmins from './components/admin/AdminManageAdmins'
 import AdminMemberBroadcasts from './components/admin/AdminMemberBroadcasts'
+import AdminAnalytics from './components/admin/AdminAnalytics'
 import useAdminAccess from './hooks/useAdminAccess'
 import useMemberAccess from './hooks/useMemberAccess'
+import useAnalytics from './hooks/useAnalytics'
 import { isUuid } from './lib/uuid'
 import { redeemStoredFreeProfileInvite } from './lib/freeProfileInvite'
+import { trackActivity } from './lib/analytics'
 import {
   enforceEmailConfirmation,
   userNeedsEmailConfirmation,
@@ -336,6 +339,8 @@ export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  useAnalytics(session)
+
   useEffect(() => {
     let active = true
 
@@ -361,6 +366,10 @@ export default function App() {
       }
 
       setSession(session)
+
+      if (event === 'SIGNED_IN' && session?.user?.id && !userNeedsEmailConfirmation(session.user)) {
+        trackActivity('sign_in')
+      }
 
       if (
         session?.user?.id &&
@@ -399,6 +408,7 @@ export default function App() {
   }, [])
 
   async function handleSignOut() {
+    trackActivity('sign_out')
     await supabase.auth.signOut()
   }
 
@@ -426,6 +436,7 @@ export default function App() {
           <Route path="moderation" element={<AdminModeration />} />
           <Route path="welcome-emails" element={<AdminWelcomeEmails />} />
           <Route path="member-broadcasts" element={<AdminMemberBroadcasts />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="profile-reminders" element={<AdminProfileReminders />} />
           <Route path="free-profiles" element={<AdminFreeProfiles />} />
           <Route path="free-year" element={<AdminFreeYearMembership />} />

@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { sortBrowseProfiles } from './browseApi'
+import { trackActivity } from './analytics'
 
 export async function fetchFavouriteIds(userId) {
   const { data, error } = await supabase
@@ -38,6 +39,11 @@ export async function addFavourite(userId, favouriteUserId) {
   if (error) {
     throw error
   }
+
+  trackActivity('profile_save', {
+    targetType: 'profile',
+    targetId: favouriteUserId,
+  })
 }
 
 export async function removeFavourite(userId, favouriteUserId) {
@@ -50,6 +56,11 @@ export async function removeFavourite(userId, favouriteUserId) {
   if (error) {
     throw error
   }
+
+  trackActivity('profile_unsave', {
+    targetType: 'profile',
+    targetId: favouriteUserId,
+  })
 }
 
 export async function fetchSavedProfiles(userId) {

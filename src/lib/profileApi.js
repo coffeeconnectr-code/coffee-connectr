@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { isUuid } from './uuid'
+import { trackActivity } from './analytics'
 
 const OWN_PROFILE_SELECT = '*, profile_roasters(*), profile_sites(*)'
 
@@ -72,6 +73,12 @@ export async function saveProfile(profile) {
   if (error) {
     throw error
   }
+
+  trackActivity('profile_update', {
+    targetType: 'profile',
+    targetId: data.user_id,
+    properties: { profileType: data.profile_type },
+  })
 
   return data
 }

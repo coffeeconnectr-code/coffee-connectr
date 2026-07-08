@@ -2,7 +2,7 @@
 -- ORDER: Run AFTER profiles.sql, messages.sql, noticeboard.sql, favourites.sql, and admin.sql
 --
 -- Member access rules:
--- - New members get a 30-day free trial
+-- - New members get a 90-day free trial
 -- - After trial: Individual US$5/month or Business US$10/month (billing via Stripe later)
 -- - Expired members lose public visibility and cannot message, save, or post listings
 
@@ -17,7 +17,7 @@ create table if not exists public.member_subscriptions (
     status in ('trialing', 'active', 'past_due', 'canceled', 'expired')
   ),
   trial_started_at timestamptz not null default now(),
-  trial_ends_at timestamptz not null default (now() + interval '30 days'),
+  trial_ends_at timestamptz not null default (now() + interval '90 days'),
   current_period_end timestamptz,
   canceled_at timestamptz,
   stripe_customer_id text,
@@ -83,7 +83,7 @@ begin
       'individual',
       'trialing',
       now(),
-      now() + interval '30 days'
+      now() + interval '90 days'
     );
     return;
   end if;
@@ -124,7 +124,7 @@ after insert on auth.users
 for each row
 execute function public.handle_new_user_subscription();
 
--- Backfill existing accounts with a fresh 30-day trial window
+-- Backfill existing accounts with a fresh 90-day trial window
 insert into public.member_subscriptions (
   user_id,
   plan_type,
@@ -137,7 +137,7 @@ select
   'individual',
   'trialing',
   now(),
-  now() + interval '30 days'
+  now() + interval '90 days'
 from auth.users
 on conflict (user_id) do nothing;
 

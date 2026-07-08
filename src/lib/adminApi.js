@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { notifyNewReport } from './notificationsApi'
+import { trackActivity } from './analytics'
 
 export async function checkIsAdmin() {
   const { data, error } = await supabase.rpc('is_current_user_admin')
@@ -498,6 +499,11 @@ export async function submitContentReport({ targetType, targetId, reason, detail
   }
 
   notifyNewReport(data)
+  trackActivity('report_submit', {
+    targetType: targetType,
+    targetId: targetId,
+    properties: { reason },
+  })
 
   return data
 }
@@ -510,6 +516,11 @@ export async function submitFeaturedRequest(message = '') {
   if (error) {
     throw error
   }
+
+  trackActivity('featured_request_submit', {
+    targetType: 'featured_request',
+    targetId: data,
+  })
 
   return data
 }
@@ -674,4 +685,71 @@ export async function adminSendMemberBroadcast(broadcastId, onProgress) {
   })
 
   return { sentCount, failedCount, totalRecipients, status: finalStatus }
+}
+
+export async function fetchAdminAnalyticsSummary(days = 30) {
+  const { data, error } = await supabase.rpc('admin_get_analytics_summary', {
+    p_days: days,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return {
+    days: data?.days ?? days,
+    activeMembers: data?.activeMembers ?? data?.active_members ?? 0,
+    totalEvents: data?.totalEvents ?? data?.total_events ?? 0,
+    totalMinutes: data?.totalMinutes ?? data?.total_minutes ?? 0,
+    topEvents: data?.topEvents ?? data?.top_events ?? [],
+    topPages: data?.topPages ?? data?.top_pages ?? [],
+    dailyActive: data?.dailyActive ?? data?.daily_active ?? [],
+    featureUsage: data?.featureUsage ?? data?.feature_usage ?? [],
+  }
+}
+
+export async function fetchAdminMemberActivity(search = '', days = 30) {
+  const { data, error } = await supabase.rpc('admin_list_member_activity', {
+    p_search: search,
+    p_days: days,
+    p_limit: 50,
+    p_offset: 0,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return (data ?? []).map((row) => ({
+    user_id: row.user_id,
+    email: row.email,
+    profile_name: row.profile_name,
+    profile_type: row.profile_type,
+    last_seen_at: row.last_seen_at,
+    total_time_seconds: row.total_time_seconds,
+    event_count: row.event_count,
+    session_count: row.session_count,
+    top_page: row.top_page,
+  }))
+}
+
+export async function fetchAdminActivityEvents({
+  search = '',
+  eventName = '',
+  days = 30,
+  limit = 100,
+} = {}) {
+  const { data, error } = await supabase.rpc('admin_list_activity_events', {
+    p_search: search,
+    p_event_name: eventName,
+    p_days: days,
+    p_limit: limit,
+    p_offset: 0,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
 }
